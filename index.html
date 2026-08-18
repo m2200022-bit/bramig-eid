@@ -13,18 +13,18 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
   :root{
-    --maroon-950:#6d0f2b; --maroon-900:#6d0f2b; --maroon-800:#8A1538; --maroon-700:#a83c5b; --maroon-600:#a83c5b;
-    --maroon-100:#f3ecde; --maroon-50:#FBF7EF; --gold:#C8A951; --gold-d:#a8893a; --red:#9e2b2b; --ink:#2b2320; --line:#e4d9c6; --white:#ffffff;
+    /* لوحة خضراء فاتحة تميل للبياض — بروح تصميم الملف المرجعي */
+    --maroon-950:#1F5B43; --maroon-900:#24684C; --maroon-800:#2F7D4F; --maroon-700:#3E9163; --maroon-600:#4FA574;
+    --maroon-100:#DCEDE3; --maroon-50:#F4F9F6; --gold:#7FBF9A; --gold-d:#5FA87F; --red:#9e2b2b; --ink:#16212B; --line:#DCE7E0; --white:#ffffff;
     --font-body:'Almohanad long kaf','Almohanad','Tajawal','Sakkal Majalla','Cairo',sans-serif;
     --font-head:'Almohanad long kaf','Almohanad','Tajawal','29LT Bukra','Cairo',sans-serif;
-    --radius:14px; --shadow:0 1px 3px rgba(43,35,32,.08),0 6px 24px rgba(138,21,56,.08);
+    --radius:10px; --shadow:0 1px 2px rgba(31,91,67,.06),0 4px 14px rgba(31,91,67,.06);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{font-family:var(--font-body); font-size:14px; background:var(--maroon-50); color:var(--ink); min-height:100vh;
-    background-image: linear-gradient(var(--line) 1px, transparent 1px); background-size: 100% 34px;}
+  body{font-family:var(--font-body); font-size:14px; background:#F5F9F7; color:var(--ink); min-height:100vh;}
   #app{display:flex; min-height:100vh;}
-  #sidebar{width:250px; flex:0 0 250px; background:linear-gradient(180deg,var(--maroon-900),var(--maroon-950)); color:var(--white);
+  #sidebar{width:250px; flex:0 0 250px; background:var(--maroon-950); color:var(--white);
     display:flex; flex-direction:column; position:sticky; top:0; height:100vh;}
   .brand{display:flex; align-items:center; gap:10px; padding:20px 16px; border-bottom:1px solid rgba(255,255,255,.12);}
   .brand img{width:42px;height:42px;object-fit:contain;}
@@ -35,7 +35,7 @@
   nav.mainnav button{all:unset; cursor:pointer; display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:8px; font-size:13.5px; color:rgba(255,255,255,.88); transition:background .15s;}
   nav.mainnav button .ic{font-size:17px; width:20px; text-align:center;}
   nav.mainnav button:hover{background:rgba(255,255,255,.08);}
-  nav.mainnav button.active{background:var(--gold); color:var(--maroon-950); font-weight:700;}
+  nav.mainnav button.active{background:var(--maroon-700); color:#fff; font-weight:700;}
   .sidebar-foot{padding:14px; font-size:11px; opacity:.85; border-top:1px solid rgba(255,255,255,.12); display:flex; flex-direction:column; gap:8px;}
   .sidebar-foot button{all:unset; cursor:pointer; background:rgba(255,255,255,.12); color:#fff; padding:7px 10px; border-radius:6px; font-size:12px; text-align:center;}
   .sidebar-foot button:hover{background:rgba(255,255,255,.22);}
@@ -45,9 +45,9 @@
   header.topbar .sub{font-size:12.5px;color:#7a5560;margin-top:3px;}
   .content{padding:24px 26px 60px; flex:1;}
   .card{background:var(--white); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:0 14px 14px; margin-bottom:14px; overflow:hidden;}
-  .card h2{font-family:var(--font-body); font-weight:900; color:#fff; background:#12335c; font-size:14px; margin:0 -14px 12px -14px; padding:10px 14px; border-radius:0; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; border-bottom:none;}
+  .card h2{font-family:var(--font-body); font-weight:900; color:#fff; background:var(--maroon-800); font-size:14px; margin:0 -14px 12px -14px; padding:10px 14px; border-radius:0; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; border-bottom:none;}
   .form-table{width:100%; border-collapse:collapse; margin:0 -14px; width:calc(100% + 28px);}
-  .form-table thead th{background:#c1902f; color:#fff; font-family:var(--font-body); font-weight:900; font-size:14px; padding:10px 14px; text-align:right;}
+  .form-table thead th{background:var(--maroon-100); color:var(--maroon-950); font-family:var(--font-body); font-weight:900; font-size:14px; padding:10px 14px; text-align:right;}
   .form-table tbody td{border:1px solid var(--line); padding:10px 12px; vertical-align:top;}
   .form-table tbody td label{display:block; font-size:12.5px; font-weight:700; color:var(--maroon-800); margin-bottom:5px;}
   .form-table.compact tbody td{padding:6px 8px; white-space:nowrap;}
@@ -92,7 +92,7 @@
   .plus-btn{all:unset; cursor:pointer; width:34px; height:34px; border-radius:7px; flex:0 0 auto; background:var(--maroon-800); color:#fff; font-size:18px; font-weight:800; display:flex; align-items:center; justify-content:center;}
   .plus-btn:hover{background:var(--maroon-900);}
   table{width:100%; border-collapse:collapse; font-size:14px; font-family:var(--font-body);}
-  thead th{background:var(--maroon-800); color:#fff; padding:12px 13px; text-align:right; font-family:var(--font-body); font-weight:800; font-style:normal; font-size:14px;}
+  thead th{background:var(--maroon-100); color:var(--maroon-950); padding:12px 13px; text-align:right; font-family:var(--font-body); font-weight:800; font-style:normal; font-size:14px;}
   tbody td{padding:12px 13px; border-bottom:1px solid var(--line); vertical-align:middle; line-height:1.6;}
   tbody tr:hover{background:var(--maroon-50);}
   .actions-cell{display:flex; gap:4px; flex-wrap:wrap;}
@@ -112,9 +112,9 @@
   .stat-box .num{font-size:15px; font-weight:800; font-family:var(--font-head); font-style:italic; color:var(--maroon-800);}
   .stat-box .lbl{font-size:9.5px; color:#7a5560; margin-top:1px;}
   .tabs{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; background:var(--maroon-50); padding:8px; border-radius:12px;}
-  .tab-btn{all:unset; cursor:pointer; padding:11px 20px; font-size:14px; font-weight:700; color:#8a5a66; border-radius:10px; transition:.15s;}
+  .tab-btn{all:unset; cursor:pointer; padding:11px 20px; font-size:14px; font-weight:700; color:var(--maroon-700); border-radius:10px; transition:.15s;}
   .tab-btn:hover{background:var(--maroon-50);}
-  .tab-btn.active{color:#fff; background:#1d6fa5; box-shadow:0 0 0 3px rgba(29,111,165,.22), 0 4px 14px rgba(29,111,165,.35);}
+  .tab-btn.active{color:#fff; background:var(--maroon-800); box-shadow:0 0 0 3px rgba(47,125,79,.18);}
   .helper{font-size:11.5px; color:#8a6470; margin-top:2px;}
   .divider{height:1px; background:var(--line); margin:16px 0;}
   .supervisor-info{background:var(--maroon-50); border:1px dashed var(--maroon-100); border-radius:8px; padding:10px; font-size:13px; display:flex; gap:16px; flex-wrap:wrap;}
@@ -508,6 +508,10 @@ function doLogin(){
   loggedTrainerId = match.role==='trainer' ? match.trainerId : null;
   currentPage='home'; trainerPortalTab='upcoming'; tpAutoOpened=false;
   renderRoot();
+  setTimeout(()=>{
+    openAnnouncement('✅ النظام متصل بقاعدة البيانات',
+      'جميع البيانات التي تدخلها تُحفظ تلقائيًا في قاعدة بيانات سحابية (Firebase)، وتبقى محفوظة عند إغلاق المتصفح أو الدخول من جهاز آخر، وتتزامن بين جميع المستخدمين.\n\nإذا حدث أي خلل في الحفظ ستظهر لك رسالة تنبيه فورية.');
+  }, 400);
 }
 
 function renderAppShell(root){
@@ -1156,8 +1160,8 @@ function renderOrderForm(sub){
       </tr>
       <tr>
         <td colspan="2"><label>عدد المستهدفين</label><input id="f_count" class="auto-w num" type="number" lang="en" min="0" required value="${editing?editing.participantsCount:''}"></td>
-        <td colspan="2"><label>عدد الأيام</label><input id="f_daysCount" class="auto-w num" type="text" lang="en" readonly style="background:#f4f6fa;" value="${editing?daysCount(editing.date, editing.dateTo):''}"></td>
-        <td colspan="2"><label>المدة بالساعات</label><input id="f_hoursCount" class="auto-w num" type="text" lang="en" readonly style="background:#f4f6fa;" value="${editing?hoursDuration(editing.timeFrom, editing.timeTo, editing.date, editing.dateTo):''}"></td>
+        <td colspan="2"><label>عدد الأيام</label><input id="f_daysCount" class="auto-w num" type="text" lang="en" readonly style="background:#EFF6F2;" value="${editing?daysCount(editing.date, editing.dateTo):''}"></td>
+        <td colspan="2"><label>المدة بالساعات</label><input id="f_hoursCount" class="auto-w num" type="text" lang="en" readonly style="background:#EFF6F2;" value="${editing?hoursDuration(editing.timeFrom, editing.timeTo, editing.date, editing.dateTo):''}"></td>
       </tr>
       <tr>
         <td colspan="6"><label>عنوان المبادرة</label><input id="f_title" style="font-size:18px; padding:11px 14px; width:100%;" required value="${editing?escapeHtml(editing.title):''}"></td>
@@ -1754,7 +1758,7 @@ function trainerMiniTable(o){
   const list = ids.map(id=>state.trainers.find(t=>t.id===id)).filter(Boolean);
   if(!list.length) return '—';
   return list.map(t=>`<div style="display:flex;align-items:center;gap:6px;margin:3px 2px;">
-      <span style="font-weight:800;font-size:10pt;color:#12335c;">${escapeHtml(t.name)}</span>
+      <span style="font-weight:800;font-size:10pt;color:#2F7D4F;">${escapeHtml(t.name)}</span>
       <span style="font-size:9pt;color:#555;">${t.phone?phoneLink(t.phone):'-'}</span>
     </div>`).join('');
 }
@@ -2196,18 +2200,18 @@ function renderQuranEntryForm(sub){
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
       <div class="field"><label>عدد صفحات الحفظ</label><input id="qa_memPages" type="number" lang="en" min="0" value="${editing?editing.memPages:''}"></div>
-      <div class="field"><label>عدد الأجزاء المحفوظة (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_memParts" type="number" lang="en" min="0" value="${editing?editing.memParts:0}" readonly style="background:#f4f6fa;"></div>
+      <div class="field"><label>عدد الأجزاء المحفوظة (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_memParts" type="number" lang="en" min="0" value="${editing?editing.memParts:0}" readonly style="background:#EFF6F2;"></div>
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
       <div class="field"><label>عدد صفحات المراجعة</label><input id="qa_revPages" type="number" lang="en" min="0" value="${editing?editing.revPages:''}"></div>
-      <div class="field"><label>عدد الأجزاء التي تمت مراجعتها (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_revParts" type="number" lang="en" min="0" value="${editing?editing.revParts:0}" readonly style="background:#f4f6fa;"></div>
+      <div class="field"><label>عدد الأجزاء التي تمت مراجعتها (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_revParts" type="number" lang="en" min="0" value="${editing?editing.revParts:0}" readonly style="background:#EFF6F2;"></div>
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
-      <div class="field"><label>المنجز (تلقائي: مجموع الأجزاء المحفوظة + الأجزاء المراجعة)</label><input id="qa_achieved" type="number" lang="en" value="${editing?((editing.memParts||0)+(editing.revParts||0)):0}" readonly style="background:#f4f6fa;"></div>
+      <div class="field"><label>المنجز (تلقائي: مجموع الأجزاء المحفوظة + الأجزاء المراجعة)</label><input id="qa_achieved" type="number" lang="en" value="${editing?((editing.memParts||0)+(editing.revParts||0)):0}" readonly style="background:#EFF6F2;"></div>
       <div class="field"><label>المستهدف الشهري (عدد الأجزاء)</label><input id="qa_target" type="number" lang="en" min="0" step="0.25" value="${editing?editing.monthlyTarget||'':''}"></div>
     </div>
     <div class="grid" style="grid-template-columns:1fr;">
-      <div class="field"><label>نسبة الإنجاز الشهري (%) — تلقائي = (المنجز ÷ المستهدف) × 100</label><input id="qa_pct" type="number" lang="en" value="${editing?editing.completionPct:0}" readonly style="background:#f4f6fa;"></div>
+      <div class="field"><label>نسبة الإنجاز الشهري (%) — تلقائي = (المنجز ÷ المستهدف) × 100</label><input id="qa_pct" type="number" lang="en" value="${editing?editing.completionPct:0}" readonly style="background:#EFF6F2;"></div>
     </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn btn-primary" id="qa_save">${editing?'حفظ التعديلات':'حفظ البيانات'}</button>
@@ -2309,12 +2313,25 @@ function renderQuranReportTab(sub){
       .sort((a,b)=> a.month.localeCompare(b.month) || a.programName.localeCompare(b.programName));
   }
   function totalsOf(list){
-    return list.reduce((t,x)=>({
-      teachersCount:t.teachersCount+x.teachersCount, studentsCount:t.studentsCount+x.studentsCount,
+    const t = list.reduce((t,x)=>({
       memPages:t.memPages+x.memPages, memParts:t.memParts+x.memParts,
       revPages:t.revPages+x.revPages, revParts:t.revParts+x.revParts,
       execDays:t.execDays+x.execDays, pctSum:t.pctSum+x.completionPct
-    }), {teachersCount:0,studentsCount:0,memPages:0,memParts:0,revPages:0,revParts:0,execDays:0,pctSum:0});
+    }), {memPages:0,memParts:0,revPages:0,revParts:0,execDays:0,pctSum:0});
+
+    /* المعلمون والطلاب أشخاص يتكررون كل شهر، فجمعهم شهريًا يضاعف نفس الأشخاص.
+       نحتسب بدلاً من ذلك أعلى عدد سُجّل لكل برنامج خلال الفترة (يمثّل حجم المجموعة
+       الفعلي دون تأثّر بغياب شهر معيّن)، ثم نجمع البرامج المختلفة معًا. */
+    const maxByProgram = {};
+    list.forEach(x=>{
+      const p = x.programName || '';
+      if(!maxByProgram[p]) maxByProgram[p] = {teachers:0, students:0};
+      maxByProgram[p].teachers = Math.max(maxByProgram[p].teachers, x.teachersCount||0);
+      maxByProgram[p].students = Math.max(maxByProgram[p].students, x.studentsCount||0);
+    });
+    t.teachersCount = Object.values(maxByProgram).reduce((s,v)=>s+v.teachers, 0);
+    t.studentsCount = Object.values(maxByProgram).reduce((s,v)=>s+v.students, 0);
+    return t;
   }
   function draw(){
     const list = getList();
@@ -2325,7 +2342,7 @@ function renderQuranReportTab(sub){
       <table><thead><tr><th>اسم البرنامج</th><th>الشهر</th><th>الفترة</th><th>أيام التنفيذ</th><th>آلية التسميع</th><th>المعلمين</th><th>الطلاب</th><th>صفحات الحفظ</th><th>الأجزاء المحفوظة</th><th>صفحات المراجعة</th><th>الأجزاء المراجعة</th><th>نسبة الإنجاز %</th>${currentRole==='admin'?'<th>إجراءات</th>':''}</tr></thead><tbody>
         ${list.map(x=>`<tr><td>${escapeHtml(x.programName)}</td><td>${monthNameAr(x.month)}</td><td>${x.dateFrom||''} — ${x.dateTo||''}</td><td>${x.execDays}</td><td>${escapeHtml(x.method)}</td><td>${x.teachersCount}</td><td>${x.studentsCount}</td><td>${x.memPages}</td><td>${x.memParts}</td><td>${x.revPages}</td><td>${x.revParts}</td><td>${x.completionPct}%</td>${currentRole==='admin'?`<td><button class="icon-btn" title="تعديل" onclick="editQuranRecord('${x.id}')">✏️</button> <button class="icon-btn" title="حذف" onclick="deleteQuranRecord('${x.id}')">🗑️</button></td>`:''}</tr>`).join('') || `<tr><td colspan="13" class="empty-state">لا توجد سجلات مطابقة</td></tr>`}
       </tbody>
-      ${list.length?`<tfoot><tr style="font-weight:900;background:#f4f6fa;"><td colspan="3">الإجمالي</td><td>${t.execDays}</td><td></td><td>${t.teachersCount}</td><td>${t.studentsCount}</td><td>${t.memPages}</td><td>${t.memParts}</td><td>${t.revPages}</td><td>${t.revParts}</td><td>${avgPct}%</td>${currentRole==='admin'?'<td></td>':''}</tr></tfoot>`:''}
+      ${list.length?`<tfoot><tr style="font-weight:900;background:#EFF6F2;"><td colspan="3">الإجمالي</td><td>${t.execDays}</td><td></td><td>${t.teachersCount}</td><td>${t.studentsCount}</td><td>${t.memPages}</td><td>${t.memParts}</td><td>${t.revPages}</td><td>${t.revParts}</td><td>${avgPct}%</td>${currentRole==='admin'?'<td></td>':''}</tr></tfoot>`:''}
       </table>`;
     enhanceReportTable(box);
   }
@@ -3303,7 +3320,7 @@ function renderDistributionsTabContent(c){
           ${allLevels.map(lvl=>{ const found = stats.byLevel.find(x=>x.level===lvl); return `<td>${found?found.count:0}</td>`; }).join('')}
         </tr>`).join('')}
       </tbody>
-      <tfoot><tr style="font-weight:900;background:#f4f6fa;">
+      <tfoot><tr style="font-weight:900;background:#EFF6F2;">
         <td>الإجمالي</td><td>${totals.events}</td><td>${totals.daysTotal}</td><td>${totals.hoursTotal}</td><td>${totals.pathsCount}</td><td>${totals.schoolsTotal}</td>
         ${allLevels.map(lvl=>{ const sum = activeGroups.reduce((s,g)=>{ const found=g.stats.byLevel.find(x=>x.level===lvl); return s+(found?found.count:0); },0); return `<td>${sum}</td>`; }).join('')}
       </tr></tfoot>
@@ -3665,7 +3682,7 @@ async function checkAndShowTrainerPopups(trainer, myOrders){
 }
 function openAnnouncement(title, message){
   const overlay=document.getElementById('modalOverlay'); const box=document.getElementById('modalBox');
-  box.innerHTML = `<h3>${escapeHtml(title)}</h3><p style="font-size:15px;line-height:1.8;">${escapeHtml(message)}</p>
+  box.innerHTML = `<h3>${escapeHtml(title)}</h3><p style="font-size:15px;line-height:1.8;white-space:pre-line;">${escapeHtml(message)}</p>
     <div class="modal-actions"><button class="btn btn-primary" id="ann_ok">حسنًا</button></div>`;
   overlay.classList.add('open');
   document.getElementById('ann_ok').onclick=()=>overlay.classList.remove('open');

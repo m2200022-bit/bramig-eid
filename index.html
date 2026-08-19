@@ -13,18 +13,18 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
   :root{
-    /* لوحة باستيل: نعناعي/سماوي + لافندر + وردي — مستوحاة من الصورة */
-    --maroon-950:#5B6BA8; --maroon-900:#6B7BB8; --maroon-800:#7C8BC7; --maroon-700:#93A0D4; --maroon-600:#A9B4DE;
-    --maroon-100:#E6ECFA; --maroon-50:#F5F8FE; --gold:#F0B7D4; --gold-d:#DE9BC0; --red:#D96A8A; --ink:#3A4A63; --line:#DCE6F5; --white:#ffffff;
+    /* لوحة عنابية أنيقة على خلفية بيضاء — مستوحاة من هوية مركز قطر للقيادات */
+    --maroon-950:#5E0B26; --maroon-900:#70102F; --maroon-800:#8A1538; --maroon-700:#A32348; --maroon-600:#BC3D60;
+    --maroon-100:#F3DCE4; --maroon-50:#FBF3F6; --gold:#C9A227; --gold-d:#A8871C; --red:#9e2b2b; --ink:#2E2A2C; --line:#EADCE2; --white:#ffffff;
     --font-body:'Almohanad long kaf','Almohanad','Tajawal','Sakkal Majalla','Cairo',sans-serif;
     --font-head:'Almohanad long kaf','Almohanad','Tajawal','29LT Bukra','Cairo',sans-serif;
-    --radius:12px; --shadow:0 1px 2px rgba(124,139,199,.08),0 4px 16px rgba(124,139,199,.10);
+    --radius:12px; --shadow:0 1px 2px rgba(138,21,56,.06),0 4px 16px rgba(138,21,56,.08);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{font-family:var(--font-body); font-size:14px; background:linear-gradient(160deg,#EAF6FA 0%,#F2F0FB 45%,#FBEFF5 100%); background-attachment:fixed; color:var(--ink); min-height:100vh;}
+  body{font-family:var(--font-body); font-size:14px; background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 55%,#FBF3F6 100%); background-attachment:fixed; color:var(--ink); min-height:100vh;}
   #app{display:flex; min-height:100vh;}
-  #sidebar{width:250px; flex:0 0 250px; background:linear-gradient(180deg,#7C8BC7 0%,#8FA6D8 55%,#A9B4DE 100%); color:var(--white);
+  #sidebar{width:250px; flex:0 0 250px; background:linear-gradient(180deg,#5E0B26 0%,#7A1233 55%,#8A1538 100%); color:var(--white);
     display:flex; flex-direction:column; position:sticky; top:0; height:100vh;}
   .brand{display:flex; align-items:center; gap:10px; padding:20px 16px; border-bottom:1px solid rgba(255,255,255,.12);}
   .brand img{width:42px;height:42px;object-fit:contain;}
@@ -47,7 +47,7 @@
   .card{background:var(--white); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:0 14px 14px; margin-bottom:14px; overflow:hidden;}
   .card h2{font-family:var(--font-body); font-weight:900; color:#fff; background:var(--maroon-800); font-size:14px; margin:0 -14px 12px -14px; padding:10px 14px; border-radius:0; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; border-bottom:none;}
   .form-table{width:100%; border-collapse:collapse; margin:0 -14px; width:calc(100% + 28px);}
-  .form-table thead th{background:linear-gradient(90deg,#DCEBF7,#E7E4F7,#FBE3EE); color:#4A5A85; font-family:var(--font-body); font-weight:900; font-size:14px; padding:10px 14px; text-align:right;}
+  .form-table thead th{background:var(--maroon-100); color:var(--maroon-950); font-family:var(--font-body); font-weight:900; font-size:14px; padding:10px 14px; text-align:right;}
   .form-table tbody td{border:1px solid var(--line); padding:10px 12px; vertical-align:top;}
   .form-table tbody td label{display:block; font-size:12.5px; font-weight:700; color:var(--maroon-800); margin-bottom:5px;}
   .form-table.compact tbody td{padding:6px 8px; white-space:nowrap;}
@@ -1215,8 +1215,8 @@ function renderOrderForm(sub){
       </tr>
       <tr>
         <td colspan="2"><label>عدد المستهدفين</label><input id="f_count" class="auto-w num" type="number" lang="en" min="0" required value="${editing?editing.participantsCount:''}"></td>
-        <td colspan="2"><label>عدد الأيام</label><input id="f_daysCount" class="auto-w num" type="text" lang="en" readonly style="background:#F2F5FD;" value="${editing?daysCount(editing.date, editing.dateTo):''}"></td>
-        <td colspan="2"><label>المدة بالساعات</label><input id="f_hoursCount" class="auto-w num" type="text" lang="en" readonly style="background:#F2F5FD;" value="${editing?hoursDuration(editing.timeFrom, editing.timeTo, editing.date, editing.dateTo):''}"></td>
+        <td colspan="2"><label>عدد الأيام</label><input id="f_daysCount" class="auto-w num" type="text" lang="en" readonly style="background:#FAF5F7;" value="${editing?daysCount(editing.date, editing.dateTo):''}"></td>
+        <td colspan="2"><label>المدة بالساعات</label><input id="f_hoursCount" class="auto-w num" type="text" lang="en" readonly style="background:#FAF5F7;" value="${editing?hoursDuration(editing.timeFrom, editing.timeTo, editing.date, editing.dateTo):''}"></td>
       </tr>
       <tr>
         <td colspan="6"><label>عنوان المبادرة</label><input id="f_title" style="font-size:18px; padding:11px 14px; width:100%;" required value="${editing?escapeHtml(editing.title):''}"></td>
@@ -1662,7 +1662,7 @@ function findDuplicateSchool(name){
 function quickAddSchool(presetLevel){
   openModal('إضافة مدرسة / جهة جديدة', [
     {name:'name', label:'اسم المدرسة / الجهة', required:true},
-    {name:'level', label:'مكان المبادرة (نوع الجهة)', type:'select', options:LOCATION_TYPES.map(t=>({value:t,label:t}))},
+    {name:'level', label:'المرحلة الدراسية', type:'select', options:LOCATION_TYPES.map(t=>({value:t,label:t}))},
     {name:'email', label:'البريد الإلكتروني (اختياري)'},
   ], async v=>{
     const dup = findDuplicateSchool(v.name);
@@ -1818,7 +1818,7 @@ function trainerMiniTable(o){
   const list = ids.map(id=>state.trainers.find(t=>t.id===id)).filter(Boolean);
   if(!list.length) return '—';
   return list.map(t=>`<div style="display:flex;align-items:center;gap:6px;margin:3px 2px;">
-      <span style="font-weight:800;font-size:10pt;color:#5B6BA8;">${escapeHtml(t.name)}</span>
+      <span style="font-weight:800;font-size:10pt;color:#8A1538;">${escapeHtml(t.name)}</span>
       <span style="font-size:9pt;color:#555;">${t.phone?phoneLink(t.phone):'-'}</span>
     </div>`).join('');
 }
@@ -2267,18 +2267,18 @@ function renderQuranEntryForm(sub){
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
       <div class="field"><label>عدد صفحات الحفظ</label><input id="qa_memPages" type="number" lang="en" min="0" value="${editing?editing.memPages:''}"></div>
-      <div class="field"><label>عدد الأجزاء المحفوظة (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_memParts" type="number" lang="en" min="0" value="${editing?editing.memParts:0}" readonly style="background:#F2F5FD;"></div>
+      <div class="field"><label>عدد الأجزاء المحفوظة (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_memParts" type="number" lang="en" min="0" value="${editing?editing.memParts:0}" readonly style="background:#FAF5F7;"></div>
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
       <div class="field"><label>عدد صفحات المراجعة</label><input id="qa_revPages" type="number" lang="en" min="0" value="${editing?editing.revPages:''}"></div>
-      <div class="field"><label>عدد الأجزاء التي تمت مراجعتها (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_revParts" type="number" lang="en" min="0" value="${editing?editing.revParts:0}" readonly style="background:#F2F5FD;"></div>
+      <div class="field"><label>عدد الأجزاء التي تمت مراجعتها (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_revParts" type="number" lang="en" min="0" value="${editing?editing.revParts:0}" readonly style="background:#FAF5F7;"></div>
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
-      <div class="field"><label>المنجز (تلقائي: مجموع الأجزاء المحفوظة + الأجزاء المراجعة)</label><input id="qa_achieved" type="number" lang="en" value="${editing?((editing.memParts||0)+(editing.revParts||0)):0}" readonly style="background:#F2F5FD;"></div>
+      <div class="field"><label>المنجز (تلقائي: مجموع الأجزاء المحفوظة + الأجزاء المراجعة)</label><input id="qa_achieved" type="number" lang="en" value="${editing?((editing.memParts||0)+(editing.revParts||0)):0}" readonly style="background:#FAF5F7;"></div>
       <div class="field"><label>المستهدف الشهري (عدد الأجزاء)</label><input id="qa_target" type="number" lang="en" min="0" step="0.25" value="${editing?editing.monthlyTarget||'':''}"></div>
     </div>
     <div class="grid" style="grid-template-columns:1fr;">
-      <div class="field"><label>نسبة الإنجاز الشهري (%) — تلقائي = (المنجز ÷ المستهدف) × 100</label><input id="qa_pct" type="number" lang="en" value="${editing?editing.completionPct:0}" readonly style="background:#F2F5FD;"></div>
+      <div class="field"><label>نسبة الإنجاز الشهري (%) — تلقائي = (المنجز ÷ المستهدف) × 100</label><input id="qa_pct" type="number" lang="en" value="${editing?editing.completionPct:0}" readonly style="background:#FAF5F7;"></div>
     </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn btn-primary" id="qa_save">${editing?'حفظ التعديلات':'حفظ البيانات'}</button>
@@ -2409,7 +2409,7 @@ function renderQuranReportTab(sub){
       <table><thead><tr><th>اسم البرنامج</th><th>الشهر</th><th>الفترة</th><th>أيام التنفيذ</th><th>آلية التسميع</th><th>المعلمين</th><th>الطلاب</th><th>صفحات الحفظ</th><th>الأجزاء المحفوظة</th><th>صفحات المراجعة</th><th>الأجزاء المراجعة</th><th>نسبة الإنجاز %</th>${currentRole==='admin'?'<th>إجراءات</th>':''}</tr></thead><tbody>
         ${list.map(x=>`<tr><td>${escapeHtml(x.programName)}</td><td>${monthNameAr(x.month)}</td><td>${x.dateFrom||''} — ${x.dateTo||''}</td><td>${x.execDays}</td><td>${escapeHtml(x.method)}</td><td>${x.teachersCount}</td><td>${x.studentsCount}</td><td>${x.memPages}</td><td>${x.memParts}</td><td>${x.revPages}</td><td>${x.revParts}</td><td>${x.completionPct}%</td>${currentRole==='admin'?`<td><button class="icon-btn" title="تعديل" onclick="editQuranRecord('${x.id}')">✏️</button> <button class="icon-btn" title="حذف" onclick="deleteQuranRecord('${x.id}')">🗑️</button></td>`:''}</tr>`).join('') || `<tr><td colspan="13" class="empty-state">لا توجد سجلات مطابقة</td></tr>`}
       </tbody>
-      ${list.length?`<tfoot><tr style="font-weight:900;background:#F2F5FD;"><td colspan="3">الإجمالي</td><td>${t.execDays}</td><td></td><td>${t.teachersCount}</td><td>${t.studentsCount}</td><td>${t.memPages}</td><td>${t.memParts}</td><td>${t.revPages}</td><td>${t.revParts}</td><td>${avgPct}%</td>${currentRole==='admin'?'<td></td>':''}</tr></tfoot>`:''}
+      ${list.length?`<tfoot><tr style="font-weight:900;background:#FAF5F7;"><td colspan="3">الإجمالي</td><td>${t.execDays}</td><td></td><td>${t.teachersCount}</td><td>${t.studentsCount}</td><td>${t.memPages}</td><td>${t.memParts}</td><td>${t.revPages}</td><td>${t.revParts}</td><td>${avgPct}%</td>${currentRole==='admin'?'<td></td>':''}</tr></tfoot>`:''}
       </table>`;
     enhanceReportTable(box);
   }
@@ -3387,7 +3387,7 @@ function renderDistributionsTabContent(c){
           ${allLevels.map(lvl=>{ const found = stats.byLevel.find(x=>x.level===lvl); return `<td>${found?found.count:0}</td>`; }).join('')}
         </tr>`).join('')}
       </tbody>
-      <tfoot><tr style="font-weight:900;background:#F2F5FD;">
+      <tfoot><tr style="font-weight:900;background:#FAF5F7;">
         <td>الإجمالي</td><td>${totals.events}</td><td>${totals.daysTotal}</td><td>${totals.hoursTotal}</td><td>${totals.pathsCount}</td><td>${totals.schoolsTotal}</td>
         ${allLevels.map(lvl=>{ const sum = activeGroups.reduce((s,g)=>{ const found=g.stats.byLevel.find(x=>x.level===lvl); return s+(found?found.count:0); },0); return `<td>${sum}</td>`; }).join('')}
       </tr></tfoot>
@@ -3834,7 +3834,7 @@ function renderSettingsPage(c){
       <label class="checkbox-chip"><input type="checkbox" id="dm_importAsDone"> تعليم الفعاليات المستوردة كـ "منجزة"</label>
       <button class="icon-btn rect danger" id="dm_dedupe" title="حذف الفعاليات المكررة (نفس العنوان والتاريخ والمدرسة)">🗑️ حذف المكرر من الفعاليات</button>
     </div>
-    <div class="helper" style="margin-top:8px;">أعمدة ملف استيراد الفعاليات: عنوان المبادرة، التاريخ (YYYY-MM-DD)، من الساعة، إلى الساعة، اسم المدرسة، عدد المستهدفين، مسار البرنامج (اختياري)، المدربون بصيغة "الاسم:الهاتف، الاسم:الهاتف" (اختياري). المدارس والمسارات والمدربون غير الموجودين يُنشأون تلقائيًا. الاستيراد يتجاهل تلقائيًا أي صف مطابق (نفس العنوان والتاريخ والمدرسة) لفعالية موجودة مسبقًا.</div>
+    <div class="helper" style="margin-top:8px;">أعمدة ملف استيراد الفعاليات: عنوان المبادرة، التاريخ (YYYY-MM-DD)، من الساعة، إلى الساعة، اسم المدرسة، عدد المستهدفين، مسار البرنامج (اختياري)، المدربون بصيغة "الاسم:الهاتف، الاسم:الهاتف"، اسم المشرف، رقم الجوال، المرحلة الدراسية، البريد الإلكتروني للمدرسة، البريد الإلكتروني للمشرف (كلها اختيارية). المدارس والمسارات والمدربون والمشرفون غير الموجودين يُنشأون تلقائيًا. الاستيراد يتجاهل تلقائيًا أي صف مطابق (نفس العنوان والتاريخ والمدرسة) لفعالية موجودة مسبقًا.</div>
   </div>
   <div class="card">
     <h2>بيانات الجهة والشعار وترويسة الطباعة</h2>
@@ -3975,15 +3975,26 @@ async function importOrdersExcel(file){
       const timeFrom=(r[2]||'').toString().trim(), timeTo=(r[3]||'').toString().trim();
       const schoolName=(r[4]||'').toString().trim(); const participantsCount=(r[5]||'').toString().trim();
       // أعمدة اختيارية إضافية: G = مسار البرنامج (اسم), H = المدربون "الاسم:الهاتف، الاسم:الهاتف"
+      // I = اسم المشرف, J = رقم جوال المشرف
       const ptypeName=(r[6]||'').toString().trim();
       const trainersRaw=(r[7]||'').toString().trim();
+      const supName=(r[8]||'').toString().trim();
+      const supPhone=(r[9]||'').toString().trim();
+      // أعمدة الدمج مع كشف المدارس: K = المرحلة الدراسية, L = بريد المدرسة, M = بريد المشرف
+      const schLevel=(r[10]||'').toString().trim();
+      const schEmail=(r[11]||'').toString().trim();
+      const supEmail=(r[12]||'').toString().trim();
 
       let sch = state.schools.find(s=>s.name===schoolName);
       // فحص التكرار: نفس عنوان المبادرة + نفس التاريخ + نفس المدرسة (سواء موجودة مسبقًا أو ستُنشأ الآن)
       const isDup = state.orders.some(o => normTitle(o.title)===normTitle(title) && o.date===date && sch && o.schoolId===sch.id);
       if(isDup){ skipped++; return; }
 
-      if(!sch && schoolName){ sch={id:uid(), name:schoolName, level:'غير ذلك', supervisors:[]}; state.schools.push(sch); }
+      if(!sch && schoolName){ sch={id:uid(), name:schoolName, level: schLevel||'غير ذلك', email: schEmail, supervisors:[]}; state.schools.push(sch); }
+      else if(sch){
+        if(schLevel && (!sch.level || sch.level==='غير ذلك')) sch.level = schLevel;
+        if(schEmail && !sch.email) sch.email = schEmail;
+      }
 
       let programTypeId = state.programTypes[0]?state.programTypes[0].id:'';
       if(ptypeName){
@@ -4003,13 +4014,25 @@ async function importOrdersExcel(file){
         });
       }
 
+      // المشرف: يُطابق برقم الجوال أو الاسم داخل نفس الجهة، ويُنشأ إن لم يوجد
+      let supervisorId = '';
+      if(sch && (supName || supPhone)){
+        let sv = sch.supervisors.find(x => (supPhone && x.phone===supPhone) || (supName && x.name===supName));
+        if(!sv){ sv = {id:uid(), name: supName||'مشرف (بدون اسم)', phone: supPhone, email: supEmail}; sch.supervisors.push(sv); }
+        else {
+          if(supPhone && !sv.phone) sv.phone = supPhone;
+          if(supEmail && !sv.email) sv.email = supEmail;
+        }
+        supervisorId = sv.id;
+      }
+
       const orderYear = (date || todayStr()).slice(0,4);
       const yearOrders = state.orders.filter(o=>o.date && o.date.slice(0,4)===orderYear);
       const maxSerialThisYear = yearOrders.reduce((m,o)=>Math.max(m,o.serial||0),0);
       state.orders.push({
         id:uid(), serial: maxSerialThisYear+1, createdAt:Date.now(), title, fieldId: state.fields[0]?state.fields[0].id:'',
         participantsCount, date, timeFrom, timeTo, programTypeId,
-        schoolId: sch?sch.id:'', supervisorId:'', trainerIds, requesterNote:'', adminNote:'مستورد من إكسل',
+        schoolId: sch?sch.id:'', supervisorId, trainerIds, requesterNote:'', adminNote:'مستورد من إكسل',
         adminRequests:[], completionStatus: markDone?'تم':'', notDoneReason:'', supervisorRating:0, schoolRating:0, studentsRating:0, recommendSchool:'', evaluatedBy:'', status:'active'
       });
       added++;
@@ -4040,8 +4063,8 @@ function editTrainer(id){
 function editSchool(id){
   const s = state.schools.find(x=>x.id===id); if(!s) return;
   openModal('تعديل مدرسة: '+s.name, [
-    {name:'name', label:'اسم المدرسة', required:true},
-    {name:'level', label:'مكان المبادرة (نوع الجهة)', type:'select', options:LOCATION_TYPES.map(t=>({value:t,label:t}))},
+    {name:'name', label:'اسم المدرسة / الجهة', required:true},
+    {name:'level', label:'المرحلة الدراسية', type:'select', options:LOCATION_TYPES.map(t=>({value:t,label:t}))},
     {name:'email', label:'البريد الإلكتروني للمدرسة (اختياري)'},
   ], async v=>{ s.name=v.name; s.level=v.level; s.email=v.email||''; await saveState(); toast('تم الحفظ'); render(); });
   setTimeout(()=>{ const f=document.getElementById('mf_name'); if(f) f.value=s.name; const l=document.getElementById('mf_level'); if(l) l.value=s.level; const em=document.getElementById('mf_email'); if(em) em.value=s.email||''; },0);

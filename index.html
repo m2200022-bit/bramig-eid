@@ -966,20 +966,29 @@ function renderOrderPage(c){
   if(orderSubTab==='list'){
     sub.innerHTML = `<div class="card"><h2>كل طلبات الفعاليات والمبادرات</h2>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:14px;">
+        <div class="field"><label>🔎 بحث بأمر التكليف</label><input id="ord_serialSearch" type="number" lang="en" placeholder="رقم أمر التكليف..."></div>
         <div class="field"><label>🔎 بحث باسم المدرسة</label><input id="ord_schoolSearch" placeholder="اكتب اسم المدرسة..."></div>
         <div class="field"><label>مقدم المبادرة</label><select id="ord_trainerFilter"><option value="">الكل</option>${state.trainers.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('')}</select></div>
+        <div class="field"><label>مجال المبادرة</label><select id="ord_fieldFilter"><option value="">الكل</option>${state.fields.map(f=>`<option value="${f.id}">${escapeHtml(f.name)}</option>`).join('')}</select></div>
+        <div class="field"><label>مسار المبادرة</label><select id="ord_pathFilter"><option value="">الكل</option>${state.programTypes.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select></div>
         <div class="field"><label>الإنجاز</label><select id="ord_completionFilter"><option value="">الكل</option><option value="تم">تم الإنجاز</option><option value="لم يتم">لم يتم الإنجاز</option><option value="الغيت">أُلغيت</option><option value="المشرف لا يرد">المشرف لا يرد</option><option value="__pending">لم تنجز بعد</option></select></div>
         <div class="field"><label>الحالة</label><select id="ord_statusFilter"><option value="">الكل</option><option value="active">نشطة</option><option value="cancelled">ملغاة</option><option value="postponed">مؤجّلة</option></select></div>
       </div>
       <div id="ord_listResult"></div></div>`;
     function drawFiltered(){
+      const serialQ = document.getElementById('ord_serialSearch').value.trim();
       const q = document.getElementById('ord_schoolSearch').value.trim();
       const trainerFilter = document.getElementById('ord_trainerFilter').value;
+      const fieldFilter = document.getElementById('ord_fieldFilter').value;
+      const pathFilter = document.getElementById('ord_pathFilter').value;
       const completionFilter = document.getElementById('ord_completionFilter').value;
       const statusFilter = document.getElementById('ord_statusFilter').value;
       let list = state.orders.slice().sort((a,b)=>b.serial-a.serial);
+      if(serialQ){ list = list.filter(o=>String(o.serial).includes(serialQ)); }
       if(q){ list = list.filter(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return s && s.name.includes(q); }); }
       if(trainerFilter){ list = list.filter(o=>(o.trainerIds||[]).includes(trainerFilter)); }
+      if(fieldFilter){ list = list.filter(o=>o.fieldId===fieldFilter); }
+      if(pathFilter){ list = list.filter(o=>o.programTypeId===pathFilter); }
       if(completionFilter){
         list = list.filter(o=> completionFilter==='__pending' ? !o.completionStatus : o.completionStatus===completionFilter);
       }
@@ -988,10 +997,8 @@ function renderOrderPage(c){
       box.innerHTML = ordersTableHtml(list, 'otbl_order_list');
       enhanceReportTable(box);
     }
-    document.getElementById('ord_schoolSearch').addEventListener('input', drawFiltered);
-    document.getElementById('ord_trainerFilter').addEventListener('change', drawFiltered);
-    document.getElementById('ord_completionFilter').addEventListener('change', drawFiltered);
-    document.getElementById('ord_statusFilter').addEventListener('change', drawFiltered);
+    ['ord_serialSearch','ord_schoolSearch'].forEach(id=>document.getElementById(id).addEventListener('input', drawFiltered));
+    ['ord_trainerFilter','ord_fieldFilter','ord_pathFilter','ord_completionFilter','ord_statusFilter'].forEach(id=>document.getElementById(id).addEventListener('change', drawFiltered));
     drawFiltered();
     return;
   }
@@ -1003,7 +1010,14 @@ function renderQuickEditSheet(sub){
   sub.innerHTML = `<div class="card">
     <h2>تعديل سريع (جدول)</h2>
     <div class="helper" style="margin-bottom:10px;">عدّل أي خلية مباشرة وسيُحفظ التغيير تلقائيًا فور الخروج منها. حدّد عدة فعاليات بمربعات الاختيار لتعديل مجال المبادرة لها دفعة واحدة.</div>
-    <div class="field" style="max-width:320px;margin-bottom:10px;"><input id="qs_search" placeholder="🔎 بحث بعنوان الفعالية أو المدرسة..."></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:10px;">
+      <div class="field"><label>🔎 أمر التكليف</label><input id="qs_serial" type="number" lang="en" placeholder="رقم..."></div>
+      <div class="field"><label>🔎 العنوان / المدرسة</label><input id="qs_search" placeholder="اكتب للبحث..."></div>
+      <div class="field"><label>مجال المبادرة</label><select id="qs_fFilter"><option value="">الكل</option>${state.fields.map(f=>`<option value="${f.id}">${escapeHtml(f.name)}</option>`).join('')}</select></div>
+      <div class="field"><label>مسار المبادرة</label><select id="qs_pFilter"><option value="">الكل</option>${state.programTypes.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select></div>
+      <div class="field"><label>مكان التنفيذ</label><select id="qs_placeFilter"><option value="">الكل</option>${state.placeTypes.map(p=>`<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('')}</select></div>
+      <div class="field"><label>المرحلة الدراسية</label><select id="qs_levelFilter"><option value="">الكل</option>${LOCATION_TYPES.map(l=>`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('')}</select></div>
+    </div>
     <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
       <select id="qs_bulkField" disabled style="width:auto;">
         <option value="">-- تعديل مجال المبادرة للمحدد --</option>
@@ -1050,17 +1064,27 @@ function renderQuickEditSheet(sub){
 
   function draw(){
     const q = document.getElementById('qs_search').value.trim();
+    const serialQ = document.getElementById('qs_serial').value.trim();
+    const fF = document.getElementById('qs_fFilter').value;
+    const pF = document.getElementById('qs_pFilter').value;
+    const placeF = document.getElementById('qs_placeFilter').value;
+    const levelF = document.getElementById('qs_levelFilter').value;
     let list = state.orders.slice().sort((a,b)=>b.serial-a.serial);
+    if(serialQ){ list = list.filter(o=>String(o.serial).includes(serialQ)); }
     if(q){
       list = list.filter(o=>{
         const s = state.schools.find(x=>x.id===o.schoolId);
         return o.title.includes(q) || (s && s.name.includes(q));
       });
     }
+    if(fF){ list = list.filter(o=>o.fieldId===fF); }
+    if(pF){ list = list.filter(o=>o.programTypeId===pF); }
+    if(placeF){ list = list.filter(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return s && placeTypeLabel(s.level)===placeF; }); }
+    if(levelF){ list = list.filter(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return s && s.level===levelF; }); }
     const wrap = document.getElementById('qs_tableWrap');
     wrap.innerHTML = `<table><thead><tr>
         <th><input type="checkbox" id="qs_selectAll" title="تحديد الكل"></th>
-        <th>رقم</th><th style="min-width:220px;">العنوان</th><th>التاريخ</th><th>من الساعة</th><th>إلى الساعة</th><th style="min-width:180px;">المدرسة</th><th>الإنجاز</th><th>إجراءات</th>
+        <th>رقم</th><th style="min-width:220px;">العنوان</th><th>التاريخ</th><th>من الساعة</th><th>إلى الساعة</th><th style="min-width:180px;">المدرسة</th><th style="min-width:150px;">المجال</th><th style="min-width:150px;">المسار</th><th>الإنجاز</th><th>إجراءات</th>
       </tr></thead><tbody>
         ${list.map(o=>`<tr data-order-id="${o.id}" style="${o.status==='cancelled'?'opacity:.55;':''}">
           <td><input type="checkbox" class="qs-check" data-id="${o.id}" ${selectedIds.has(o.id)?'checked':''}></td>
@@ -1073,6 +1097,14 @@ function renderQuickEditSheet(sub){
             <option value="">—</option>
             ${state.schools.map(s=>`<option value="${s.id}" ${o.schoolId===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}
           </select></td>
+          <td><select class="qs-field" data-field="fieldId">
+            <option value="">—</option>
+            ${state.fields.map(f=>`<option value="${f.id}" ${o.fieldId===f.id?'selected':''}>${escapeHtml(f.name)}</option>`).join('')}
+          </select></td>
+          <td><select class="qs-field" data-field="programTypeId">
+            <option value="">—</option>
+            ${state.programTypes.map(p=>`<option value="${p.id}" ${o.programTypeId===p.id?'selected':''}>${escapeHtml(p.name)}</option>`).join('')}
+          </select></td>
           <td><select class="qs-field" data-field="completionStatus">
             <option value="" ${!o.completionStatus?'selected':''}>لم تنجز بعد</option>
             <option value="تم" ${o.completionStatus==='تم'?'selected':''}>تم</option>
@@ -1084,7 +1116,7 @@ function renderQuickEditSheet(sub){
             <button class="icon-btn" title="ترحيل / تأجيل" onclick="openPostponeModal('${o.id}')">⏩</button>
             <button class="icon-btn danger" title="حذف" onclick="qsDeleteRow('${o.id}')">🗑️</button>
           </td>
-        </tr>`).join('') || `<tr><td colspan="9" class="empty-state">لا توجد فعاليات مطابقة</td></tr>`}
+        </tr>`).join('') || `<tr><td colspan="11" class="empty-state">لا توجد فعاليات مطابقة</td></tr>`}
       </tbody></table>`;
     wrap.querySelectorAll('.qs-field').forEach(el=>{
       el.addEventListener('change', async ()=>{
@@ -1118,7 +1150,8 @@ function renderQuickEditSheet(sub){
     }
     updateBulkToolbar();
   }
-  document.getElementById('qs_search').addEventListener('input', draw);
+  ['qs_search','qs_serial'].forEach(id=>document.getElementById(id).addEventListener('input', draw));
+  ['qs_fFilter','qs_pFilter','qs_placeFilter','qs_levelFilter'].forEach(id=>document.getElementById(id).addEventListener('change', draw));
   draw();
 }
 async function qsDeleteRow(id){
@@ -1279,8 +1312,13 @@ function renderOrderForm(sub){
   document.getElementById('f_school').addEventListener('change', refreshSupervisors);
   document.getElementById('f_supervisor').addEventListener('change', updateSupervisorInfo);
   function recalcDurations(){
-    document.getElementById('f_daysCount').value = document.getElementById('f_date').value ? daysCount(document.getElementById('f_date').value, document.getElementById('f_dateTo').value) : '';
-    document.getElementById('f_hoursCount').value = hoursDuration(document.getElementById('f_timeFrom').value, document.getElementById('f_timeTo').value, document.getElementById('f_date').value, document.getElementById('f_dateTo').value);
+    const dEl = document.getElementById('f_date'), dToEl = document.getElementById('f_dateTo');
+    // فعالية ليوم واحد: يُعبّأ تاريخ الانتهاء تلقائيًا بنفس تاريخ البداية
+    if(dEl.value && !dToEl.value) dToEl.value = dEl.value;
+    // حماية: تاريخ انتهاء أسبق من البداية يُعاد لتاريخ البداية
+    if(dEl.value && dToEl.value && dToEl.value < dEl.value) dToEl.value = dEl.value;
+    document.getElementById('f_daysCount').value = dEl.value ? daysCount(dEl.value, dToEl.value) : '';
+    document.getElementById('f_hoursCount').value = hoursDuration(document.getElementById('f_timeFrom').value, document.getElementById('f_timeTo').value, dEl.value, dToEl.value);
   }
   ['f_date','f_dateTo','f_timeFrom','f_timeTo'].forEach(id=>document.getElementById(id).addEventListener('input', recalcDurations));
   recalcDurations();
@@ -1969,6 +2007,7 @@ function renderAdminPage(c){
     <div class="grid">
       <div class="field"><label>من تاريخ</label><input id="adm_from" type="date" lang="en" value="${today}"></div>
       <div class="field"><label>إلى تاريخ</label><input id="adm_to" type="date" lang="en" value="${today}"></div>
+      <div class="field"><label>🔎 بحث بأمر التكليف</label><input id="adm_serial" type="number" lang="en" placeholder="رقم أمر التكليف..."></div>
     </div>
     <button class="btn btn-primary" id="adm_filter">عرض</button>
     <button class="icon-btn rect" id="adm_print" title="طباعة">🖨️ طباعة</button>
@@ -1979,6 +2018,11 @@ function renderAdminPage(c){
   <div class="card" id="adm_results"></div>`;
   function getList(){
     const from=document.getElementById('adm_from').value, to=document.getElementById('adm_to').value;
+    const serialQ=document.getElementById('adm_serial').value.trim();
+    // البحث برقم أمر التكليف يتجاوز فلتر التاريخ ليجد الفعالية أيًا كان تاريخها
+    if(serialQ){
+      return {list: state.orders.filter(o=>String(o.serial).includes(serialQ)).sort((a,b)=> (a.date||'').localeCompare(b.date||'')), from, to};
+    }
     return {list: state.orders.filter(o=> (!from || o.date>=from) && (!to || o.date<=to)).sort((a,b)=> (a.date||'').localeCompare(b.date||'')), from, to};
   }
   function computeKpis(list){
@@ -2012,6 +2056,7 @@ function renderAdminPage(c){
     enhanceReportTable(box_adm);
   }
   document.getElementById('adm_filter').onclick=doFilter;
+  document.getElementById('adm_serial').addEventListener('input', doFilter);
   document.getElementById('adm_excel').onclick=()=>{
     const {list, from, to}=getList();
     const rows = list.map((o,i)=>{

@@ -1017,6 +1017,21 @@ function renderQuickEditSheet(sub){
   sub.innerHTML = `<div class="card">
     <h2>تعديل سريع (جدول)</h2>
     <div class="helper" style="margin-bottom:10px;">عدّل أي خلية مباشرة وسيُحفظ التغيير تلقائيًا فور الخروج منها. حدّد عدة فعاليات بمربعات الاختيار لتعديل مجال المبادرة لها دفعة واحدة.</div>
+    <details style="margin-bottom:12px;border:1.5px solid var(--line);border-radius:10px;padding:10px;">
+      <summary style="cursor:pointer;font-weight:800;color:var(--maroon-800);">📋 لصق مدخلات من إكسل أو نص — اضغط للفتح</summary>
+      <div class="helper" style="margin:8px 0;">
+        انسخ الصفوف من إكسل والصقها هنا مباشرة. ترتيب الأعمدة:<br>
+        <b>عنوان المبادرة | التاريخ | من الساعة | إلى الساعة | اسم المدرسة | عدد المستهدفين | مسار البرنامج | المدربون | اسم المشرف | رقم الجوال</b><br>
+        الأعمدة بعد "اسم المدرسة" اختيارية. التاريخ بصيغة YYYY-MM-DD. المدربون: <code>الاسم:الهاتف، الاسم:الهاتف</code>
+      </div>
+      <textarea id="qs_paste" placeholder="الصق الصفوف هنا..." style="min-height:120px;font-family:monospace;direction:ltr;text-align:left;"></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center;">
+        <button class="btn btn-primary" id="qs_pasteParse">🔍 معاينة</button>
+        <button class="icon-btn rect" id="qs_pasteApply" disabled>✅ إضافة للجدول</button>
+        <label class="checkbox-chip"><input type="checkbox" id="qs_pasteDone"> تعليمها كـ "تم الإنجاز"</label>
+      </div>
+      <div id="qs_pastePreview" style="margin-top:10px;"></div>
+    </details>
     <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:10px;">
       <div class="field"><label>🔎 أمر التكليف</label><input id="qs_serial" type="number" lang="en" placeholder="رقم..."></div>
       <div class="field"><label>🔎 العنوان / المدرسة</label><input id="qs_search" placeholder="اكتب للبحث..."></div>
@@ -1024,6 +1039,22 @@ function renderQuickEditSheet(sub){
       <div class="field"><label>مسار المبادرة</label><select id="qs_pFilter"><option value="">الكل</option>${state.programTypes.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select></div>
       <div class="field"><label>مكان التنفيذ</label><select id="qs_placeFilter"><option value="">الكل</option>${state.placeTypes.map(p=>`<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('')}</select></div>
       <div class="field"><label>المرحلة الدراسية</label><select id="qs_levelFilter"><option value="">الكل</option>${LOCATION_TYPES.map(l=>`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('')}</select></div>
+      <div class="field"><label>🔍 بحث عن الفراغات في</label><select id="qs_emptyFilter">
+        <option value="">— بدون —</option>
+        <option value="fieldId">مجال المبادرة</option>
+        <option value="programTypeId">مسار المبادرة</option>
+        <option value="date">تاريخ المبادرة من</option>
+        <option value="dateTo">تاريخ الانتهاء</option>
+        <option value="timeFrom">وقت المبادرة من</option>
+        <option value="timeTo">وقت المبادرة إلى</option>
+        <option value="participantsCount">عدد المستهدفين</option>
+        <option value="title">عنوان المبادرة</option>
+        <option value="placeType">مكان التنفيذ</option>
+        <option value="schoolId">مكان المبادرة</option>
+        <option value="supervisorId">المشرف</option>
+        <option value="supPhone">رقم الجوال</option>
+        <option value="trainerIds">المدربون</option>
+      </select></div>
     </div>
     <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
       <select id="qs_bulkField" disabled style="width:auto;">
@@ -1037,17 +1068,114 @@ function renderQuickEditSheet(sub){
         ${state.programTypes.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}
       </select>
       <button class="icon-btn rect" id="qs_bulkApplyPath" disabled title="تطبيق على المحدد">✅ تطبيق</button>
+      <span style="border-right:1.5px solid var(--line); height:24px; margin:0 4px;"></span>
+      <button class="icon-btn rect danger" id="qs_bulkDelete" disabled title="حذف الفعاليات المحددة">🗑️ حذف المحدد</button>
     </div>
     <div id="qs_tableWrap" class="tbl-scroll"></div>
   </div>`;
 
   const selectedIds = new Set();
+
+  /* ===== لصق مدخلات من إكسل/نص ===== */
+  let pastedRows = [];
+  function parsePasted(){
+    const raw = document.getElementById('qs_paste').value;
+    const lines = raw.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    const out = [];
+    lines.forEach(line=>{
+      // يفصل بالتاب (اللصق من إكسل) وإلا بالفاصلة
+      const cells = (line.includes('\t') ? line.split('\t') : line.split(/[,،]/)).map(c=>c.trim());
+      const title = cells[0]||'';
+      if(!title) return;
+      // تجاهل صف العناوين إن لُصق معها
+      if(title==='عنوان المبادرة') return;
+      out.push({
+        title, date:cells[1]||'', timeFrom:cells[2]||'', timeTo:cells[3]||'',
+        schoolName:cells[4]||'', participantsCount:cells[5]||'', ptypeName:cells[6]||'',
+        trainersRaw:cells[7]||'', supName:cells[8]||'', supPhone:cells[9]||''
+      });
+    });
+    return out;
+  }
+  document.getElementById('qs_pasteParse').onclick = ()=>{
+    pastedRows = parsePasted();
+    const box = document.getElementById('qs_pastePreview');
+    if(!pastedRows.length){
+      box.innerHTML = `<div class="empty-state">لم يتم التعرّف على أي صف — تأكد من اللصق ومن ترتيب الأعمدة</div>`;
+      document.getElementById('qs_pasteApply').disabled = true;
+      return;
+    }
+    box.innerHTML = `<div class="helper" style="margin-bottom:6px;">تم التعرّف على <b>${pastedRows.length}</b> صفًا — راجعها ثم اضغط "إضافة للجدول":</div>
+      <div class="tbl-scroll"><table><thead><tr><th>العنوان</th><th>التاريخ</th><th>من</th><th>إلى</th><th>المدرسة</th><th>المستهدفون</th><th>المسار</th><th>المدربون</th><th>المشرف</th><th>الجوال</th></tr></thead><tbody>
+        ${pastedRows.map(r=>`<tr><td>${escapeHtml(r.title)}</td><td>${escapeHtml(r.date)}</td><td>${escapeHtml(r.timeFrom)}</td><td>${escapeHtml(r.timeTo)}</td><td>${escapeHtml(r.schoolName)}</td><td>${escapeHtml(r.participantsCount)}</td><td>${escapeHtml(r.ptypeName)}</td><td>${escapeHtml(r.trainersRaw)}</td><td>${escapeHtml(r.supName)}</td><td>${escapeHtml(r.supPhone)}</td></tr>`).join('')}
+      </tbody></table></div>`;
+    document.getElementById('qs_pasteApply').disabled = false;
+  };
+  document.getElementById('qs_pasteApply').onclick = async ()=>{
+    if(!pastedRows.length){ toast('اضغط "معاينة" أولًا'); return; }
+    const markDone = document.getElementById('qs_pasteDone').checked;
+    const normT = s => (s||'').toString().trim().replace(/\s+/g,' ');
+    let added=0, skipped=0;
+    pastedRows.forEach(r=>{
+      let sch = state.schools.find(s=>s.name===r.schoolName);
+      // منع التكرار: نفس العنوان والتاريخ والمدرسة
+      if(state.orders.some(o=>normT(o.title)===normT(r.title) && o.date===r.date && sch && o.schoolId===sch.id)){ skipped++; return; }
+      if(!sch && r.schoolName){ sch={id:uid(), name:r.schoolName, level:'غير ذلك', email:'', supervisors:[]}; state.schools.push(sch); }
+
+      let programTypeId = state.programTypes[0]?state.programTypes[0].id:'';
+      if(r.ptypeName){
+        let pt = state.programTypes.find(p=>p.name===r.ptypeName);
+        if(!pt){ pt={id:uid(), name:r.ptypeName}; state.programTypes.push(pt); }
+        programTypeId = pt.id;
+      }
+      const trainerIds = [];
+      if(r.trainersRaw){
+        r.trainersRaw.split(/[،,]/).map(s=>s.trim()).filter(Boolean).forEach(entry=>{
+          const [nm, ph] = entry.split(':').map(s=>s?s.trim():'');
+          const name = nm||entry;
+          let tr = state.trainers.find(t=> (ph && t.phone===ph) || t.name===name);
+          if(!tr){ tr={id:uid(), name, phone:ph||''}; state.trainers.push(tr); }
+          trainerIds.push(tr.id);
+        });
+      }
+      let supervisorId='';
+      if(sch && (r.supName || r.supPhone)){
+        let sv = sch.supervisors.find(x=>(r.supPhone && x.phone===r.supPhone) || (r.supName && x.name===r.supName));
+        if(!sv){ sv={id:uid(), name:r.supName||'مشرف (بدون اسم)', phone:r.supPhone, email:''}; sch.supervisors.push(sv); }
+        supervisorId = sv.id;
+      }
+      const yr = (r.date || todayStr()).slice(0,4);
+      const maxSerial = state.orders.filter(o=>o.date && o.date.slice(0,4)===yr).reduce((m,o)=>Math.max(m,o.serial||0),0);
+      state.orders.push({
+        id:uid(), serial:maxSerial+1, createdAt:Date.now(), title:r.title,
+        fieldId: state.fields[0]?state.fields[0].id:'', participantsCount:r.participantsCount,
+        date:r.date, dateTo:r.date, timeFrom:r.timeFrom, timeTo:r.timeTo, programTypeId,
+        schoolId: sch?sch.id:'', supervisorId, trainerIds, requesterNote:'', adminNote:'مُدخل باللصق',
+        adminRequests:[], completionStatus: markDone?'تم':'', notDoneReason:'', supervisorRating:0,
+        schoolRating:0, studentsRating:0, recommendSchool:'', evaluatedBy:'', status:'active'
+      });
+      added++;
+    });
+    await saveState();
+    toast(`تمت إضافة ${added} فعالية${skipped?` — تم تجاهل ${skipped} مكررة`:''}`);
+    document.getElementById('qs_paste').value=''; document.getElementById('qs_pastePreview').innerHTML='';
+    pastedRows=[]; document.getElementById('qs_pasteApply').disabled=true;
+    draw();
+  };
   function updateBulkToolbar(){
     document.getElementById('qs_bulkField').disabled = selectedIds.size<1;
     document.getElementById('qs_bulkApply').disabled = selectedIds.size<1;
     document.getElementById('qs_bulkPath').disabled = selectedIds.size<1;
     document.getElementById('qs_bulkApplyPath').disabled = selectedIds.size<1;
+    document.getElementById('qs_bulkDelete').disabled = selectedIds.size<1;
   }
+  document.getElementById('qs_bulkDelete').onclick = async ()=>{
+    if(selectedIds.size<1){ toast('حدد فعالية واحدة على الأقل'); return; }
+    if(!confirm(`سيتم حذف ${selectedIds.size} فعالية محددة نهائيًا. متابعة؟`)) return;
+    state.orders = state.orders.filter(o=>!selectedIds.has(o.id));
+    const n = selectedIds.size; selectedIds.clear();
+    await saveState(); toast(`تم حذف ${n} فعالية`); draw();
+  };
   document.getElementById('qs_bulkApply').onclick = async ()=>{
     const fieldId = document.getElementById('qs_bulkField').value;
     if(!fieldId){ toast('اختر مجال المبادرة أولًا'); return; }
@@ -1076,6 +1204,7 @@ function renderQuickEditSheet(sub){
     const pF = document.getElementById('qs_pFilter').value;
     const placeF = document.getElementById('qs_placeFilter').value;
     const levelF = document.getElementById('qs_levelFilter').value;
+    const emptyCol = document.getElementById('qs_emptyFilter').value;
     let list = state.orders.slice().sort((a,b)=>b.serial-a.serial);
     if(serialQ){ list = list.filter(o=>String(o.serial).includes(serialQ)); }
     if(q){
@@ -1088,26 +1217,57 @@ function renderQuickEditSheet(sub){
     if(pF){ list = list.filter(o=>o.programTypeId===pF); }
     if(placeF){ list = list.filter(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return s && placeTypeLabel(s.level)===placeF; }); }
     if(levelF){ list = list.filter(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return s && s.level===levelF; }); }
+    // بحث حسب الفراغ: يعرض الصفوف التي يكون فيها العمود المختار فارغًا
+    if(emptyCol){
+      list = list.filter(o=>{
+        const sch = state.schools.find(x=>x.id===o.schoolId);
+        const sup = sch ? sch.supervisors.find(s=>s.id===o.supervisorId) : null;
+        switch(emptyCol){
+          case 'fieldId': return !o.fieldId;
+          case 'programTypeId': return !o.programTypeId;
+          case 'date': return !o.date;
+          case 'dateTo': return !o.dateTo;
+          case 'timeFrom': return !o.timeFrom;
+          case 'timeTo': return !o.timeTo;
+          case 'participantsCount': return !o.participantsCount;
+          case 'title': return !o.title;
+          case 'placeType': return !sch || !sch.level;
+          case 'schoolId': return !o.schoolId;
+          case 'supervisorId': return !o.supervisorId;
+          case 'supPhone': return !sup || !sup.phone;
+          case 'trainerIds': return !(o.trainerIds||[]).length;
+          default: return true;
+        }
+      });
+    }
     const wrap = document.getElementById('qs_tableWrap');
     wrap.innerHTML = `<table><thead><tr>
         <th><input type="checkbox" id="qs_selectAll" title="تحديد الكل"></th>
-        <th>رقم</th><th style="min-width:220px;">العنوان</th><th>التاريخ</th><th>من الساعة</th><th>إلى الساعة</th><th style="min-width:180px;">المدرسة</th><th style="min-width:130px;">مكان التنفيذ</th><th style="min-width:150px;">المجال</th><th style="min-width:150px;">المسار</th><th>الإنجاز</th><th>إجراءات</th>
+        <th>رقم أمر التكليف</th>
+        <th style="min-width:150px;">مجال المبادرة</th>
+        <th style="min-width:150px;">مسار المبادرة</th>
+        <th>تاريخ المبادرة من</th>
+        <th>تاريخ الانتهاء</th>
+        <th>وقت المبادرة من</th>
+        <th>وقت المبادرة إلى</th>
+        <th>عدد المستهدفين</th>
+        <th style="min-width:220px;">عنوان المبادرة</th>
+        <th style="min-width:130px;">مكان التنفيذ</th>
+        <th style="min-width:180px;">مكان المبادرة</th>
+        <th style="min-width:120px;">المرحلة</th>
+        <th style="min-width:150px;">المشرف</th>
+        <th style="min-width:120px;">رقم الجوال</th>
+        <th style="min-width:200px;">بيانات المدربين وهواتفهم</th>
+        <th>الإنجاز</th>
+        <th>إجراءات</th>
       </tr></thead><tbody>
-        ${list.map(o=>`<tr data-order-id="${o.id}" style="${o.status==='cancelled'?'opacity:.55;':''}">
+        ${list.map(o=>{
+          const sch = state.schools.find(x=>x.id===o.schoolId);
+          const sup = sch ? sch.supervisors.find(s=>s.id===o.supervisorId) : null;
+          const trainersTxt = (o.trainerIds||[]).map(id=>{ const t=state.trainers.find(x=>x.id===id); return t?`${t.name}:${t.phone||''}`:''; }).filter(Boolean).join('، ');
+          return `<tr data-order-id="${o.id}" style="${o.status==='cancelled'?'opacity:.55;':''}">
           <td><input type="checkbox" class="qs-check" data-id="${o.id}" ${selectedIds.has(o.id)?'checked':''}></td>
           <td><span class="badge">${o.serial}</span></td>
-          <td><input type="text" class="qs-field" data-field="title" value="${escapeHtml(o.title)}"></td>
-          <td><input type="date" lang="en" class="qs-field" data-field="date" value="${o.date||''}"></td>
-          <td><input type="time" lang="en" class="qs-field" data-field="timeFrom" value="${o.timeFrom||''}"></td>
-          <td><input type="time" lang="en" class="qs-field" data-field="timeTo" value="${o.timeTo||''}"></td>
-          <td><select class="qs-field" data-field="schoolId">
-            <option value="">—</option>
-            ${state.schools.map(s=>`<option value="${s.id}" ${o.schoolId===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}
-          </select></td>
-          <td><select class="qs-place" data-school="${o.schoolId||''}">
-            <option value="">—</option>
-            ${state.placeTypes.map(p=>{ const s=state.schools.find(x=>x.id===o.schoolId); const cur=s?placeTypeLabel(s.level):''; return `<option value="${escapeHtml(p.name)}" ${cur===p.name?'selected':''}>${escapeHtml(p.name)}</option>`; }).join('')}
-          </select></td>
           <td><select class="qs-field" data-field="fieldId">
             <option value="">—</option>
             ${state.fields.map(f=>`<option value="${f.id}" ${o.fieldId===f.id?'selected':''}>${escapeHtml(f.name)}</option>`).join('')}
@@ -1116,6 +1276,30 @@ function renderQuickEditSheet(sub){
             <option value="">—</option>
             ${state.programTypes.map(p=>`<option value="${p.id}" ${o.programTypeId===p.id?'selected':''}>${escapeHtml(p.name)}</option>`).join('')}
           </select></td>
+          <td><input type="date" lang="en" class="qs-field" data-field="date" value="${o.date||''}"></td>
+          <td><input type="date" lang="en" class="qs-field" data-field="dateTo" value="${o.dateTo||''}"></td>
+          <td><input type="time" lang="en" class="qs-field" data-field="timeFrom" value="${o.timeFrom||''}"></td>
+          <td><input type="time" lang="en" class="qs-field" data-field="timeTo" value="${o.timeTo||''}"></td>
+          <td><input type="number" lang="en" min="0" class="qs-field" data-field="participantsCount" value="${o.participantsCount||''}" style="width:90px;"></td>
+          <td><input type="text" class="qs-field" data-field="title" value="${escapeHtml(o.title)}"></td>
+          <td><select class="qs-place">
+            <option value="">—</option>
+            ${state.placeTypes.map(p=>{ const cur=sch?placeTypeLabel(sch.level):''; return `<option value="${escapeHtml(p.name)}" ${cur===p.name?'selected':''}>${escapeHtml(p.name)}</option>`; }).join('')}
+          </select></td>
+          <td><select class="qs-field" data-field="schoolId">
+            <option value="">—</option>
+            ${state.schools.map(s=>`<option value="${s.id}" ${o.schoolId===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}
+          </select></td>
+          <td><select class="qs-level">
+            <option value="">—</option>
+            ${LOCATION_TYPES.map(l=>`<option value="${escapeHtml(l)}" ${sch&&sch.level===l?'selected':''}>${escapeHtml(l)}</option>`).join('')}
+          </select></td>
+          <td><select class="qs-field" data-field="supervisorId">
+            <option value="">—</option>
+            ${(sch?sch.supervisors:[]).map(s=>`<option value="${s.id}" ${o.supervisorId===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}
+          </select></td>
+          <td><input type="text" class="qs-supphone" value="${sup?escapeHtml(sup.phone||''):''}" placeholder="—" style="width:110px;"></td>
+          <td><input type="text" class="qs-trainers" value="${escapeHtml(trainersTxt)}" placeholder="الاسم:الهاتف، الاسم:الهاتف"></td>
           <td><select class="qs-field" data-field="completionStatus">
             <option value="" ${!o.completionStatus?'selected':''}>لم تنجز بعد</option>
             <option value="تم" ${o.completionStatus==='تم'?'selected':''}>تم</option>
@@ -1127,8 +1311,43 @@ function renderQuickEditSheet(sub){
             <button class="icon-btn" title="ترحيل / تأجيل" onclick="openPostponeModal('${o.id}')">⏩</button>
             <button class="icon-btn danger" title="حذف" onclick="qsDeleteRow('${o.id}')">🗑️</button>
           </td>
-        </tr>`).join('') || `<tr><td colspan="12" class="empty-state">لا توجد فعاليات مطابقة</td></tr>`}
+        </tr>`;}).join('') || `<tr><td colspan="18" class="empty-state">لا توجد فعاليات مطابقة</td></tr>`}
       </tbody></table>`;
+    // حفظ رقم جوال المشرف
+    wrap.querySelectorAll('.qs-supphone').forEach(el=>{
+      el.addEventListener('change', async ()=>{
+        const o = state.orders.find(x=>x.id===el.closest('tr').dataset.orderId); if(!o) return;
+        const sch = state.schools.find(s=>s.id===o.schoolId);
+        const sv = sch ? sch.supervisors.find(s=>s.id===o.supervisorId) : null;
+        if(!sv){ toast('اختر المشرف أولًا'); draw(); return; }
+        sv.phone = el.value.trim(); await saveState(); toast('تم حفظ رقم الجوال');
+      });
+    });
+    // حفظ المرحلة على الجهة
+    wrap.querySelectorAll('.qs-level').forEach(el=>{
+      el.addEventListener('change', async ()=>{
+        const o = state.orders.find(x=>x.id===el.closest('tr').dataset.orderId); if(!o) return;
+        const sch = state.schools.find(s=>s.id===o.schoolId);
+        if(!sch){ toast('اختر مكان المبادرة أولًا'); draw(); return; }
+        sch.level = el.value; await saveState(); toast('تم تحديث المرحلة'); draw();
+      });
+    });
+    // حفظ المدربين نصًا "الاسم:الهاتف، ..."
+    wrap.querySelectorAll('.qs-trainers').forEach(el=>{
+      el.addEventListener('change', async ()=>{
+        const o = state.orders.find(x=>x.id===el.closest('tr').dataset.orderId); if(!o) return;
+        const ids=[];
+        el.value.split(/[،,]/).map(s=>s.trim()).filter(Boolean).forEach(entry=>{
+          const [nm,ph]=entry.split(':').map(s=>s?s.trim():'');
+          const name=nm||entry;
+          let tr=state.trainers.find(t=>(ph&&t.phone===ph)||t.name===name);
+          if(!tr){ tr={id:uid(), name, phone:ph||''}; state.trainers.push(tr); }
+          else if(ph && !tr.phone){ tr.phone=ph; }
+          ids.push(tr.id);
+        });
+        o.trainerIds=ids; await saveState(); toast('تم حفظ بيانات المدربين');
+      });
+    });
     wrap.querySelectorAll('.qs-field').forEach(el=>{
       el.addEventListener('change', async ()=>{
         const tr = el.closest('tr');
@@ -1173,7 +1392,7 @@ function renderQuickEditSheet(sub){
     updateBulkToolbar();
   }
   ['qs_search','qs_serial'].forEach(id=>document.getElementById(id).addEventListener('input', draw));
-  ['qs_fFilter','qs_pFilter','qs_placeFilter','qs_levelFilter'].forEach(id=>document.getElementById(id).addEventListener('change', draw));
+  ['qs_fFilter','qs_pFilter','qs_placeFilter','qs_levelFilter','qs_emptyFilter'].forEach(id=>document.getElementById(id).addEventListener('change', draw));
   draw();
 }
 async function qsDeleteRow(id){

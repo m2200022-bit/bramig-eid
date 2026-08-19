@@ -13,18 +13,18 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
   :root{
-    /* لوحة خضراء فاتحة تميل للبياض — بروح تصميم الملف المرجعي */
-    --maroon-950:#1F5B43; --maroon-900:#24684C; --maroon-800:#2F7D4F; --maroon-700:#3E9163; --maroon-600:#4FA574;
-    --maroon-100:#DCEDE3; --maroon-50:#F4F9F6; --gold:#7FBF9A; --gold-d:#5FA87F; --red:#9e2b2b; --ink:#16212B; --line:#DCE7E0; --white:#ffffff;
+    /* لوحة باستيل: نعناعي/سماوي + لافندر + وردي — مستوحاة من الصورة */
+    --maroon-950:#5B6BA8; --maroon-900:#6B7BB8; --maroon-800:#7C8BC7; --maroon-700:#93A0D4; --maroon-600:#A9B4DE;
+    --maroon-100:#E6ECFA; --maroon-50:#F5F8FE; --gold:#F0B7D4; --gold-d:#DE9BC0; --red:#D96A8A; --ink:#3A4A63; --line:#DCE6F5; --white:#ffffff;
     --font-body:'Almohanad long kaf','Almohanad','Tajawal','Sakkal Majalla','Cairo',sans-serif;
     --font-head:'Almohanad long kaf','Almohanad','Tajawal','29LT Bukra','Cairo',sans-serif;
-    --radius:10px; --shadow:0 1px 2px rgba(31,91,67,.06),0 4px 14px rgba(31,91,67,.06);
+    --radius:12px; --shadow:0 1px 2px rgba(124,139,199,.08),0 4px 16px rgba(124,139,199,.10);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{font-family:var(--font-body); font-size:14px; background:#F5F9F7; color:var(--ink); min-height:100vh;}
+  body{font-family:var(--font-body); font-size:14px; background:linear-gradient(160deg,#EAF6FA 0%,#F2F0FB 45%,#FBEFF5 100%); background-attachment:fixed; color:var(--ink); min-height:100vh;}
   #app{display:flex; min-height:100vh;}
-  #sidebar{width:250px; flex:0 0 250px; background:var(--maroon-950); color:var(--white);
+  #sidebar{width:250px; flex:0 0 250px; background:linear-gradient(180deg,#7C8BC7 0%,#8FA6D8 55%,#A9B4DE 100%); color:var(--white);
     display:flex; flex-direction:column; position:sticky; top:0; height:100vh;}
   .brand{display:flex; align-items:center; gap:10px; padding:20px 16px; border-bottom:1px solid rgba(255,255,255,.12);}
   .brand img{width:42px;height:42px;object-fit:contain;}
@@ -47,7 +47,7 @@
   .card{background:var(--white); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:0 14px 14px; margin-bottom:14px; overflow:hidden;}
   .card h2{font-family:var(--font-body); font-weight:900; color:#fff; background:var(--maroon-800); font-size:14px; margin:0 -14px 12px -14px; padding:10px 14px; border-radius:0; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; border-bottom:none;}
   .form-table{width:100%; border-collapse:collapse; margin:0 -14px; width:calc(100% + 28px);}
-  .form-table thead th{background:var(--maroon-100); color:var(--maroon-950); font-family:var(--font-body); font-weight:900; font-size:14px; padding:10px 14px; text-align:right;}
+  .form-table thead th{background:linear-gradient(90deg,#DCEBF7,#E7E4F7,#FBE3EE); color:#4A5A85; font-family:var(--font-body); font-weight:900; font-size:14px; padding:10px 14px; text-align:right;}
   .form-table tbody td{border:1px solid var(--line); padding:10px 12px; vertical-align:top;}
   .form-table tbody td label{display:block; font-size:12.5px; font-weight:700; color:var(--maroon-800); margin-bottom:5px;}
   .form-table.compact tbody td{padding:6px 8px; white-space:nowrap;}
@@ -183,21 +183,26 @@
    بدون أي دوال serverless. */
 let state = null;
 /* تصنيف مكان المبادرة الموحّد: مراحل دراسية للمدارس الحكومية + أنواع جهات أخرى */
-const LOCATION_TYPES = ['ابتدائي','إعدادي','ثانوي','خاصة','جامعة','نادي','استراحة','مركز','غير ذلك'];
-/* يربط تصنيف "مكان التنفيذ" (مدارس حكومية/خاصة/نادي...) بقيم level الفعلية للمدرسة/الجهة */
+const LOCATION_TYPES = ['مدرسة','مدارس حكومية','مدارس خاصة','نادي','مركز','استراحة','جامعة','مكان عام','ابتدائي','إعدادي','ثانوي','خاصة','غير ذلك'];
+/* يربط تصنيف "مكان التنفيذ" بقيم level المخزّنة (يقبل التسمية الجديدة والقديمة معًا) */
 function levelsForPlaceType(typeName){
   const map = {
-    'مدارس حكومية': ['ابتدائي','إعدادي','ثانوي'],
-    'مدارس خاصة': ['خاصة'],
+    'مدرسة': ['مدرسة','مدارس حكومية','مدارس خاصة','ابتدائي','إعدادي','ثانوي','خاصة'],
+    'مدارس حكومية': ['مدارس حكومية','ابتدائي','إعدادي','ثانوي'],
+    'مدارس خاصة': ['مدارس خاصة','خاصة'],
     'نادي': ['نادي'],
     'مركز': ['مركز'],
     'استراحة': ['استراحة'],
-    'مكان عام': ['غير ذلك','جامعة'],
+    'جامعة': ['جامعة'],
+    'مكان عام': ['مكان عام','غير ذلك'],
   };
   return map[typeName] || [];
 }
 /* الاتجاه المعاكس: يحوّل level المدرسة إلى اسم تصنيف "مكان التنفيذ" لعرضه في التقارير */
 function placeTypeLabel(level){
+  // القيم المخزّنة بتسمية "مكان التنفيذ" تُعاد كما هي
+  if(['مدرسة','مدارس حكومية','مدارس خاصة','نادي','مركز','استراحة','جامعة','مكان عام'].includes(level)) return level;
+  // توافق مع القيم القديمة (المراحل الدراسية)
   if(['ابتدائي','إعدادي','ثانوي'].includes(level)) return 'مدارس حكومية';
   if(level==='خاصة') return 'مدارس خاصة';
   if(level==='نادي') return 'نادي';
@@ -235,11 +240,13 @@ function defaultState(){
       {id:uid(), name:'قفشات ومياه', category:'ضيافة'},
     ],
     placeTypes:[
+      {id:uid(), name:'مدرسة'},
       {id:uid(), name:'مدارس حكومية'},
       {id:uid(), name:'مدارس خاصة'},
       {id:uid(), name:'نادي'},
       {id:uid(), name:'مركز'},
       {id:uid(), name:'استراحة'},
+      {id:uid(), name:'جامعة'},
       {id:uid(), name:'مكان عام'},
     ],
     users:[
@@ -306,7 +313,7 @@ async function loadState(){
       if(!state.reminderFlags) state.reminderFlags={};
       if(!state.quranActivities) state.quranActivities=[];
       if(!state.placeTypes || !state.placeTypes.length){
-        state.placeTypes = ['مدارس حكومية','مدارس خاصة','نادي','مركز','استراحة','مكان عام'].map(name=>({id:uid(), name}));
+        state.placeTypes = ['مدرسة','مدارس حكومية','مدارس خاصة','نادي','مركز','استراحة','جامعة','مكان عام'].map(name=>({id:uid(), name}));
       }
       if(!state.__locationTypesMigrated){
         (state.schools||[]).forEach(s=>{
@@ -1084,7 +1091,7 @@ function renderQuickEditSheet(sub){
     const wrap = document.getElementById('qs_tableWrap');
     wrap.innerHTML = `<table><thead><tr>
         <th><input type="checkbox" id="qs_selectAll" title="تحديد الكل"></th>
-        <th>رقم</th><th style="min-width:220px;">العنوان</th><th>التاريخ</th><th>من الساعة</th><th>إلى الساعة</th><th style="min-width:180px;">المدرسة</th><th style="min-width:150px;">المجال</th><th style="min-width:150px;">المسار</th><th>الإنجاز</th><th>إجراءات</th>
+        <th>رقم</th><th style="min-width:220px;">العنوان</th><th>التاريخ</th><th>من الساعة</th><th>إلى الساعة</th><th style="min-width:180px;">المدرسة</th><th style="min-width:130px;">مكان التنفيذ</th><th style="min-width:150px;">المجال</th><th style="min-width:150px;">المسار</th><th>الإنجاز</th><th>إجراءات</th>
       </tr></thead><tbody>
         ${list.map(o=>`<tr data-order-id="${o.id}" style="${o.status==='cancelled'?'opacity:.55;':''}">
           <td><input type="checkbox" class="qs-check" data-id="${o.id}" ${selectedIds.has(o.id)?'checked':''}></td>
@@ -1096,6 +1103,10 @@ function renderQuickEditSheet(sub){
           <td><select class="qs-field" data-field="schoolId">
             <option value="">—</option>
             ${state.schools.map(s=>`<option value="${s.id}" ${o.schoolId===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}
+          </select></td>
+          <td><select class="qs-place" data-school="${o.schoolId||''}">
+            <option value="">—</option>
+            ${state.placeTypes.map(p=>{ const s=state.schools.find(x=>x.id===o.schoolId); const cur=s?placeTypeLabel(s.level):''; return `<option value="${escapeHtml(p.name)}" ${cur===p.name?'selected':''}>${escapeHtml(p.name)}</option>`; }).join('')}
           </select></td>
           <td><select class="qs-field" data-field="fieldId">
             <option value="">—</option>
@@ -1116,7 +1127,7 @@ function renderQuickEditSheet(sub){
             <button class="icon-btn" title="ترحيل / تأجيل" onclick="openPostponeModal('${o.id}')">⏩</button>
             <button class="icon-btn danger" title="حذف" onclick="qsDeleteRow('${o.id}')">🗑️</button>
           </td>
-        </tr>`).join('') || `<tr><td colspan="11" class="empty-state">لا توجد فعاليات مطابقة</td></tr>`}
+        </tr>`).join('') || `<tr><td colspan="12" class="empty-state">لا توجد فعاليات مطابقة</td></tr>`}
       </tbody></table>`;
     wrap.querySelectorAll('.qs-field').forEach(el=>{
       el.addEventListener('change', async ()=>{
@@ -1127,6 +1138,17 @@ function renderQuickEditSheet(sub){
         o[field] = el.value;
         await saveState();
         toast('تم الحفظ');
+      });
+    });
+    wrap.querySelectorAll('.qs-place').forEach(el=>{
+      el.addEventListener('change', async ()=>{
+        const tr = el.closest('tr');
+        const o = state.orders.find(x=>x.id===tr.dataset.orderId); if(!o) return;
+        const sch = state.schools.find(s=>s.id===o.schoolId);
+        if(!sch){ toast('اختر المدرسة/الجهة أولًا'); draw(); return; }
+        sch.level = el.value;   // مكان التنفيذ يُخزَّن على الجهة نفسها
+        await saveState();
+        toast(`تم تحديث مكان التنفيذ لـ "${sch.name}"`);
       });
     });
     wrap.querySelectorAll('.qs-check').forEach(cb=>{
@@ -1193,8 +1215,8 @@ function renderOrderForm(sub){
       </tr>
       <tr>
         <td colspan="2"><label>عدد المستهدفين</label><input id="f_count" class="auto-w num" type="number" lang="en" min="0" required value="${editing?editing.participantsCount:''}"></td>
-        <td colspan="2"><label>عدد الأيام</label><input id="f_daysCount" class="auto-w num" type="text" lang="en" readonly style="background:#EFF6F2;" value="${editing?daysCount(editing.date, editing.dateTo):''}"></td>
-        <td colspan="2"><label>المدة بالساعات</label><input id="f_hoursCount" class="auto-w num" type="text" lang="en" readonly style="background:#EFF6F2;" value="${editing?hoursDuration(editing.timeFrom, editing.timeTo, editing.date, editing.dateTo):''}"></td>
+        <td colspan="2"><label>عدد الأيام</label><input id="f_daysCount" class="auto-w num" type="text" lang="en" readonly style="background:#F2F5FD;" value="${editing?daysCount(editing.date, editing.dateTo):''}"></td>
+        <td colspan="2"><label>المدة بالساعات</label><input id="f_hoursCount" class="auto-w num" type="text" lang="en" readonly style="background:#F2F5FD;" value="${editing?hoursDuration(editing.timeFrom, editing.timeTo, editing.date, editing.dateTo):''}"></td>
       </tr>
       <tr>
         <td colspan="6"><label>عنوان المبادرة</label><input id="f_title" style="font-size:18px; padding:11px 14px; width:100%;" required value="${editing?escapeHtml(editing.title):''}"></td>
@@ -1796,7 +1818,7 @@ function trainerMiniTable(o){
   const list = ids.map(id=>state.trainers.find(t=>t.id===id)).filter(Boolean);
   if(!list.length) return '—';
   return list.map(t=>`<div style="display:flex;align-items:center;gap:6px;margin:3px 2px;">
-      <span style="font-weight:800;font-size:10pt;color:#2F7D4F;">${escapeHtml(t.name)}</span>
+      <span style="font-weight:800;font-size:10pt;color:#5B6BA8;">${escapeHtml(t.name)}</span>
       <span style="font-size:9pt;color:#555;">${t.phone?phoneLink(t.phone):'-'}</span>
     </div>`).join('');
 }
@@ -2245,18 +2267,18 @@ function renderQuranEntryForm(sub){
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
       <div class="field"><label>عدد صفحات الحفظ</label><input id="qa_memPages" type="number" lang="en" min="0" value="${editing?editing.memPages:''}"></div>
-      <div class="field"><label>عدد الأجزاء المحفوظة (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_memParts" type="number" lang="en" min="0" value="${editing?editing.memParts:0}" readonly style="background:#EFF6F2;"></div>
+      <div class="field"><label>عدد الأجزاء المحفوظة (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_memParts" type="number" lang="en" min="0" value="${editing?editing.memParts:0}" readonly style="background:#F2F5FD;"></div>
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
       <div class="field"><label>عدد صفحات المراجعة</label><input id="qa_revPages" type="number" lang="en" min="0" value="${editing?editing.revPages:''}"></div>
-      <div class="field"><label>عدد الأجزاء التي تمت مراجعتها (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_revParts" type="number" lang="en" min="0" value="${editing?editing.revParts:0}" readonly style="background:#EFF6F2;"></div>
+      <div class="field"><label>عدد الأجزاء التي تمت مراجعتها (تلقائي: كل 20 صفحة = جزء)</label><input id="qa_revParts" type="number" lang="en" min="0" value="${editing?editing.revParts:0}" readonly style="background:#F2F5FD;"></div>
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
-      <div class="field"><label>المنجز (تلقائي: مجموع الأجزاء المحفوظة + الأجزاء المراجعة)</label><input id="qa_achieved" type="number" lang="en" value="${editing?((editing.memParts||0)+(editing.revParts||0)):0}" readonly style="background:#EFF6F2;"></div>
+      <div class="field"><label>المنجز (تلقائي: مجموع الأجزاء المحفوظة + الأجزاء المراجعة)</label><input id="qa_achieved" type="number" lang="en" value="${editing?((editing.memParts||0)+(editing.revParts||0)):0}" readonly style="background:#F2F5FD;"></div>
       <div class="field"><label>المستهدف الشهري (عدد الأجزاء)</label><input id="qa_target" type="number" lang="en" min="0" step="0.25" value="${editing?editing.monthlyTarget||'':''}"></div>
     </div>
     <div class="grid" style="grid-template-columns:1fr;">
-      <div class="field"><label>نسبة الإنجاز الشهري (%) — تلقائي = (المنجز ÷ المستهدف) × 100</label><input id="qa_pct" type="number" lang="en" value="${editing?editing.completionPct:0}" readonly style="background:#EFF6F2;"></div>
+      <div class="field"><label>نسبة الإنجاز الشهري (%) — تلقائي = (المنجز ÷ المستهدف) × 100</label><input id="qa_pct" type="number" lang="en" value="${editing?editing.completionPct:0}" readonly style="background:#F2F5FD;"></div>
     </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn btn-primary" id="qa_save">${editing?'حفظ التعديلات':'حفظ البيانات'}</button>
@@ -2387,7 +2409,7 @@ function renderQuranReportTab(sub){
       <table><thead><tr><th>اسم البرنامج</th><th>الشهر</th><th>الفترة</th><th>أيام التنفيذ</th><th>آلية التسميع</th><th>المعلمين</th><th>الطلاب</th><th>صفحات الحفظ</th><th>الأجزاء المحفوظة</th><th>صفحات المراجعة</th><th>الأجزاء المراجعة</th><th>نسبة الإنجاز %</th>${currentRole==='admin'?'<th>إجراءات</th>':''}</tr></thead><tbody>
         ${list.map(x=>`<tr><td>${escapeHtml(x.programName)}</td><td>${monthNameAr(x.month)}</td><td>${x.dateFrom||''} — ${x.dateTo||''}</td><td>${x.execDays}</td><td>${escapeHtml(x.method)}</td><td>${x.teachersCount}</td><td>${x.studentsCount}</td><td>${x.memPages}</td><td>${x.memParts}</td><td>${x.revPages}</td><td>${x.revParts}</td><td>${x.completionPct}%</td>${currentRole==='admin'?`<td><button class="icon-btn" title="تعديل" onclick="editQuranRecord('${x.id}')">✏️</button> <button class="icon-btn" title="حذف" onclick="deleteQuranRecord('${x.id}')">🗑️</button></td>`:''}</tr>`).join('') || `<tr><td colspan="13" class="empty-state">لا توجد سجلات مطابقة</td></tr>`}
       </tbody>
-      ${list.length?`<tfoot><tr style="font-weight:900;background:#EFF6F2;"><td colspan="3">الإجمالي</td><td>${t.execDays}</td><td></td><td>${t.teachersCount}</td><td>${t.studentsCount}</td><td>${t.memPages}</td><td>${t.memParts}</td><td>${t.revPages}</td><td>${t.revParts}</td><td>${avgPct}%</td>${currentRole==='admin'?'<td></td>':''}</tr></tfoot>`:''}
+      ${list.length?`<tfoot><tr style="font-weight:900;background:#F2F5FD;"><td colspan="3">الإجمالي</td><td>${t.execDays}</td><td></td><td>${t.teachersCount}</td><td>${t.studentsCount}</td><td>${t.memPages}</td><td>${t.memParts}</td><td>${t.revPages}</td><td>${t.revParts}</td><td>${avgPct}%</td>${currentRole==='admin'?'<td></td>':''}</tr></tfoot>`:''}
       </table>`;
     enhanceReportTable(box);
   }
@@ -3365,7 +3387,7 @@ function renderDistributionsTabContent(c){
           ${allLevels.map(lvl=>{ const found = stats.byLevel.find(x=>x.level===lvl); return `<td>${found?found.count:0}</td>`; }).join('')}
         </tr>`).join('')}
       </tbody>
-      <tfoot><tr style="font-weight:900;background:#EFF6F2;">
+      <tfoot><tr style="font-weight:900;background:#F2F5FD;">
         <td>الإجمالي</td><td>${totals.events}</td><td>${totals.daysTotal}</td><td>${totals.hoursTotal}</td><td>${totals.pathsCount}</td><td>${totals.schoolsTotal}</td>
         ${allLevels.map(lvl=>{ const sum = activeGroups.reduce((s,g)=>{ const found=g.stats.byLevel.find(x=>x.level===lvl); return s+(found?found.count:0); },0); return `<td>${sum}</td>`; }).join('')}
       </tr></tfoot>

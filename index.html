@@ -16,16 +16,23 @@
     /* لوحة عنابية أنيقة على خلفية بيضاء — مستوحاة من هوية مركز قطر للقيادات */
     --maroon-950:#5E0B26; --maroon-900:#70102F; --maroon-800:#8A1538; --maroon-700:#A32348; --maroon-600:#BC3D60;
     --maroon-100:#F3DCE4; --maroon-50:#FBF3F6; --gold:#C9A227; --gold-d:#A8871C; --red:#9e2b2b; --ink:#2E2A2C; --line:#EADCE2; --white:#ffffff;
-    --font-body:'Almohanad long kaf','Almohanad','Tajawal','Sakkal Majalla','Cairo',sans-serif;
-    --font-head:'Almohanad long kaf','Almohanad','Tajawal','29LT Bukra','Cairo',sans-serif;
+    --font-body:'Tajawal','Cairo',sans-serif;
+    --font-head:'Tajawal','Cairo',sans-serif;
     --radius:12px; --shadow:0 1px 2px rgba(138,21,56,.06),0 4px 16px rgba(138,21,56,.08);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{font-family:var(--font-body); font-size:14px; background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 55%,#FBF3F6 100%); background-attachment:fixed; color:var(--ink); min-height:100vh;}
+  body{font-family:var(--font-body); font-size:14px; background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 55%,#FBF3F6 100%); background-attachment:fixed; color:var(--ink); min-height:100vh; overflow-x:hidden;}
   #app{display:flex; min-height:100vh;}
   #sidebar{width:250px; flex:0 0 250px; background:linear-gradient(180deg,#5E0B26 0%,#7A1233 55%,#8A1538 100%); color:var(--white);
-    display:flex; flex-direction:column; position:sticky; top:0; height:100vh;}
+    display:flex; flex-direction:column; position:sticky; top:0; height:100vh; transition:width .2s;}
+  #sidebar.collapsed{width:64px; flex:0 0 64px;}
+  #sidebar.collapsed .brand-name, #sidebar.collapsed .brand-sub, #sidebar.collapsed nav.mainnav button span:not(.ic),
+  #sidebar.collapsed .user-chip .uc-info, #sidebar.collapsed .sync-status span:not(.sync-dot), #sidebar.collapsed .app-version{display:none;}
+  #sidebar.collapsed nav.mainnav button{justify-content:center;}
+  #sidebar.collapsed .brand{justify-content:center; padding:20px 8px;}
+  .sidebar-toggle{all:unset; cursor:pointer; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.12); color:#fff; font-size:14px; flex:0 0 auto;}
+  .sidebar-toggle:hover{background:rgba(255,255,255,.22);}
   .brand{display:flex; align-items:center; gap:10px; padding:20px 16px; border-bottom:1px solid rgba(255,255,255,.12);}
   .brand img{width:42px;height:42px;object-fit:contain;}
   .brand .logo-placeholder{width:42px;height:42px;border-radius:8px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:18px;}
@@ -36,15 +43,30 @@
   nav.mainnav button .ic{font-size:17px; width:20px; text-align:center;}
   nav.mainnav button:hover{background:rgba(255,255,255,.08);}
   nav.mainnav button.active{background:var(--maroon-700); color:#fff; font-weight:700;}
-  .sidebar-foot{padding:14px; font-size:11px; opacity:.85; border-top:1px solid rgba(255,255,255,.12); display:flex; flex-direction:column; gap:8px;}
+  .sidebar-foot{padding:12px 14px; font-size:11px; opacity:.85; border-top:1px solid rgba(255,255,255,.12); display:flex; flex-direction:column; gap:8px;}
   .sidebar-foot button{all:unset; cursor:pointer; background:rgba(255,255,255,.12); color:#fff; padding:7px 10px; border-radius:6px; font-size:12px; text-align:center;}
   .sidebar-foot button:hover{background:rgba(255,255,255,.22);}
+  .user-chip{display:flex; align-items:center; gap:8px; position:relative;}
+  .user-chip .uc-avatar{width:30px; height:30px; border-radius:50%; background:var(--maroon-700); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12.5px; flex:0 0 auto;}
+  .user-chip .uc-info{flex:1; min-width:0;}
+  .user-chip .uc-name{font-weight:700; font-size:12px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .user-chip .uc-role{font-size:10px; opacity:.7;}
+  .user-chip .uc-kebab{all:unset; cursor:pointer; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; opacity:.75; flex:0 0 auto;}
+  .user-chip .uc-kebab:hover{background:rgba(255,255,255,.15); opacity:1;}
+  .uc-popover{position:absolute; bottom:38px; left:0; background:#fff; border-radius:10px; box-shadow:0 12px 30px rgba(0,0,0,.25); padding:6px; min-width:150px; display:none; z-index:60;}
+  .uc-popover.open{display:block;}
+  .uc-popover button{all:unset; display:block; width:100%; cursor:pointer; color:var(--ink); padding:9px 10px; border-radius:6px; font-size:12.5px; text-align:right;}
+  .uc-popover button:hover{background:var(--maroon-50);}
+  .sync-status{display:flex; align-items:center; gap:6px; font-size:11px; color:#f0c8d4;}
+  .sync-status .sync-dot{width:7px; height:7px; border-radius:50%; background:#3ecf7a; box-shadow:0 0 0 2px rgba(62,207,122,.3); flex:0 0 auto;}
+  .sync-status.saving .sync-dot{background:#e0b23f; box-shadow:0 0 0 2px rgba(224,178,63,.3);}
+  .app-version{font-size:10px; opacity:.5;}
   #main{flex:1; display:flex; flex-direction:column; min-width:0;}
   header.topbar{background:var(--white); border-bottom:2px solid var(--maroon-800); padding:16px 26px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:5; box-shadow:var(--shadow);}
   header.topbar h1{font-family:var(--font-head); font-style:italic; font-weight:800; color:var(--maroon-800); font-size:21px; margin:0;}
   header.topbar .sub{font-size:12.5px;color:#7a5560;margin-top:3px;}
   .content{padding:24px 26px 60px; flex:1;}
-  .card{background:var(--white); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:0 14px 14px; margin-bottom:14px; overflow:hidden;}
+  .card{background:var(--white); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:0 14px 14px; margin-bottom:14px; overflow:hidden; transition:box-shadow .15s;}
   .card h2{font-family:var(--font-body); font-weight:900; color:#fff; background:var(--maroon-800); font-size:14px; margin:0 -14px 12px -14px; padding:10px 14px; border-radius:0; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; border-bottom:none;}
   .form-table{width:100%; border-collapse:collapse; margin:0 -14px; width:calc(100% + 28px);}
   .form-table thead th{background:var(--maroon-100); color:var(--maroon-950); font-family:var(--font-body); font-weight:900; font-size:14px; padding:10px 14px; text-align:right;}
@@ -53,13 +75,13 @@
   .form-table.compact tbody td{padding:6px 8px; white-space:nowrap;}
   .form-table.compact tbody td label{font-size:11.5px; margin-bottom:3px;}
   .form-table .auto-w{width:auto; min-width:0; max-width:100%;}
-  .form-table .auto-w.num{width:84px;}
+  .form-table .auto-w.num{width:84px; max-width:100%;}
   .plus-btn.mini{width:18px; height:18px; font-size:12px; line-height:1; padding:0; vertical-align:middle; margin-inline-start:4px;}
   .th-bar{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
   .th-actions{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
   .th-actions .plus-btn.mini{width:auto; height:24px; padding:0 8px; font-size:11.5px; font-weight:800; border-radius:6px; background:rgba(255,255,255,.9); color:#8a6a1f; border:none; margin:0; white-space:nowrap;}
   .th-actions .plus-btn.mini:hover{background:#fff;}
-  .th-search{width:160px; height:24px; padding:0 8px; font-size:11.5px; border-radius:6px; border:none; background:rgba(255,255,255,.92);}
+  .th-search{width:160px; max-width:100%; height:24px; padding:0 8px; font-size:11.5px; border-radius:6px; border:none; background:rgba(255,255,255,.92);}
   .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin-bottom:14px;}
   .field{display:flex; flex-direction:column; gap:6px;}
   .field label{font-size:14px; font-weight:700; color:var(--maroon-800);}
@@ -69,14 +91,14 @@
   input:disabled, select:disabled{background:#f2eaec; color:#a98d94;}
   input[type=date], input[type=time]{text-align:right; direction:rtl;}
   textarea{resize:vertical; min-height:64px;}
-  .btn{all:unset; cursor:pointer; font-family:var(--font-body); font-size:14px; font-weight:700; padding:9px 16px; border-radius:7px; text-align:center; display:inline-flex; align-items:center; gap:6px;}
+  .btn{all:unset; cursor:pointer; font-family:var(--font-body); font-size:14px; font-weight:700; padding:9px 16px; border-radius:7px; text-align:center; display:inline-flex; align-items:center; gap:6px; transition:background .15s;}
   .btn-primary{background:var(--maroon-800); color:#fff;}
   .btn-primary:hover{background:var(--maroon-900);}
   .btn-outline{background:#fff; color:var(--maroon-800); border:1.5px solid var(--maroon-800);}
   .btn-outline:hover{background:var(--maroon-100);}
   .btn-lg{padding:14px 22px; font-size:15px;}
   .btn-sm{padding:6px 10px; font-size:12.5px;}
-  .icon-btn{all:unset; cursor:pointer; width:30px; height:30px; border-radius:5px; border:1.5px solid var(--maroon-700); display:inline-flex; align-items:center; justify-content:center; font-size:15px; background:var(--maroon-100); color:var(--maroon-800);}
+  .icon-btn{all:unset; cursor:pointer; width:30px; height:30px; border-radius:5px; border:1.5px solid var(--maroon-700); display:inline-flex; align-items:center; justify-content:center; font-size:15px; background:var(--maroon-100); color:var(--maroon-800); transition:background .15s,color .15s;}
   .icon-btn.rect{width:auto; min-width:38px; height:36px; padding:0 10px; border-radius:8px; margin-inline-start:6px; background:#fff;}
   .icon-btn.rect{width:auto; height:36px; padding:0 12px; border-radius:6px;}
   .icon-btn:hover{background:var(--maroon-800); color:#fff;}
@@ -92,15 +114,24 @@
   .plus-btn{all:unset; cursor:pointer; width:34px; height:34px; border-radius:7px; flex:0 0 auto; background:var(--maroon-800); color:#fff; font-size:18px; font-weight:800; display:flex; align-items:center; justify-content:center;}
   .plus-btn:hover{background:var(--maroon-900);}
   table{width:100%; border-collapse:collapse; font-size:14px; font-family:var(--font-body);}
-  thead th{background:var(--maroon-100); color:var(--maroon-950); padding:12px 13px; text-align:right; font-family:var(--font-body); font-weight:800; font-style:normal; font-size:14px;}
-  tbody td{padding:12px 13px; border-bottom:1px solid var(--line); vertical-align:middle; line-height:1.6;}
+  thead th{background:var(--maroon-100); color:var(--maroon-950); padding:9px 10px; text-align:right; font-family:var(--font-body); font-weight:800; font-style:normal; font-size:14px;}
+  tbody td{padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:middle; line-height:1.6;}
   tbody tr:hover{background:var(--maroon-50);}
+  .school-pick-row{display:flex; align-items:center; gap:6px; padding:2px 4px; font-size:13px;}
+  .sec-header{display:flex; align-items:center; gap:10px; margin:0 0 12px;}
+  .sec-badge{width:34px; height:34px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; background:var(--maroon-700);}
+  .sec-title{font-family:var(--font-head); font-weight:800; font-size:17px; margin:0; color:var(--ink);}
+  .icon-reveal-row .lbl{display:none;}
+  .icon-reveal-row.expanded .lbl{display:inline;}
+  .icon-reveal-toggle{all:unset; cursor:pointer; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:var(--maroon-100); color:var(--maroon-800); font-size:13px; margin-inline-end:6px;}
+  .icon-reveal-toggle:hover{background:var(--maroon-800); color:#fff;}
   .actions-cell{display:flex; gap:4px; flex-wrap:wrap;}
   .badge{display:inline-block; padding:3px 9px; border-radius:20px; background:var(--maroon-100); color:var(--maroon-800); font-size:11.5px; font-weight:700;}
   .badge.ok{background:#d9f0dd;color:#1e6b34;}
   .badge.bad{background:#f7d6d6;color:#8f1a1a;}
   .empty-state{text-align:center; padding:40px 10px; color:#946; opacity:.65;}
   .checkbox-list{display:flex; flex-wrap:wrap; gap:10px;}
+  .checkbox-row{display:flex; flex-wrap:wrap; gap:8px;}
   .checkbox-chip{display:flex; align-items:center; gap:6px; border:1.5px solid var(--line); border-radius:20px; padding:6px 12px; font-size:13.5px; cursor:pointer;}
   .checkbox-chip input{width:auto;}
   .presenter-chip{display:flex; align-items:center; gap:8px; border:none; border-radius:0; padding:4px 2px; font-size:15px; cursor:pointer; background:transparent; transition:.15s;}
@@ -167,11 +198,23 @@
     .mob-scrim.show{display:block; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:45;}
     .grid{grid-template-columns:1fr !important;}
     table{font-size:13.5px;}
+    .sidebar-toggle{display:none;}
+  }
+  /* نقطة انكسار التابلت (861-1024px): الشريط الجانبي يصبح شريطاً رفيعاً افتراضياً */
+  @media (max-width:1024px) and (min-width:861px){
+    #sidebar.collapsed{width:76px; flex:0 0 76px;}
+  }
+  /* أهداف لمس ملائمة على الأجهزة اللمسية، بغض النظر عن عرض الشاشة */
+  @media (pointer:coarse){
+    .icon-btn{width:40px; height:40px; font-size:16px;}
+    .btn{padding:11px 18px;}
+    .tab-btn{padding:13px 18px;}
+    .checkbox-chip{padding:9px 14px;}
   }
 </style>
 </head>
 <body>
-<div id="rootWrap"></div>
+<div id="rootWrap"><div style="min-height:100vh;display:flex;align-items:center;justify-content:center;color:#8a6470;font-family:Tajawal,Arial;font-size:14px;">⏳ جارٍ التحميل...</div></div>
 <div class="mob-scrim" id="mobScrim"></div>
 <div class="toast" id="toast"></div>
 <div class="modal-overlay" id="modalOverlay"><div class="modal-box" id="modalBox"></div></div>
@@ -184,6 +227,8 @@
 let state = null;
 /* تصنيف مكان المبادرة الموحّد: مراحل دراسية للمدارس الحكومية + أنواع جهات أخرى */
 const LOCATION_TYPES = ['مدرسة','مدارس حكومية','مدارس خاصة','نادي','مركز','استراحة','جامعة','مكان عام','ابتدائي','إعدادي','ثانوي','خاصة','غير ذلك'];
+/* المراحل الدراسية المستقلة (حقل school.stages الجديد) — منفصل عن level، يدعم أكثر من مرحلة لكل مدرسة */
+const STAGE_OPTIONS = ['ابتدائي','إعدادي','ثانوي','جامعي'];
 /* يربط تصنيف "مكان التنفيذ" بقيم level المخزّنة (يقبل التسمية الجديدة والقديمة معًا) */
 function levelsForPlaceType(typeName){
   const map = {
@@ -224,9 +269,9 @@ function defaultState(){
     ],
     programTypes:[{id:uid(), name:'حملات'},{id:uid(), name:'مدارك'},{id:uid(), name:'مواهب ومسابقات'},{id:uid(), name:'صحبة'}],
     schools:[
-      {id:uid(), name:'مدرسة الشمال الابتدائية', level:'ابتدائي', supervisors:[{id:uid(), name:'أ. خالد المري', phone:'55511111', email:'khaled@example.com'}]},
-      {id:uid(), name:'مدرسة عبدالله بن زيد آل محمود', level:'إعدادي', supervisors:[{id:uid(), name:'أ. سعد العبدالله', phone:'55522222', email:'saad@example.com'}]},
-      {id:uid(), name:'مدرسة اليرموك الإعدادية', level:'إعدادي', supervisors:[{id:uid(), name:'أ. محمد الكواري', phone:'55533333', email:'mohd@example.com'}]},
+      {id:uid(), name:'مدرسة الشمال الابتدائية', level:'ابتدائي', stages:['ابتدائي'], supervisors:[{id:uid(), name:'أ. خالد المري', phone:'55511111', email:'khaled@example.com'}]},
+      {id:uid(), name:'مدرسة عبدالله بن زيد آل محمود', level:'إعدادي', stages:['إعدادي'], supervisors:[{id:uid(), name:'أ. سعد العبدالله', phone:'55522222', email:'saad@example.com'}]},
+      {id:uid(), name:'مدرسة اليرموك الإعدادية', level:'إعدادي', stages:['إعدادي'], supervisors:[{id:uid(), name:'أ. محمد الكواري', phone:'55533333', email:'mohd@example.com'}]},
     ],
     trainers:(function(){ const t1=uid(), t2=uid(); window.__seedTrainerIds=[t1,t2]; return [{id:t1, name:'أ. أحمد النعيمي', phone:'55011122'},{id:t2, name:'أ. فيصل السليطي', phone:'55033344'}]; })(),
     adminRequestsList:[
@@ -241,8 +286,6 @@ function defaultState(){
     ],
     placeTypes:[
       {id:uid(), name:'مدرسة'},
-      {id:uid(), name:'مدارس حكومية'},
-      {id:uid(), name:'مدارس خاصة'},
       {id:uid(), name:'نادي'},
       {id:uid(), name:'مركز'},
       {id:uid(), name:'استراحة'},
@@ -313,7 +356,7 @@ async function loadState(){
       if(!state.reminderFlags) state.reminderFlags={};
       if(!state.quranActivities) state.quranActivities=[];
       if(!state.placeTypes || !state.placeTypes.length){
-        state.placeTypes = ['مدرسة','مدارس حكومية','مدارس خاصة','نادي','مركز','استراحة','جامعة','مكان عام'].map(name=>({id:uid(), name}));
+        state.placeTypes = ['مدرسة','نادي','مركز','استراحة','جامعة','مكان عام'].map(name=>({id:uid(), name}));
       }
       if(!state.__locationTypesMigrated){
         (state.schools||[]).forEach(s=>{
@@ -329,6 +372,23 @@ async function loadState(){
         });
         state.__locationTypesMigrated = true;
       }
+      /* دمج "مدارس حكومية"/"مدارس خاصة" القديمتين في تصنيف واحد "مدرسة" (لا يحذف بيانات، فقط يوحّد قائمة الاختيار) */
+      if(!state.__placeTypesMerged){
+        const uni = state.placeTypes.find(p=>p.name==='مدرسة');
+        const gov = state.placeTypes.find(p=>p.name==='مدارس حكومية');
+        const priv = state.placeTypes.find(p=>p.name==='مدارس خاصة');
+        if(!uni && gov){ gov.name='مدرسة'; if(priv) state.placeTypes = state.placeTypes.filter(p=>p.id!==priv.id); }
+        else if(!uni && priv){ priv.name='مدرسة'; }
+        else {
+          if(gov) state.placeTypes = state.placeTypes.filter(p=>p.id!==gov.id);
+          if(priv) state.placeTypes = state.placeTypes.filter(p=>p.id!==priv.id);
+        }
+        state.__placeTypesMerged = true;
+      }
+      /* حقل المراحل الدراسية الجديد لكل مدرسة (منفصل عن level، إضافي وغير مدمّر) */
+      (state.schools||[]).forEach(s=>{
+        if(!s.stages){ s.stages = ['ابتدائي','إعدادي','ثانوي'].includes(s.level) ? [s.level] : []; }
+      });
       if(!state.users || !state.users.length){
         state.users=[
           {id:uid(), username:'admin', password:'admin123', role:'admin', trainerId:'', displayName:'مدير النظام', active:true},
@@ -385,6 +445,7 @@ let editingQuranId=null;
 let editingOrderId=null;
 let loggedTrainerId=null;
 let trainerPortalTab='upcoming';
+let sidebarCollapsed=false;
 let tpAutoOpened=false;
 
 function visiblePages(){ return PAGES.filter(p=>p.roles.includes(currentRole) && !p.hidden); }
@@ -396,6 +457,70 @@ function toast(msg){
   window.__toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
 }
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function debounce(fn, ms){ let t; return function(...args){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), ms); }; }
+/* ============ Draft autosave (localStorage فقط — لا علاقة له بـ Firestore) ============
+   يحفظ القيم أثناء التعبئة تلقائياً حتى لا تُفقد عند إغلاق النموذج بالخطأ أو تحديث الصفحة،
+   ويُمسح فقط بعد نجاح الحفظ الفعلي عبر saveState(). */
+const DRAFT_PREFIX = 'evtapp_draft_';
+function collectFormValues(container){
+  const data = {};
+  container.querySelectorAll('[id]').forEach(el=>{
+    if(!el.id) return;
+    if(el.tagName==='INPUT' && (el.type==='checkbox'||el.type==='radio')) data[el.id] = el.checked;
+    else if(el.value!==undefined && (el.tagName==='INPUT'||el.tagName==='SELECT'||el.tagName==='TEXTAREA')) data[el.id] = el.value;
+  });
+  container.querySelectorAll('.checkbox-row [id]').forEach(wrap=>{
+    if(!wrap.id) return;
+    data['__group_'+wrap.id] = Array.from(wrap.querySelectorAll('input:checked')).map(c=>c.value);
+  });
+  return data;
+}
+function saveDraft(key, container){
+  try{ localStorage.setItem(DRAFT_PREFIX+key, JSON.stringify({t:Date.now(), data:collectFormValues(container)})); }catch(e){}
+}
+function getDraftData(key){
+  try{
+    const raw = localStorage.getItem(DRAFT_PREFIX+key); if(!raw) return null;
+    const parsed = JSON.parse(raw); return (parsed && parsed.data) ? parsed.data : null;
+  }catch(e){ return null; }
+}
+function applyDraftField(data, container, id){
+  if(!data || data[id]===undefined) return false;
+  const el = container.querySelector('#'+CSS.escape(id)); if(!el) return false;
+  if(el.tagName==='INPUT' && (el.type==='checkbox'||el.type==='radio')) el.checked = !!data[id];
+  else el.value = data[id];
+  return true;
+}
+function restoreDraft(key, container){
+  const data = getDraftData(key); if(!data) return false;
+  let applied=false;
+  Object.keys(data).forEach(k=>{
+    if(k.startsWith('__group_')){
+      const groupId = k.slice('__group_'.length);
+      const wrap = container.querySelector('#'+CSS.escape(groupId)); if(!wrap) return;
+      const set = new Set(data[k]);
+      wrap.querySelectorAll('input[type=checkbox]').forEach(c=>{ c.checked = set.has(c.value); });
+      applied=true;
+      return;
+    }
+    if(applyDraftField(data, container, k)) applied=true;
+  });
+  if(applied) toast('↩️ تم استرجاع مسودة محفوظة تلقائياً');
+  return applied;
+}
+function clearDraft(key){ try{ localStorage.removeItem(DRAFT_PREFIX+key); }catch(e){} }
+function purgeOldDrafts(){
+  try{
+    const cutoff = Date.now() - 7*24*60*60*1000;
+    Object.keys(localStorage).filter(k=>k.startsWith(DRAFT_PREFIX)).forEach(k=>{
+      try{ const p=JSON.parse(localStorage.getItem(k)); if(!p || !p.t || p.t<cutoff) localStorage.removeItem(k); }catch(e){ localStorage.removeItem(k); }
+    });
+  }catch(e){}
+}
+/* رأس قسم موحّد: شارة دائرية ملوّنة + عنوان، يظهر فوق الصندوق وليس داخله */
+function sectionHeader(title, icon, colorVar){
+  return `<div class="sec-header"><span class="sec-badge" style="background:${colorVar||'var(--maroon-700)'}">${icon||'📄'}</span><h2 class="sec-title">${escapeHtml(title)}</h2></div>`;
+}
 function fileToDataUrl(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 /* يحوّل قيمة الشهر (YYYY-MM) إلى اسم الشهر بالعربية + السنة، مثل "يونيو 2026" */
@@ -408,7 +533,7 @@ function monthNameAr(m){
 }
 
 /* ============ Modal helper ============ */
-function openModal(title, fieldsConfig, onSubmit){
+function openModal(title, fieldsConfig, onSubmit, draftId){
   const overlay=document.getElementById('modalOverlay'); const box=document.getElementById('modalBox');
   box.innerHTML = `<h3>${title}</h3><div id="modalFields" class="grid"></div>
     <div class="modal-actions"><button class="btn btn-outline" id="modalCancel">إلغاء</button><button class="btn btn-primary" id="modalSave">حفظ</button></div>`;
@@ -417,17 +542,28 @@ function openModal(title, fieldsConfig, onSubmit){
     const wrap=document.createElement('div'); wrap.className='field';
     wrap.innerHTML = `<label>${f.label}</label>` + (f.type==='select'
       ? `<select id="mf_${f.name}">${f.options.map(o=>`<option value="${o.value}">${o.label}</option>`).join('')}</select>`
+      : f.type==='checkboxgroup'
+      ? `<div id="mf_${f.name}" class="checkbox-row">${f.options.map(o=>`<label class="checkbox-chip"><input type="checkbox" value="${o.value}"> ${o.label}</label>`).join('')}</div>`
       : `<input id="mf_${f.name}" type="${f.type||'text'}" placeholder="${f.placeholder||''}">`);
     fc.appendChild(wrap);
   });
   overlay.classList.add('open');
-  box.querySelector('#modalCancel').onclick=()=>overlay.classList.remove('open');
+  if(draftId) restoreDraft(draftId, box);
+  const draftListener = draftId ? debounce(()=>saveDraft(draftId, box), 800) : null;
+  if(draftListener) box.addEventListener('input', draftListener);
+  box.querySelector('#modalCancel').onclick=()=>{ overlay.classList.remove('open'); if(draftListener) box.removeEventListener('input', draftListener); };
   box.querySelector('#modalSave').onclick=async ()=>{
     const values={};
-    fieldsConfig.forEach(f=>{ values[f.name]=document.getElementById('mf_'+f.name).value.trim(); });
+    fieldsConfig.forEach(f=>{
+      if(f.type==='checkboxgroup'){
+        values[f.name] = Array.from(document.getElementById('mf_'+f.name).querySelectorAll('input:checked')).map(c=>c.value);
+      } else {
+        values[f.name]=document.getElementById('mf_'+f.name).value.trim();
+      }
+    });
     if(fieldsConfig.some(f=>f.required && !values[f.name])){ toast('يرجى تعبئة الحقول المطلوبة'); return; }
     const __result = await onSubmit(values);
-    if(__result !== false){ overlay.classList.remove('open'); }
+    if(__result !== false){ overlay.classList.remove('open'); if(draftListener) box.removeEventListener('input', draftListener); if(draftId) clearDraft(draftId); }
   };
 }
 function starRatingHtml(name, val){
@@ -514,6 +650,10 @@ function doLogin(){
   currentRole = match.role;
   loggedTrainerId = match.role==='trainer' ? match.trainerId : null;
   currentPage='home'; trainerPortalTab='upcoming'; tpAutoOpened=false;
+  try{
+    const saved = localStorage.getItem('sidebarCollapsed_'+match.username);
+    sidebarCollapsed = saved!==null ? saved==='1' : (window.innerWidth<=1024);
+  }catch(e){ sidebarCollapsed = window.innerWidth<=1024; }
   renderRoot();
   setTimeout(()=>{
     openAnnouncement('✅ النظام متصل بقاعدة البيانات',
@@ -521,25 +661,35 @@ function doLogin(){
   }, 400);
 }
 
+const APP_VERSION = '1.1.0';
 function renderAppShell(root){
+  const initials = currentUser ? (currentUser.displayName||currentUser.username||'?').trim().slice(0,1) : '?';
+  const roleLabel = currentRole==='admin'?'مدير نظام':currentRole==='user'?'مستخدم':'مقدم فعالية';
   root.innerHTML = `
   <div id="app">
     <aside id="sidebar">
       <div class="brand">
         <div id="logoSlot"><div class="logo-placeholder">🕌</div></div>
         <div><div class="brand-name" id="orgNameDisplay">إدارة الفعاليات</div><div class="brand-sub">نظام طلبات الفعاليات والمبادرات</div></div>
+        <button class="sidebar-toggle" id="sidebarToggleBtn" title="طيّ/فتح القائمة">◀</button>
       </div>
       <nav class="mainnav" id="mainNav"></nav>
       <div class="sidebar-foot">
-        <div style="font-weight:800;">${currentUser?escapeHtml(currentUser.displayName||currentUser.username):''}</div>
-        <div>الدور: ${currentRole==='admin'?'مدير نظام':currentRole==='user'?'مستخدم':'مقدم فعالية'}</div>
-        <button id="switchRoleBtn">تسجيل الخروج</button>
+        <div class="user-chip">
+          <div class="uc-avatar">${escapeHtml(initials)}</div>
+          <div class="uc-info"><div class="uc-name">${currentUser?escapeHtml(currentUser.displayName||currentUser.username):''}</div><div class="uc-role">${roleLabel}</div></div>
+          <button class="uc-kebab" id="ucKebabBtn" title="خيارات">⋮</button>
+          <div class="uc-popover" id="ucPopover"><button id="switchRoleBtn">🚪 تسجيل الخروج</button></div>
+        </div>
+        <div class="sync-status" id="syncStatus"><span class="sync-dot"></span><span>متزامن</span></div>
+        <div class="app-version">الإصدار ${APP_VERSION}</div>
       </div>
     </aside>
     <div id="main">
       <header class="topbar">
         <div style="display:flex; align-items:center; gap:10px;">
           <button class="mob-toggle" id="mobToggleBtn">☰</button>
+          <span class="sec-badge" id="pageIconBadge" style="width:32px;height:32px;font-size:15px;"></span>
           <div><h1 id="pageTitle"></h1><div class="sub" id="pageSub"></div></div>
         </div>
         <div id="topbarActions" style="display:flex; align-items:center; gap:8px;"></div>
@@ -550,6 +700,15 @@ function renderAppShell(root){
   document.getElementById('switchRoleBtn').onclick=()=>{ currentRole=null; loggedTrainerId=null; currentUser=null; renderRoot(); };
   document.getElementById('mobToggleBtn').onclick=()=>{ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('mobScrim').classList.toggle('show'); };
   document.getElementById('mobScrim').onclick=()=>{ document.getElementById('sidebar').classList.remove('open'); document.getElementById('mobScrim').classList.remove('show'); };
+  document.getElementById('ucKebabBtn').onclick=(e)=>{ e.stopPropagation(); document.getElementById('ucPopover').classList.toggle('open'); };
+  document.addEventListener('click', function closeUcPopover(ev){ const p=document.getElementById('ucPopover'); if(p && !p.contains(ev.target) && ev.target.id!=='ucKebabBtn'){ p.classList.remove('open'); } });
+  const sidebarEl = document.getElementById('sidebar');
+  sidebarEl.classList.toggle('collapsed', sidebarCollapsed);
+  document.getElementById('sidebarToggleBtn').onclick=()=>{
+    sidebarCollapsed = !sidebarCollapsed;
+    sidebarEl.classList.toggle('collapsed', sidebarCollapsed);
+    if(currentUser){ try{ localStorage.setItem('sidebarCollapsed_'+currentUser.username, sidebarCollapsed?'1':'0'); }catch(e){} }
+  };
   if(currentRole==='trainer'){ currentPage='trainerPortal'; }
   else if(!visiblePages().find(p=>p.id===currentPage)){ currentPage='home'; }
   render();
@@ -564,7 +723,10 @@ function renderNav(){
     b.className = p.id===currentPage ? 'active':'';
     const badge = (p.id==='approvals' && pendingCount) ? ` <span class="badge" style="background:#f4c9d1;color:#7a1230;">${pendingCount}</span>` : '';
     b.innerHTML = `<span class="ic">${p.icon}</span><span>${p.label}</span>${badge}`;
-    b.onclick=()=>{ currentPage=p.id; if(p.id==='order'){editingOrderId=null;} render(); };
+    b.onclick=()=>{
+      currentPage=p.id; if(p.id==='order'){editingOrderId=null;} render();
+      if(window.innerWidth<=860){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('mobScrim').classList.remove('show'); }
+    };
     nav.appendChild(b);
   });
 }
@@ -630,6 +792,13 @@ function render(){
     settings:['الإعدادات والقوائم','إدارة القوائم المنسدلة والشعار']};
   document.getElementById('pageTitle').textContent = titleMap[currentPage][0];
   document.getElementById('pageSub').textContent = titleMap[currentPage][1];
+  const curPageDef = PAGES.find(p=>p.id===currentPage);
+  document.getElementById('pageIconBadge').textContent = curPageDef ? curPageDef.icon : '📄';
+  const syncEl = document.getElementById('syncStatus');
+  if(syncEl){
+    syncEl.classList.toggle('saving', !!saving);
+    syncEl.querySelector('span:last-child').textContent = saving ? 'جارٍ الحفظ...' : 'متزامن';
+  }
   document.getElementById('topbarActions').innerHTML='';
   renderBell();
   renderRefreshBtn();
@@ -665,7 +834,7 @@ function renderHome(c){
   <div class="stat-grid" style="margin-bottom:14px;">
     <div class="stat-box"><div class="num">${totalOrders}</div><div class="lbl">إجمالي طلبات الفعاليات</div></div>
     <div class="stat-box"><div class="num">${thisMonth}</div><div class="lbl">فعاليات هذا الشهر</div></div>
-    <div class="stat-box"><div class="num">${state.schools.length}</div><div class="lbl">عدد المدارس</div></div>
+    <div class="stat-box"><div class="num">${state.schools.length}</div><div class="lbl">${LBL_PLACES}</div></div>
     <div class="stat-box"><div class="num">${state.trainers.length}</div><div class="lbl">عدد مقدمي الفعاليات</div></div>
     <div class="stat-box"><div class="num">${totalParticipants}</div><div class="lbl">إجمالي المستهدفين</div></div>
     <div class="stat-box"><div class="num">${pendingReq}</div><div class="lbl">طلبات ترشيح بانتظار الرد</div></div>
@@ -727,7 +896,7 @@ function phoneLink(phone){
   const p = (phone||'').toString().trim();
   if(!p) return '';
   const digits = p.replace(/[^\d+]/g,'');
-  return `<a href="tel:${digits}" style="color:inherit;text-decoration:underline;white-space:nowrap;">${escapeHtml(p)}</a>`;
+  return `<a href="tel:${digits}" style="color:#C9A227;font-weight:800;text-decoration:underline;white-space:nowrap;">${escapeHtml(p)}</a>`;
 }
 /* رقم هاتف + أيقونة اتصال + أيقونة واتساب، تُستخدم في أمر التكليف بجانب هاتف المشرف/مقدم المبادرة */
 function phoneLinkWithIcons(phone){
@@ -736,7 +905,7 @@ function phoneLinkWithIcons(phone){
   const digits = p.replace(/[^\d+]/g,'');
   const bare = digits.replace(/^\+/,'').replace(/^0+/,'');
   const waDigits = bare.length<=8 ? '974'+bare : bare;
-  return `<span style="white-space:nowrap;">${escapeHtml(p)}
+  return `<span style="white-space:nowrap;"><span style="color:#C9A227;font-weight:800;">${escapeHtml(p)}</span>
     <a href="tel:${digits}" title="اتصال" style="text-decoration:none;margin-inline-start:4px;">📞</a>
     <a href="https://wa.me/${waDigits}" target="_blank" title="واتساب" style="text-decoration:none;margin-inline-start:2px;">💬</a>
   </span>`;
@@ -952,7 +1121,7 @@ function renderOrderPage(c){
         const list = thisWeek.filter(o=>(o.trainerIds||[]).includes(t.id));
         let hrs=0; list.forEach(o=>{ if(o.timeFrom&&o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); if(s&&e) hrs+=Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } });
         return `<div class="stat-box"><div style="font-weight:800;color:var(--maroon-800);margin-bottom:6px;">${escapeHtml(t.name)}</div>
-          <div class="num">${list.length}</div><div class="lbl">عدد الفعاليات</div>
+          <div class="num">${list.length}</div><div class="lbl">${LBL_EVENTS}</div>
           <div style="margin-top:6px;font-size:13px;color:#7a5560;">${hrs.toFixed(1)} ساعة</div></div>`;
       }).join('') || `<div class="empty-state">لا يوجد مقدمو فعاليات</div>`}
     </div>
@@ -1406,9 +1575,7 @@ function renderOrderForm(sub){
   const selectedTrainerIds = editing ? (editing.trainerIds||[]) : [];
 
   sub.innerHTML = `
-  <div class="card">
-    <h2>${editing? 'تعديل فعاليات ومبادرات — رقم '+editing.serial : 'فعاليات ومبادرات'}</h2>
-  </div>
+  ${sectionHeader(editing? 'تعديل فعاليات ومبادرات — رقم '+editing.serial : 'فعاليات ومبادرات جديدة', '📋')}
 
   <div class="card">
     <table class="form-table compact"><thead><tr><th colspan="6">
@@ -1444,7 +1611,7 @@ function renderOrderForm(sub){
   </div>
 
   <div class="card">
-    <table class="form-table compact"><thead><tr><th colspan="3">
+    <table class="form-table compact"><colgroup><col style="width:15%"><col style="width:13%"><col style="width:42%"><col style="width:30%"></colgroup><thead><tr><th colspan="4">
       <div class="th-bar">
         <span>بيانات التنفيذ والمكان والمشرفين</span>
         <span class="th-actions">
@@ -1462,14 +1629,20 @@ function renderOrderForm(sub){
             ${state.placeTypes.map(p=>`<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('')}
           </select>
         </td>
+        <td id="f_stageWrap" style="display:none;"><label>المرحلة</label>
+          <select id="f_stage" class="auto-w">
+            <option value="">-- الكل --</option>
+            ${STAGE_OPTIONS.map(st=>`<option value="${st}">${st}</option>`).join('')}
+          </select>
+        </td>
         <td><label>مكان المبادرة (${state.schools.length} مدرسة/جهة)</label>
-          <select id="f_school" size="1" required>${state.schools.map(s=>`<option value="${s.id}" data-level="${escapeHtml(s.level||'')}" ${editing&&editing.schoolId===s.id?'selected':''}>${escapeHtml(s.name)} — ${escapeHtml(s.level)}</option>`).join('')}</select>
+          <select id="f_school" size="1" required>${state.schools.map(s=>`<option value="${s.id}" data-level="${escapeHtml(s.level||'')}" data-stages="${escapeHtml((s.stages||[]).join(','))}" ${editing&&editing.schoolId===s.id?'selected':''}>${escapeHtml(s.name)} — ${escapeHtml(s.level)}</option>`).join('')}</select>
         </td>
         <td><label>المشرف</label>
           <select id="f_supervisor" required></select>
         </td>
       </tr>
-      <tr><td colspan="3"><div id="supervisorInfo" class="supervisor-info">${''}</div></td></tr>
+      <tr><td colspan="4"><div id="supervisorInfo" class="supervisor-info">${''}</div></td></tr>
     </tbody></table>
   </div>
 
@@ -1548,7 +1721,8 @@ function renderOrderForm(sub){
     const sch = state.schools.find(s=>s.id===schId);
     const svId = document.getElementById('f_supervisor').value;
     const sv = sch? sch.supervisors.find(s=>s.id===svId):null;
-    document.getElementById('supervisorInfo').innerHTML = sv ? `<span>📱 ${escapeHtml(sv.phone||'-')}</span><span>✉️ ${escapeHtml(sv.email||'-')}</span><span>🏫 المرحلة: ${escapeHtml(sch.level)}</span>` : `<span>اختر مدرسة ومشرف لعرض بياناته</span>`;
+    const multiHint = (sch && sch.supervisors.length>1) ? '<span style="color:#b45309;font-weight:700;"> — ⚠️ توجد أكثر من مشرف، تأكد من اختيار الصحيح</span>' : '';
+    document.getElementById('supervisorInfo').innerHTML = sv ? `<span>📱 ${escapeHtml(sv.phone||'-')}</span><span>✉️ ${escapeHtml(sv.email||'-')}</span><span>🏫 المرحلة: ${escapeHtml(sch.level)}</span>${multiHint}` : `<span>اختر مدرسة ومشرف لعرض بياناته</span>`;
   }
   document.getElementById('f_school').addEventListener('change', refreshSupervisors);
   document.getElementById('f_supervisor').addEventListener('change', updateSupervisorInfo);
@@ -1575,24 +1749,50 @@ function renderOrderForm(sub){
     refreshTrainerChips();
   });
   refreshSupervisors(); refreshTrainerChips();
+  function toggleStageBox(){
+    const cat = document.getElementById('f_placeType').value;
+    const isSchools = cat === 'مدرسة';
+    document.getElementById('f_stageWrap').style.display = isSchools ? '' : 'none';
+    if(!isSchools) document.getElementById('f_stage').value = '';
+  }
   function filterSchoolOptions(){
     const q = document.getElementById('f_schoolSearch').value.trim();
     const cat = document.getElementById('f_placeType').value;
+    const stage = document.getElementById('f_stage').value;
     const levels = cat ? levelsForPlaceType(cat) : [];
     const sel = document.getElementById('f_school');
     Array.from(sel.options).forEach(opt=>{
       if(!opt.value){ opt.style.display=''; return; }
       const matchesText = !q || opt.textContent.includes(q);
       const matchesLevel = !levels.length || levels.includes(opt.dataset.level);
-      opt.style.display = (matchesText && matchesLevel) ? '' : 'none';
+      const optStages = opt.dataset.stages ? opt.dataset.stages.split(',').filter(Boolean) : [];
+      const matchesStage = !stage || optStages.includes(stage);
+      opt.style.display = (matchesText && matchesLevel && matchesStage) ? '' : 'none';
     });
   }
   document.getElementById('f_schoolSearch').addEventListener('input', filterSchoolOptions);
-  document.getElementById('f_placeType').addEventListener('change', filterSchoolOptions);
+  document.getElementById('f_placeType').addEventListener('change', ()=>{ toggleStageBox(); filterSchoolOptions(); });
+  document.getElementById('f_stage').addEventListener('change', filterSchoolOptions);
   if(editing){
     const curSchool = state.schools.find(s=>s.id===editing.schoolId);
-    if(curSchool){ document.getElementById('f_placeType').value = placeTypeLabel(curSchool.level); filterSchoolOptions(); }
+    if(curSchool){
+      document.getElementById('f_placeType').value = placeTypeLabel(curSchool.level);
+      toggleStageBox();
+      filterSchoolOptions();
+    }
   }
+
+  /* حفظ مسودة تلقائي: يسترجع آخر إدخال غير محفوظ لنفس النموذج، ويحفظ أي تعديل جديد فورًا (localStorage فقط) */
+  const draftKey = editing ? ('orderForm_edit_'+editing.id) : 'orderForm_new';
+  if(restoreDraft(draftKey, sub)){
+    const draftData = getDraftData(draftKey);
+    toggleStageBox(); filterSchoolOptions();
+    refreshSupervisors();
+    applyDraftField(draftData, sub, 'f_supervisor');
+    updateSupervisorInfo();
+    recalcDurations(); refreshTrainerChips();
+  }
+  sub.addEventListener('input', debounce(()=>saveDraft(draftKey, sub), 800));
 
   const reqBox = document.getElementById('adminReqList');
   const selectedReqIds = new Set(editing && editing.adminRequests ? editing.adminRequests : []);
@@ -1727,6 +1927,7 @@ function renderOrderForm(sub){
       state.orders.push(orderData);
     }
     await saveState();
+    clearDraft(draftKey);
     toast(editing?'تم حفظ التعديلات':'تم حفظ الطلب');
     editingOrderId=null; orderSubTab='list'; render();
   };
@@ -1882,11 +2083,12 @@ function quickAddSchool(presetLevel){
   openModal('إضافة مدرسة / جهة جديدة', [
     {name:'name', label:'اسم المدرسة / الجهة', required:true},
     {name:'level', label:'المرحلة الدراسية', type:'select', options:LOCATION_TYPES.map(t=>({value:t,label:t}))},
+    {name:'stages', label:'المراحل الدراسية (إن كانت مدرسة، اختر واحدة أو أكثر)', type:'checkboxgroup', options:STAGE_OPTIONS.map(t=>({value:t,label:t}))},
     {name:'email', label:'البريد الإلكتروني (اختياري)'},
   ], async v=>{
     const dup = findDuplicateSchool(v.name);
     if(dup){ toast(`⚠️ توجد جهة بنفس الاسم أو باسم مشابه: "${dup.name}" — لم تتم الإضافة`); return false; }
-    const item={id:uid(), name:v.name, level:v.level, email:v.email||'', supervisors:[]};
+    const item={id:uid(), name:v.name, level:v.level, stages:v.stages||[], email:v.email||'', supervisors:[]};
     state.schools.push(item); await saveState(); render();
     setTimeout(()=>{ const s=document.getElementById('f_school'); if(s){ s.value=item.id; s.dispatchEvent(new Event('change')); } },0);
     promptAddSupervisorFor(item.id, item.name);
@@ -1943,6 +2145,14 @@ function quickAddPlaceType(){
   });
 }
 
+/* ============ تسميات موحّدة بأيقونات لصناديق الإحصائيات وعناوين الأعمدة في كل التقارير ============ */
+const LBL_PLACES = '📍 الأماكن';
+const LBL_SUPERVISOR_PHONE = '📱 رقم المشرف';
+const LBL_HOURS = '🕐 إجمالي عدد الساعات';
+const LBL_TRAINERS = '🧑‍🏫 عدد المدربين';
+const LBL_EVENTS = '📌 عدد الفعاليات';
+const LBL_ADMIN_REQS = '🗂️ عدد الطلبات الإدارية';
+
 /* ============ Print system (Duroob-style: self-contained popup document) ============ */
 const PRINT_THEME = '#12335c';
 const PRINT_LINE_COLOR = '#8A1538'; // عنابي — يُستخدم لإطارات وخطوط الجداول في كل التقارير
@@ -1981,22 +2191,22 @@ function printDocOpen(theme){
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Almohanad long kaf','Almohanad','Tajawal',Arial;direction:rtl;background:#f5f7fa;padding:10mm;color:#222;font-size:14pt;font-weight:400}
-  .doc-heading-font{font-family:'Almohanad long kaf','Almohanad','Cairo','Tajawal',Arial;font-weight:900;}
+  body{font-family:'Tajawal','Cairo',Arial;direction:rtl;background:#f5f7fa;padding:10mm;color:#222;font-size:10pt;font-weight:400}
+  .doc-heading-font{font-family:'Tajawal','Cairo',Arial;font-weight:900;}
   .doc{width:100%;max-width:100%;margin:0 auto;padding:10mm 14mm;border:1.5px solid ${PRINT_LINE_COLOR};border-radius:4px;background:#fff;box-sizing:border-box}
   .hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid ${theme};padding-bottom:5mm;margin-bottom:5mm;direction:ltr}
   .org-right{text-align:right;direction:rtl;line-height:1.7}
-  .org-l1{font-size:15pt;font-weight:900;color:${PRINT_LINE_COLOR};font-family:'Almohanad long kaf','Almohanad','Cairo','Tajawal',Arial;}
+  .org-l1{font-size:15pt;font-weight:900;color:${PRINT_LINE_COLOR};font-family:'Tajawal','Cairo',Arial;}
   .org-l2,.org-l3{font-size:10pt;color:${PRINT_LINE_COLOR};font-weight:700}
   .logo-ph{font-size:34px}
   .title-blk{text-align:center;margin-bottom:6mm;border:2px solid ${theme};border-radius:8px;padding:5mm;background:${theme}0d}
-  .title-ar{font-size:19pt;font-weight:900;color:${theme};font-family:'Almohanad long kaf','Almohanad','Cairo','Tajawal',Arial;letter-spacing:.3px;}
+  .title-ar{font-size:19pt;font-weight:900;color:${theme};font-family:'Tajawal','Cairo',Arial;letter-spacing:.3px;}
   .title-sub{font-size:10.5pt;color:#555;margin-top:2mm;font-weight:700}
   .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin-bottom:6mm}
   .kpi{border:1.5px solid ${theme};border-radius:6px;padding:7px;text-align:center}
   .kpi-v{font-size:15pt;font-weight:900;color:${theme}}
   .kpi-l{font-size:9.5pt;color:#666;margin-top:2px}
-  .sec-t{font-size:14pt;font-weight:900;margin:6mm 0 3mm;border-right:5px solid ${theme};padding-right:8px;color:${theme};font-family:'Almohanad long kaf','Almohanad','Cairo','Tajawal',Arial;}
+  .sec-t{font-size:14pt;font-weight:900;margin:6mm 0 3mm;border-right:5px solid ${theme};padding-right:8px;color:${theme};font-family:'Tajawal','Cairo',Arial;}
   table{width:100%;border-collapse:collapse;font-size:11pt;margin-bottom:4mm}
   thead{display:table-header-group}
   tfoot{display:table-footer-group}
@@ -2061,8 +2271,8 @@ function hoursDuration(timeFrom, timeTo, dateFrom, dateTo){
 }
 function fullTimeRange(from, to){
   if(!from && !to) return '';
-  if(from && to) return `من الساعة ${from} إلى الساعة ${to}`;
-  return from ? `من الساعة ${from}` : `إلى الساعة ${to}`;
+  if(from && to) return `🕐 ${from}–${to}`;
+  return from ? `🕐 ${from}` : `🕐 ${to}`;
 }
 function fullDateStr(dateStr){
   if(!dateStr) return '';
@@ -2153,7 +2363,7 @@ async function buildOrderPrintDoc(o, opts, copyLabel){
   html += printDocHeaderBlock();
   html += `<div style="display:flex;align-items:stretch;border:1.5px dashed ${PRINT_LINE_COLOR};border-radius:8px;overflow:hidden;margin-bottom:4mm;">
     <div style="flex:0 0 260px;padding:3mm 8mm;text-align:center;display:flex;flex-direction:column;justify-content:center;border-left:1px dashed ${PRINT_LINE_COLOR};">
-      <div style="font-family:'Almohanad long kaf','Almohanad','Cairo','Tajawal',Arial;font-weight:900;font-size:12pt;color:${PRINT_THEME};">أمر تكليف</div>
+      <div style="font-family:'Tajawal','Cairo',Arial;font-weight:900;font-size:12pt;color:${PRINT_THEME};">أمر تكليف</div>
       <div style="font-family:Arial,'Tajawal';font-weight:800;font-size:7pt;letter-spacing:1px;color:${PRINT_THEME};margin-top:0.5mm;">ASSIGNMENT ORDER</div>
     </div>
     <div style="flex:1 1 auto;padding:1.5mm 5mm;display:flex;align-items:center;justify-content:center;border-left:1px dashed ${PRINT_LINE_COLOR};">
@@ -2208,7 +2418,7 @@ function dailyReportTable(list){
   if(!list.length) return `<div class="empty-state">لا توجد فعاليات ضمن هذه الفترة</div>`;
   return `<table class="print-table"><thead><tr>
     <th>م</th><th>أمر التكليف</th><th>عنوان الفعالية</th><th>التاريخ</th><th>الوقت</th><th>المكان</th>
-    <th>رقم المشرف</th><th>عدد المشاركين</th><th>مقدم البرنامج</th><th>الطلبات الإدارية للبرنامج</th>
+    <th>${LBL_SUPERVISOR_PHONE}</th><th>عدد المشاركين</th><th>مقدم البرنامج</th><th>الطلبات الإدارية للبرنامج</th>
   </tr></thead><tbody>
   ${list.map((o,i)=>{
     const school = state.schools.find(s=>s.id===o.schoolId);
@@ -2284,11 +2494,11 @@ function renderAdminPage(c){
     const k = computeKpis(list);
     document.getElementById('adm_kpis').innerHTML = `<h2>ملخص الفترة</h2>
       <div class="stat-grid">
-        <div class="stat-box"><div class="num">${k.events}</div><div class="lbl">عدد الفعاليات</div></div>
-        <div class="stat-box"><div class="num">${k.trainers}</div><div class="lbl">عدد المدربين</div></div>
-        <div class="stat-box"><div class="num">${k.hours.toFixed(1)}</div><div class="lbl">إجمالي عدد الساعات</div></div>
-        <div class="stat-box"><div class="num">${k.schools}</div><div class="lbl">عدد المدارس</div></div>
-        <div class="stat-box"><div class="num">${k.reqs}</div><div class="lbl">عدد الطلبات الإدارية</div></div>
+        <div class="stat-box"><div class="num">${k.events}</div><div class="lbl">${LBL_EVENTS}</div></div>
+        <div class="stat-box"><div class="num">${k.trainers}</div><div class="lbl">${LBL_TRAINERS}</div></div>
+        <div class="stat-box"><div class="num">${k.hours.toFixed(1)}</div><div class="lbl">${LBL_HOURS}</div></div>
+        <div class="stat-box"><div class="num">${k.schools}</div><div class="lbl">${LBL_PLACES}</div></div>
+        <div class="stat-box"><div class="num">${k.reqs}</div><div class="lbl">${LBL_ADMIN_REQS}</div></div>
       </div>
       <h3 style="margin-top:16px;font-family:var(--font-head);color:var(--maroon-800);">توزيع الطلبات الإدارية خلال الفترة</h3>
       ${reqBreakdownTable(k.reqCounts)}`;
@@ -2306,7 +2516,7 @@ function renderAdminPage(c){
       const reqs = (o.adminRequests||[]).map(id=>{const r=state.adminRequestsList.find(x=>x.id===id); return r?r.name:'';}).filter(Boolean).join('، ');
       return [i+1, o.serial, o.title, o.date||'', fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', o.participantsCount||'', trainerNames(o), trainerPhones(o), reqs||'—'];
     });
-    exportToExcel('جدول_الفعاليات.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج'], rows, `جدول الفعاليات خلال فترة (من ${from||'—'} إلى ${to||'—'})`);
+    exportToExcel('جدول_الفعاليات.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان',LBL_SUPERVISOR_PHONE,'عدد المشاركين','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج'], rows, `جدول الفعاليات خلال فترة (من ${from||'—'} إلى ${to||'—'})`);
   };
   document.getElementById('adm_print').onclick=async ()=>{
     const {list, from, to}=getList();
@@ -2321,8 +2531,8 @@ function renderAdminPage(c){
     const reqRows = Object.entries(k.reqCounts).map(([id,count])=>{ const r=state.adminRequestsList.find(x=>x.id===id); return `<tr><td>${escapeHtml(r?r.name:id)}</td><td>${count}</td></tr>`; }).join('') || '<tr><td colspan="2" style="text-align:center;color:#999;">لا توجد</td></tr>';
     doPrintDoc(buildReportDoc({
       titleAr:'جدول الفعاليات خلال فترة', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
-      kpis:[{v:k.events,l:'عدد الفعاليات'},{v:k.trainers,l:'عدد المدربين'},{v:k.hours.toFixed(1),l:'إجمالي عدد الساعات'},{v:k.schools,l:'عدد المدارس'},{v:k.reqs,l:'عدد الطلبات الإدارية'}],
-      headers:['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','الطلبات الإدارية للبرنامج','QR'],
+      kpis:[{v:k.events,l:LBL_EVENTS},{v:k.trainers,l:LBL_TRAINERS},{v:k.hours.toFixed(1),l:LBL_HOURS},{v:k.schools,l:LBL_PLACES},{v:k.reqs,l:LBL_ADMIN_REQS}],
+      headers:['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان',LBL_SUPERVISOR_PHONE,'عدد المشاركين','مقدم البرنامج','الطلبات الإدارية للبرنامج','QR'],
       rows,
       extraHtml:`<div class="sec-t">توزيع الطلبات الإدارية خلال الفترة</div><table><thead><tr><th>الطلب الإداري</th><th>عدد مرات الطلب</th></tr></thead><tbody>${reqRows}</tbody></table>`
     }), true, 'A4');
@@ -2421,7 +2631,7 @@ function renderAdminRequestsReportPage(c){
     const {list, from, to} = getList();
     doPrintDoc(buildReportDoc({
       titleAr:'تقرير الطلبات الإدارية', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
-      kpis:[{v:list.length,l:'عدد الفعاليات'}],
+      kpis:[{v:list.length,l:LBL_EVENTS}],
       headers:excelHeaders,
       rows: buildPrintRows(rowsOf(list))
     }), true, 'A4');
@@ -2880,7 +3090,7 @@ function renderReportsPage(c){
         return {headers:['اسم المدرسة','المرحلة','عدد المشرفين'], rows:state.schools.map(s=>[s.name, s.level, s.supervisors.length])};
       }
       if(type==='trainers'){
-        return {headers:['الاسم','الجوال','عدد الفعاليات'], rows:state.trainers.map(t=>[t.name, t.phone||'', state.orders.filter(o=>(o.trainerIds||[]).includes(t.id)).length])};
+        return {headers:['الاسم','الجوال',LBL_EVENTS], rows:state.trainers.map(t=>[t.name, t.phone||'', state.orders.filter(o=>(o.trainerIds||[]).includes(t.id)).length])};
       }
       const list = state.tasks.filter(t=>(!from||(t.due&&t.due>=from))&&(!to||(t.due&&t.due<=to)));
       return {headers:['المهمة','البدء','الاستحقاق','الأولوية','الحالة'], rows:list.map(t=>[t.title, t.start||'', t.due||'', t.priority||'', t.status||''])};
@@ -3087,8 +3297,8 @@ function renderReportsPage(c){
           <label style="font-weight:400;font-size:12px;"><input type="checkbox" id="rp_schoolAll"> تحديد الكل</label>
         </label>
         <input id="rp_schoolSearch" placeholder="🔎 اكتب للبحث عن مدرسة..." style="margin-bottom:6px;">
-        <div id="rp_schoolChecks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;border:1px solid var(--line);border-radius:8px;padding:8px;max-height:180px;overflow:auto;">
-          ${state.schools.map(s=>`<label class="checkbox-chip rp_schoolRow" data-name="${escapeHtml(s.name)}"><input type="checkbox" class="rp_schoolChk" value="${s.id}"> ${escapeHtml(s.name)}</label>`).join('') || '<span class="helper">لا توجد مدارس</span>'}
+        <div id="rp_schoolChecks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0 10px;border:1px solid var(--line);border-radius:8px;padding:8px;max-height:180px;overflow:auto;">
+          ${state.schools.map(s=>`<label class="school-pick-row rp_schoolRow" data-name="${escapeHtml(s.name)}"><input type="checkbox" class="rp_schoolChk" value="${s.id}"> ${escapeHtml(s.name)}</label>`).join('') || '<span class="helper">لا توجد مدارس</span>'}
         </div>
       </div>
       <button class="btn btn-primary" id="rp_go2">عرض الجدول</button>
@@ -3200,7 +3410,7 @@ function renderReportsPage(c){
       const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs = Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs;
         return [o.serial, escapeHtml(o.title), o.date||'', (o.timeFrom||'')+'-'+(o.timeTo||''), hrs.toFixed(1)]; });
       doPrintDoc(buildReportDoc({ titleAr:`تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''}`, subtitle:`من ${from||'—'} إلى ${to||'—'}`,
-        kpis:[{v:list.length,l:'عدد الفعاليات'},{v:totalHours.toFixed(1),l:'إجمالي الساعات'}],
+        kpis:[{v:list.length,l:LBL_EVENTS},{v:totalHours.toFixed(1),l:LBL_HOURS}],
         headers:['م','عنوان الفعالية','التاريخ','الوقت','عدد الساعات'], rows }), true, 'A4');
     };
     document.getElementById('hr_pdf').onclick=()=>document.getElementById('hr_print').onclick();
@@ -3284,7 +3494,7 @@ function renderStatsPage(c){
     });
     return {byField, byType, byLevel, from, to};
   }
-  function tableFrom(arr){ return `<table class="print-table"><thead><tr><th>البند</th><th>عدد المدارس</th><th>عدد المبادرات</th><th>عدد الساعات</th><th>عدد الأيام</th><th>عدد المدربين</th><th>عدد الطلاب</th></tr></thead><tbody>
+  function tableFrom(arr){ return `<table class="print-table"><thead><tr><th>البند</th><th>${LBL_PLACES}</th><th>عدد المبادرات</th><th>عدد الساعات</th><th>عدد الأيام</th><th>${LBL_TRAINERS}</th><th>عدد الطلاب</th></tr></thead><tbody>
       ${arr.map(x=>`<tr><td>${escapeHtml(x.name)}</td><td>${x.schools}</td><td>${x.programs}</td><td>${x.hours.toFixed(1)}</td><td>${x.days}</td><td>${x.trainers}</td><td>${x.participants}</td></tr>`).join('')}</tbody></table>`; }
   function tableLevel(arr){ return `<table class="print-table"><thead><tr><th>المرحلة</th><th>عدد البرامج المنفذة</th></tr></thead><tbody>
       ${arr.map(x=>`<tr><td>${escapeHtml(x.name)}</td><td>${x.programs}</td></tr>`).join('')}</tbody></table>`; }
@@ -3299,8 +3509,8 @@ function renderStatsPage(c){
     enhanceReportTable(fCard);
     document.getElementById('pr_field').onclick=()=>doPrintDoc(buildReportDoc({
       titleAr:'تقرير التصنيفيات — البند (مجال المبادرة)', subtitle,
-      kpis:[{v:byField.reduce((s,x)=>s+x.programs,0),l:'إجمالي البرامج'},{v:byField.reduce((s,x)=>s+x.participants,0),l:'إجمالي الطلاب'},{v:byField.reduce((s,x)=>s+x.hours,0).toFixed(1),l:'إجمالي الساعات'},{v:byField.reduce((s,x)=>s+x.days,0),l:'إجمالي الأيام'}],
-      headers:['البند','عدد المدارس','عدد المبادرات','عدد الساعات','عدد الأيام','عدد المدربين','عدد الطلاب'],
+      kpis:[{v:byField.reduce((s,x)=>s+x.programs,0),l:'إجمالي البرامج'},{v:byField.reduce((s,x)=>s+x.participants,0),l:'إجمالي الطلاب'},{v:byField.reduce((s,x)=>s+x.hours,0).toFixed(1),l:LBL_HOURS},{v:byField.reduce((s,x)=>s+x.days,0),l:'إجمالي الأيام'}],
+      headers:['البند',LBL_PLACES,'عدد المبادرات','عدد الساعات','عدد الأيام',LBL_TRAINERS,'عدد الطلاب'],
       rows:byField.map(x=>[escapeHtml(x.name),x.schools,x.programs,x.hours.toFixed(1),x.days,x.trainers,x.participants]),
       extraHtml:`<div class="sec-t">📊 الرسم البياني</div>${svgBarChart(byField.map(x=>({name:x.name, value:x.programs})))}`
     }), true, 'A4');
@@ -3311,8 +3521,8 @@ function renderStatsPage(c){
     enhanceReportTable(tCard);
     document.getElementById('pr_type').onclick=()=>doPrintDoc(buildReportDoc({
       titleAr:'تقرير التصنيفيات — حسب نوع البرنامج', subtitle,
-      kpis:[{v:byType.reduce((s,x)=>s+x.programs,0),l:'إجمالي البرامج'},{v:byType.reduce((s,x)=>s+x.participants,0),l:'إجمالي الطلاب'},{v:byType.reduce((s,x)=>s+x.hours,0).toFixed(1),l:'إجمالي الساعات'},{v:byType.reduce((s,x)=>s+x.days,0),l:'إجمالي الأيام'}],
-      headers:['البند','عدد المدارس','عدد المبادرات','عدد الساعات','عدد الأيام','عدد المدربين','عدد الطلاب'],
+      kpis:[{v:byType.reduce((s,x)=>s+x.programs,0),l:'إجمالي البرامج'},{v:byType.reduce((s,x)=>s+x.participants,0),l:'إجمالي الطلاب'},{v:byType.reduce((s,x)=>s+x.hours,0).toFixed(1),l:LBL_HOURS},{v:byType.reduce((s,x)=>s+x.days,0),l:'إجمالي الأيام'}],
+      headers:['البند',LBL_PLACES,'عدد المبادرات','عدد الساعات','عدد الأيام',LBL_TRAINERS,'عدد الطلاب'],
       rows:byType.map(x=>[escapeHtml(x.name),x.schools,x.programs,x.hours.toFixed(1),x.days,x.trainers,x.participants]),
       extraHtml:`<div class="sec-t">📊 الرسم البياني</div>${svgBarChart(byType.map(x=>({name:x.name, value:x.programs})))}`
     }), true, 'A4');
@@ -3333,15 +3543,15 @@ function renderStatsPage(c){
     if(!window.__lastStatsData){ toast('اضغط "احتساب" أولاً'); return; }
     const {byField, byType, byLevel, from, to} = window.__lastStatsData;
     exportToExcelMultiSheet('تقرير_التصنيفيات.xlsx', [
-      {name:'حسب المجال', headers:['البند','عدد المدارس','عدد المبادرات','عدد الساعات','عدد الأيام','عدد المدربين','عدد الطلاب'], rows:byField.map(x=>[x.name,x.schools,x.programs,x.hours.toFixed(1),x.days,x.trainers,x.participants])},
-      {name:'حسب نوع البرنامج', headers:['البند','عدد المدارس','عدد المبادرات','عدد الساعات','عدد الأيام','عدد المدربين','عدد الطلاب'], rows:byType.map(x=>[x.name,x.schools,x.programs,x.hours.toFixed(1),x.days,x.trainers,x.participants])},
+      {name:'حسب المجال', headers:['البند',LBL_PLACES,'عدد المبادرات','عدد الساعات','عدد الأيام',LBL_TRAINERS,'عدد الطلاب'], rows:byField.map(x=>[x.name,x.schools,x.programs,x.hours.toFixed(1),x.days,x.trainers,x.participants])},
+      {name:'حسب نوع البرنامج', headers:['البند',LBL_PLACES,'عدد المبادرات','عدد الساعات','عدد الأيام',LBL_TRAINERS,'عدد الطلاب'], rows:byType.map(x=>[x.name,x.schools,x.programs,x.hours.toFixed(1),x.days,x.trainers,x.participants])},
       {name:'حسب المرحلة', headers:['المرحلة','عدد البرامج المنفذة'], rows:byLevel.map(x=>[x.name,x.programs])},
     ], `تقرير التصنيفيات (من ${from||'—'} إلى ${to||'—'})`);
   };
   document.getElementById('st_print').onclick=()=>{
     if(!window.__lastStatsData){ toast('اضغط "احتساب" أولاً'); return; }
     const {byField, byType, byLevel, from, to} = window.__lastStatsData;
-    const sectionTable = (rows7)=>`<table><thead><tr><th>البند</th><th>عدد المدارس</th><th>عدد المبادرات</th><th>عدد الساعات</th><th>عدد الأيام</th><th>عدد المدربين</th><th>عدد الطلاب</th></tr></thead><tbody>
+    const sectionTable = (rows7)=>`<table><thead><tr><th>البند</th><th>${LBL_PLACES}</th><th>عدد المبادرات</th><th>عدد الساعات</th><th>عدد الأيام</th><th>${LBL_TRAINERS}</th><th>عدد الطلاب</th></tr></thead><tbody>
       ${rows7.map(x=>`<tr><td>${escapeHtml(x.name)}</td><td>${x.schools}</td><td>${x.programs}</td><td>${x.hours.toFixed(1)}</td><td>${x.days}</td><td>${x.trainers}</td><td>${x.participants}</td></tr>`).join('')}
     </tbody></table>`;
     const levelTable = `<table><thead><tr><th>المرحلة</th><th>عدد البرامج المنفذة</th></tr></thead><tbody>
@@ -3349,7 +3559,7 @@ function renderStatsPage(c){
     </tbody></table>`;
     doPrintDoc(buildReportDoc({
       titleAr:'تقرير التصنيفيات الشامل', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
-      kpis:[{v:byField.reduce((s,x)=>s+x.programs,0),l:'إجمالي البرامج'},{v:byField.reduce((s,x)=>s+x.participants,0),l:'إجمالي الطلاب'},{v:byField.reduce((s,x)=>s+x.hours,0).toFixed(1),l:'إجمالي الساعات'}],
+      kpis:[{v:byField.reduce((s,x)=>s+x.programs,0),l:'إجمالي البرامج'},{v:byField.reduce((s,x)=>s+x.participants,0),l:'إجمالي الطلاب'},{v:byField.reduce((s,x)=>s+x.hours,0).toFixed(1),l:LBL_HOURS}],
       extraHtml:`<div class="sec-t">حسب مجال المبادرة</div>${sectionTable(byField)}
         <div class="sec-t">حسب مسار المبادرة (نوع البرنامج)</div>${sectionTable(byType)}
         <div class="sec-t">حسب المرحلة الدراسية</div>${levelTable}`
@@ -3598,7 +3808,7 @@ function renderDistributionsTabContent(c){
         ${otherNoteRows.map(({t,stats})=>`${escapeHtml(t.name)}: ${stats.otherDetails.map(d=>`${escapeHtml(d.school)} (رقم التكليف ${d.serial})`).join('، ')}`).join('<br>')}
       </div>` : '';
     return `<table style="text-align:center;"><thead><tr>
-        <th>اسم مقدم المبادرة</th><th>عدد الفعاليات</th><th>عدد الأيام</th><th>عدد الساعات</th><th>عدد المسارات المقدَّمة</th><th>عدد المدارس</th>
+        <th>اسم مقدم المبادرة</th><th>${LBL_EVENTS}</th><th>عدد الأيام</th><th>عدد الساعات</th><th>عدد المسارات المقدَّمة</th><th>${LBL_PLACES}</th>
         ${allLevels.map(lvl=>`<th>${escapeHtml(lvl)}</th>`).join('')}
       </tr></thead><tbody>
         ${activeGroups.map(({t,stats})=>`<tr>
@@ -3767,14 +3977,14 @@ function renderTrainerPortalPage(c){
   if(trainerPortalTab==='upcoming'){
     box.innerHTML = `<div class="card"><h2 class="tp-h">فعالياتي القادمة <button class="btn btn-outline btn-sm" id="tp_print_up">🖨️ طباعة</button></h2>${upcomingTableOnScreen(upcoming)}</div>`;
     document.getElementById('tp_print_up').onclick=()=>doPrintDoc(buildReportDoc({
-      titleAr:'فعاليات قادمة — '+(trainer?trainer.name:''), kpis:[{v:upcoming.length,l:'عدد الفعاليات'}],
+      titleAr:'فعاليات قادمة — '+(trainer?trainer.name:''), kpis:[{v:upcoming.length,l:LBL_EVENTS}],
       headers:['م','أمر التكليف','عنوان المبادرة','المكان','هاتف المشرف','التاريخ','الوقت','الطلبات المقدمة','الإنجاز'], rows:upcomingRowsForPrint(upcoming)
     }), true, 'A4');
 
   } else if(trainerPortalTab==='past'){
     box.innerHTML = `<div class="card"><h2 class="tp-h">فعالياتي السابقة <button class="btn btn-outline btn-sm" id="tp_print_past">🖨️ طباعة</button></h2>${upcomingTableOnScreen(past)}</div>`;
     document.getElementById('tp_print_past').onclick=()=>doPrintDoc(buildReportDoc({
-      titleAr:'فعاليات سابقة — '+(trainer?trainer.name:''), kpis:[{v:past.length,l:'عدد الفعاليات'}],
+      titleAr:'فعاليات سابقة — '+(trainer?trainer.name:''), kpis:[{v:past.length,l:LBL_EVENTS}],
       headers:['م','أمر التكليف','عنوان المبادرة','المكان','هاتف المشرف','التاريخ','الوقت','الطلبات المقدمة','الإنجاز'], rows:upcomingRowsForPrint(past)
     }), true, 'A4');
 
@@ -3816,7 +4026,7 @@ function renderTrainerPortalPage(c){
       <button class="btn btn-outline btn-sm" style="margin-top:12px;" id="tp_print_hours">🖨️ طباعة</button>
     </div>`;
     document.getElementById('tp_print_hours').onclick=()=>doPrintDoc(buildReportDoc({
-      titleAr:'تقرير ساعات مقدم الفعالية: '+(trainer?trainer.name:''), kpis:[{v:myOrders.length,l:'عدد الفعاليات'},{v:totalHours.toFixed(1),l:'إجمالي الساعات'}],
+      titleAr:'تقرير ساعات مقدم الفعالية: '+(trainer?trainer.name:''), kpis:[{v:myOrders.length,l:LBL_EVENTS},{v:totalHours.toFixed(1),l:LBL_HOURS}],
       headers:['م','العنوان','التاريخ','الوقت','عدد الساعات'], rows:rows.map(r=>[r.o.serial, escapeHtml(r.o.title), r.o.date||'', (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.hrs.toFixed(1)])
     }), true, 'A4');
 
@@ -4043,17 +4253,19 @@ function renderSettingsPage(c){
   c.innerHTML = `
   <div class="card">
     <h2>إدارة البيانات</h2>
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      <button class="btn btn-outline" id="dm_backup">💾 نسخة احتياطية (تنزيل)</button>
-      <button class="btn btn-outline" onclick="document.getElementById('dm_restoreFile').click()">📥 استيراد نسخة احتياطية</button>
+    <div class="icon-reveal-row" id="dmButtonsRow" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <button class="icon-reveal-toggle" id="dmRevealToggle" title="إظهار/إخفاء أسماء الأزرار">☰</button>
+      <button class="btn btn-outline" id="dm_backup">💾 <span class="lbl">نسخة احتياطية (تنزيل)</span></button>
+      <button class="btn btn-outline" onclick="document.getElementById('dm_restoreFile').click()">📥 <span class="lbl">استيراد نسخة احتياطية</span></button>
       <input type="file" id="dm_restoreFile" accept=".json" style="display:none" onchange="restoreBackup(this.files[0])">
-      <button class="btn btn-outline" id="dm_refresh">🔄 تحديث البيانات من الخادم</button>
-      <button class="btn btn-outline" onclick="document.getElementById('dm_ordersFile').click()">📊 استيراد فعاليات من إكسل</button>
+      <button class="btn btn-outline" id="dm_refresh">🔄 <span class="lbl">تحديث البيانات من الخادم</span></button>
+      <button class="btn btn-outline" onclick="document.getElementById('dm_ordersFile').click()">📊 <span class="lbl">استيراد فعاليات من إكسل</span></button>
       <input type="file" id="dm_ordersFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importOrdersExcel(this.files[0])">
-      <label class="checkbox-chip"><input type="checkbox" id="dm_importAsDone"> تعليم الفعاليات المستوردة كـ "منجزة"</label>
-      <button class="icon-btn rect danger" id="dm_dedupe" title="حذف الفعاليات المكررة (نفس العنوان والتاريخ والمدرسة)">🗑️ حذف المكرر من الفعاليات</button>
+      <label class="checkbox-chip"><input type="checkbox" id="dm_importAsDone"> <span class="lbl">تعليم الفعاليات المستوردة كـ "منجزة"</span></label>
+      <button class="icon-btn rect danger" id="dm_dedupe" title="حذف الفعاليات المكررة (نفس العنوان والتاريخ والمدرسة)">🗑️ <span class="lbl">حذف المكرر من الفعاليات</span></button>
     </div>
     <div class="helper" style="margin-top:8px;">أعمدة ملف استيراد الفعاليات: عنوان المبادرة، التاريخ (YYYY-MM-DD)، من الساعة، إلى الساعة، اسم المدرسة، عدد المستهدفين، مسار البرنامج (اختياري)، المدربون بصيغة "الاسم:الهاتف، الاسم:الهاتف"، اسم المشرف، رقم الجوال، المرحلة الدراسية، البريد الإلكتروني للمدرسة، البريد الإلكتروني للمشرف (كلها اختيارية). المدارس والمسارات والمدربون والمشرفون غير الموجودين يُنشأون تلقائيًا. الاستيراد يتجاهل تلقائيًا أي صف مطابق (نفس العنوان والتاريخ والمدرسة) لفعالية موجودة مسبقًا.</div>
+    <div class="helper" style="margin-top:4px;">ملاحظة: ملفات تصدير الإكسل في كل التقارير تطابق ترتيب أعمدة نسخة الطباعة/PDF، لكن التنسيق المرئي الكامل (ألوان وحدود وتعريض) متاح فقط في نسخة PDF/الطباعة — قيد تقني في مكتبة الإكسل المجانية المستخدمة.</div>
   </div>
   <div class="card">
     <h2>بيانات الجهة والشعار وترويسة الطباعة</h2>
@@ -4139,6 +4351,7 @@ function renderSettingsPage(c){
     if(file){ state.logo = await fileToDataUrl(file); }
     await saveState(); toast('تم الحفظ'); render();
   };
+  document.getElementById('dmRevealToggle').onclick=()=>{ document.getElementById('dmButtonsRow').classList.toggle('expanded'); };
   document.getElementById('dm_backup').onclick=()=>{
     const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
@@ -4284,9 +4497,16 @@ function editSchool(id){
   openModal('تعديل مدرسة: '+s.name, [
     {name:'name', label:'اسم المدرسة / الجهة', required:true},
     {name:'level', label:'المرحلة الدراسية', type:'select', options:LOCATION_TYPES.map(t=>({value:t,label:t}))},
+    {name:'stages', label:'المراحل الدراسية (إن كانت مدرسة، اختر واحدة أو أكثر)', type:'checkboxgroup', options:STAGE_OPTIONS.map(t=>({value:t,label:t}))},
     {name:'email', label:'البريد الإلكتروني للمدرسة (اختياري)'},
-  ], async v=>{ s.name=v.name; s.level=v.level; s.email=v.email||''; await saveState(); toast('تم الحفظ'); render(); });
-  setTimeout(()=>{ const f=document.getElementById('mf_name'); if(f) f.value=s.name; const l=document.getElementById('mf_level'); if(l) l.value=s.level; const em=document.getElementById('mf_email'); if(em) em.value=s.email||''; },0);
+  ], async v=>{ s.name=v.name; s.level=v.level; s.stages=v.stages||[]; s.email=v.email||''; await saveState(); toast('تم الحفظ'); render(); });
+  setTimeout(()=>{
+    const f=document.getElementById('mf_name'); if(f) f.value=s.name;
+    const l=document.getElementById('mf_level'); if(l) l.value=s.level;
+    const em=document.getElementById('mf_email'); if(em) em.value=s.email||'';
+    const stagesWrap=document.getElementById('mf_stages');
+    if(stagesWrap){ const set=new Set(s.stages||[]); stagesWrap.querySelectorAll('input[type=checkbox]').forEach(c=>{ c.checked=set.has(c.value); }); }
+  },0);
 }
 
 /* ---- Excel import (SheetJS) ---- */
@@ -4338,6 +4558,10 @@ async function importSchoolsExcel(file){
     await saveState(); toast(`تم استيراد ${added} مدرسة جديدة، ${supAdded} مشرف، وتحديث بريد ${emailFilled} مدرسة`); render();
   }catch(e){ toast('تعذّرت قراءة الملف، تأكد من صيغته'); console.error(e); }
 }
+/* عرض عمود تقريبي متناسب مع طول العنوان (بدل عرض ثابت 18 للجميع) — أقرب لتناسق أعمدة تقرير الـPDF.
+   ⚠️ قيد معروف في مكتبة SheetJS المجانية (xlsx.full.min.js) المستخدمة هنا: لا تدعم كتابة تنسيق الخلايا
+   (تعريض الخط، الألوان، الحدود) عند الحفظ — فقط عرض الأعمدة. التنسيق الكامل متاح فقط في نسخة PDF/الطباعة. */
+function excelColWidths(headers){ return headers.map(h=>({wch: Math.min(40, Math.max(10, String(h||'').length + 4))})); }
 function exportToExcel(filename, headers, rows, titleAr){
   const now = new Date();
   const dateStr = todayStr();
@@ -4347,7 +4571,7 @@ function exportToExcel(filename, headers, rows, titleAr){
   aoa.push(headers);
   rows.forEach(r=>aoa.push(r));
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = headers.map(()=>({wch:18}));
+  ws['!cols'] = excelColWidths(headers);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'بيانات');
   XLSX.writeFile(wb, filename);
@@ -4363,7 +4587,7 @@ function exportToExcelMultiSheet(filename, sheets, titleAr){
     aoa.push(s.headers);
     s.rows.forEach(r=>aoa.push(r));
     const ws = XLSX.utils.aoa_to_sheet(aoa);
-    ws['!cols'] = s.headers.map(()=>({wch:18}));
+    ws['!cols'] = excelColWidths(s.headers);
     XLSX.utils.book_append_sheet(wb, ws, (s.name||'بيانات').slice(0,31));
   });
   XLSX.writeFile(wb, filename);
@@ -4424,7 +4648,10 @@ async function rejectTrainerRequest(id){
 }
 
 /* ============ Init ============ */
-(async function init(){ await loadState(); renderRoot(); })();
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){ const ov=document.getElementById('modalOverlay'); if(ov && ov.classList.contains('open')) ov.classList.remove('open'); }
+});
+(async function init(){ purgeOldDrafts(); await loadState(); renderRoot(); })();
 </script>
 </body>
 </html>

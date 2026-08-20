@@ -679,8 +679,8 @@ function renderHome(c){
     <h2>🔎 بحث سريع</h2>
     <div class="grid">
       <div class="field"><label>اسم الفعالية / المدرسة / رقم أمر التكليف</label><input id="hs_query" placeholder="اكتب للبحث..."></div>
-      <div class="field"><label>من تاريخ</label><input id="hs_from" type="date" lang="en"></div>
-      <div class="field"><label>إلى تاريخ</label><input id="hs_to" type="date" lang="en"></div>
+      <div class="field"><label>من تاريخ</label><input id="hs_from" type="date" lang="en-GB"></div>
+      <div class="field"><label>إلى تاريخ</label><input id="hs_to" type="date" lang="en-GB"></div>
     </div>
     <button class="btn btn-primary" id="hs_go">بحث</button>
     <div id="hs_result" style="margin-top:14px;"></div>
@@ -1276,8 +1276,8 @@ function renderQuickEditSheet(sub){
             <option value="">—</option>
             ${state.programTypes.map(p=>`<option value="${p.id}" ${o.programTypeId===p.id?'selected':''}>${escapeHtml(p.name)}</option>`).join('')}
           </select></td>
-          <td><input type="date" lang="en" class="qs-field" data-field="date" value="${o.date||''}"></td>
-          <td><input type="date" lang="en" class="qs-field" data-field="dateTo" value="${o.dateTo||''}"></td>
+          <td><input type="date" lang="en-GB" class="qs-field" data-field="date" value="${o.date||''}"></td>
+          <td><input type="date" lang="en-GB" class="qs-field" data-field="dateTo" value="${o.dateTo||''}"></td>
           <td><input type="time" lang="en" class="qs-field" data-field="timeFrom" value="${o.timeFrom||''}"></td>
           <td><input type="time" lang="en" class="qs-field" data-field="timeTo" value="${o.timeTo||''}"></td>
           <td><input type="number" lang="en" min="0" class="qs-field" data-field="participantsCount" value="${o.participantsCount||''}" style="width:90px;"></td>
@@ -1427,8 +1427,8 @@ function renderOrderForm(sub){
         <td><label>مسار المبادرة</label>
           <select id="f_ptype" class="auto-w" required>${state.programTypes.map(p=>`<option value="${p.id}" ${editing&&editing.programTypeId===p.id?'selected':''}>${escapeHtml(p.name)}</option>`).join('')}</select>
         </td>
-        <td><label>تاريخ المبادرة (من)</label><input id="f_date" class="auto-w" type="date" lang="en" required value="${editing?editing.date:''}"></td>
-        <td><label>تاريخ الانتهاء</label><input id="f_dateTo" class="auto-w" type="date" lang="en" required value="${editing?editing.dateTo||'':''}"></td>
+        <td><label>تاريخ المبادرة (من)</label><input id="f_date" class="auto-w" type="date" lang="en-GB" required value="${editing?editing.date:''}"></td>
+        <td><label>تاريخ الانتهاء</label><input id="f_dateTo" class="auto-w" type="date" lang="en-GB" required value="${editing?editing.dateTo||'':''}"></td>
         <td><label>وقت المبادرة من</label><input id="f_timeFrom" class="auto-w" type="time" lang="en" required value="${editing?editing.timeFrom:''}"></td>
         <td><label>وقت المبادرة إلى</label><input id="f_timeTo" class="auto-w" type="time" lang="en" required value="${editing?editing.timeTo:''}"></td>
       </tr>
@@ -2028,7 +2028,7 @@ function printDocFooter(){
   const ph = state.printHeader || {};
   const now = new Date();
   const timeStr = now.toLocaleTimeString('ar-QA-u-nu-latn', {hour:'2-digit', minute:'2-digit'});
-  return `<div class="ftr">${escapeHtml(ph.line1||'')} — ${escapeHtml(ph.line2||'')} — تمت الطباعة بتاريخ ${todayStr()} الساعة ${timeStr}</div>`;
+  return `<div class="ftr">${escapeHtml(ph.line1||'')} — ${escapeHtml(ph.line2||'')} — تمت الطباعة بتاريخ ${fmtDate(todayStr())} الساعة ${timeStr}</div>`;
 }
 function printDocClose(){ return `</div></body></html>`; }
 /* Trainer name+phone: same style and same color for both boxes, uniform width across multiple trainers */
@@ -2068,7 +2068,7 @@ function fullTimeRange(from, to){
 function fmtDate(dateStr){
   if(!dateStr) return '';
   const m = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  return m ? `${m[3]}-${m[2]}-${m[1]}` : dateStr;
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : dateStr;
 }
 function fullDateStr(dateStr){
   if(!dateStr) return '';
@@ -2252,8 +2252,8 @@ function renderAdminPage(c){
   <div class="card">
     <h2>عرض الفعاليات اليومية</h2>
     <div class="grid">
-      <div class="field"><label>من تاريخ</label><input id="adm_from" type="date" lang="en" value="${today}"></div>
-      <div class="field"><label>إلى تاريخ</label><input id="adm_to" type="date" lang="en" value="${today}"></div>
+      <div class="field"><label>من تاريخ</label><input id="adm_from" type="date" lang="en-GB" value="${today}"></div>
+      <div class="field"><label>إلى تاريخ</label><input id="adm_to" type="date" lang="en-GB" value="${today}"></div>
       <div class="field"><label>🔎 بحث بأمر التكليف</label><input id="adm_serial" type="number" lang="en" placeholder="رقم أمر التكليف..."></div>
     </div>
     <button class="btn btn-primary" id="adm_filter">عرض</button>
@@ -2354,8 +2354,8 @@ function renderAdminRequestsReportPage(c){
     <h2>تقرير الطلبات الإدارية</h2>
     <div class="grid">
       <div class="field"><label>البحث خلال</label><select id="arq_range"><option value="">فترة مخصصة (من/إلى)</option><option value="week">أسبوع بدءًا من</option><option value="month">شهر بدءًا من</option></select></div>
-      <div class="field"><label>من تاريخ / تاريخ البداية</label><input id="arq_from" type="date" lang="en"></div>
-      <div class="field" id="arq_toWrap"><label>إلى تاريخ</label><input id="arq_to" type="date" lang="en"></div>
+      <div class="field"><label>من تاريخ / تاريخ البداية</label><input id="arq_from" type="date" lang="en-GB"></div>
+      <div class="field" id="arq_toWrap"><label>إلى تاريخ</label><input id="arq_to" type="date" lang="en-GB"></div>
     </div>
     <button class="btn btn-primary" id="arq_go">عرض</button>
     <button class="icon-btn rect" id="arq_print" title="طباعة الكل">🖨️ الكل</button>
@@ -2483,11 +2483,11 @@ function renderQuranEntryForm(sub){
         <option value="روح" ${editing&&editing.programName==='روح'?'selected':''}>روح</option>
         <option value="الرحيق" ${editing&&editing.programName==='الرحيق'?'selected':''}>الرحيق</option>
       </select></div>
-      <div class="field"><label>الشهر</label><input id="qa_month" type="month" lang="en" value="${editing?editing.month:''}"></div>
+      <div class="field"><label>الشهر</label><input id="qa_month" type="month" lang="en-GB" value="${editing?editing.month:''}"></div>
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
-      <div class="field"><label>من تاريخ</label><input id="qa_from" type="date" lang="en" value="${editing?editing.dateFrom:''}"></div>
-      <div class="field"><label>إلى تاريخ</label><input id="qa_to" type="date" lang="en" value="${editing?editing.dateTo:''}"></div>
+      <div class="field"><label>من تاريخ</label><input id="qa_from" type="date" lang="en-GB" value="${editing?editing.dateFrom:''}"></div>
+      <div class="field"><label>إلى تاريخ</label><input id="qa_to" type="date" lang="en-GB" value="${editing?editing.dateTo:''}"></div>
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
       <div class="field"><label>عدد أيام تنفيذ البرنامج</label><input id="qa_days" type="number" lang="en" min="0" value="${editing?editing.execDays:''}"></div>
@@ -2597,13 +2597,13 @@ function renderQuranReportTab(sub){
     <h2>تقرير الأنشطة القرآنية</h2>
     <div class="grid" style="grid-template-columns:repeat(4,1fr);">
       <div class="field"><label>البرنامج</label><select id="qr_program"><option value="">الكل</option><option value="روح">روح</option><option value="الرحيق">الرحيق</option></select></div>
-      <div class="field"><label>الشهر (شهر واحد)</label><input id="qr_month" type="month" lang="en"></div>
-      <div class="field"><label>من شهر</label><input id="qr_from" type="month" lang="en"></div>
-      <div class="field"><label>إلى شهر</label><input id="qr_to" type="month" lang="en"></div>
+      <div class="field"><label>الشهر (شهر واحد)</label><input id="qr_month" type="month" lang="en-GB"></div>
+      <div class="field"><label>من شهر</label><input id="qr_from" type="month" lang="en-GB"></div>
+      <div class="field"><label>إلى شهر</label><input id="qr_to" type="month" lang="en-GB"></div>
     </div>
     <div class="grid" style="grid-template-columns:repeat(2,1fr);">
-      <div class="field"><label>من تاريخ</label><input id="qr_dFrom" type="date" lang="en"></div>
-      <div class="field"><label>إلى تاريخ</label><input id="qr_dTo" type="date" lang="en"></div>
+      <div class="field"><label>من تاريخ</label><input id="qr_dFrom" type="date" lang="en-GB"></div>
+      <div class="field"><label>إلى تاريخ</label><input id="qr_dTo" type="date" lang="en-GB"></div>
     </div>
     <div class="helper" style="margin-bottom:8px;">اترك الحقول فارغة لعرض كل السجلات. "من/إلى شهر" تصفّي حسب شهر السجل، و"من/إلى تاريخ" تصفّي حسب فترة تنفيذ البرنامج المسجّلة.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -2735,8 +2735,8 @@ function renderReportsPage(c){
       <h2>ابدأ تقريرًا</h2>
       <div class="helper" style="margin-bottom:10px;">اختر الفترة ثم نوع التقرير، وسيُفتح التقرير المطلوب بالفترة معبّأة تلقائيًا.</div>
       <div class="grid">
-        <div class="field"><label>من تاريخ</label><input id="rl_from" type="date" lang="en"></div>
-        <div class="field"><label>إلى تاريخ</label><input id="rl_to" type="date" lang="en"></div>
+        <div class="field"><label>من تاريخ</label><input id="rl_from" type="date" lang="en-GB"></div>
+        <div class="field"><label>إلى تاريخ</label><input id="rl_to" type="date" lang="en-GB"></div>
       </div>
       <div class="field" style="margin-bottom:12px;">
         <label>نوع التقرير</label>
@@ -2777,8 +2777,8 @@ function renderReportsPage(c){
     const box=document.getElementById('reportContent');
     box.innerHTML = `<div class="card"><h2>تقرير حسب مسار / مجال المبادرة</h2>
       <div class="grid">
-        <div class="field"><label>من تاريخ</label><input id="bp_from" type="date" lang="en" value="2025-08-11"></div>
-        <div class="field"><label>إلى تاريخ</label><input id="bp_to" type="date" lang="en" value="2026-06-16"></div>
+        <div class="field"><label>من تاريخ</label><input id="bp_from" type="date" lang="en-GB" value="2025-08-11"></div>
+        <div class="field"><label>إلى تاريخ</label><input id="bp_to" type="date" lang="en-GB" value="2026-06-16"></div>
       </div>
       <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;">
         <label class="checkbox-chip"><input type="checkbox" id="bp_byPath" checked> مسار المبادرة</label>
@@ -2910,8 +2910,8 @@ function renderReportsPage(c){
           <option value="trainers">مقدمو الفعاليات</option>
           <option value="tasks">المهام</option>
         </select></div>
-        <div class="field"><label>من تاريخ</label><input id="gn_from" type="date" lang="en"></div>
-        <div class="field"><label>إلى تاريخ</label><input id="gn_to" type="date" lang="en"></div>
+        <div class="field"><label>من تاريخ</label><input id="gn_from" type="date" lang="en-GB"></div>
+        <div class="field"><label>إلى تاريخ</label><input id="gn_to" type="date" lang="en-GB"></div>
       </div>
       <button class="btn btn-primary" id="gn_go">عرض</button>
       <button class="icon-btn rect" id="gn_print" title="طباعة">🖨️ طباعة</button>
@@ -2952,7 +2952,7 @@ function renderReportsPage(c){
   function drawEval(){
     const box=document.getElementById('reportContent');
     box.innerHTML = `<div class="card"><h2>النتائج والإنجازات</h2>
-      <div class="grid"><div class="field"><label>من تاريخ</label><input id="ev_from" type="date" lang="en"></div><div class="field"><label>إلى تاريخ</label><input id="ev_to" type="date" lang="en"></div></div>
+      <div class="grid"><div class="field"><label>من تاريخ</label><input id="ev_from" type="date" lang="en-GB"></div><div class="field"><label>إلى تاريخ</label><input id="ev_to" type="date" lang="en-GB"></div></div>
       <button class="btn btn-primary" id="ev_go">عرض</button>
       <button class="icon-btn rect" id="ev_print" title="طباعة">🖨️ طباعة</button>
       <button class="icon-btn rect" id="ev_pdf" title="تنزيل PDF">📄 تنزيل PDF</button>
@@ -3012,8 +3012,8 @@ function renderReportsPage(c){
     const box=document.getElementById('reportContent');
     box.innerHTML = `<div class="card"><h2>تقرير مقدم فعالية</h2>
       <div class="grid">
-        <div class="field"><label>من تاريخ</label><input id="rp_from" type="date" lang="en"></div>
-        <div class="field"><label>إلى تاريخ</label><input id="rp_to" type="date" lang="en"></div>
+        <div class="field"><label>من تاريخ</label><input id="rp_from" type="date" lang="en-GB"></div>
+        <div class="field"><label>إلى تاريخ</label><input id="rp_to" type="date" lang="en-GB"></div>
       </div>
       <div class="field" style="margin-bottom:10px;">
         <label style="display:flex;justify-content:space-between;align-items:center;">
@@ -3128,8 +3128,8 @@ function renderReportsPage(c){
     const box=document.getElementById('reportContent');
     box.innerHTML = `<div class="card"><h2>تقرير مدرسة</h2>
       <div class="grid">
-        <div class="field"><label>من تاريخ</label><input id="rp_from2" type="date" lang="en"></div>
-        <div class="field"><label>إلى تاريخ</label><input id="rp_to2" type="date" lang="en"></div>
+        <div class="field"><label>من تاريخ</label><input id="rp_from2" type="date" lang="en-GB"></div>
+        <div class="field"><label>إلى تاريخ</label><input id="rp_to2" type="date" lang="en-GB"></div>
       </div>
       <div class="field" style="margin-bottom:10px;">
         <label style="display:flex;justify-content:space-between;align-items:center;">
@@ -3209,8 +3209,8 @@ function renderReportsPage(c){
     box.innerHTML = `<div class="card"><h2>تقرير ساعات مقدمي الفعالية</h2>
       <div class="grid">
         <div class="field"><label>مقدم الفعالية</label><select id="hr_trainer">${state.trainers.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('')}</select></div>
-        <div class="field"><label>من تاريخ</label><input id="hr_from" type="date" lang="en"></div>
-        <div class="field"><label>إلى تاريخ</label><input id="hr_to" type="date" lang="en"></div>
+        <div class="field"><label>من تاريخ</label><input id="hr_from" type="date" lang="en-GB"></div>
+        <div class="field"><label>إلى تاريخ</label><input id="hr_to" type="date" lang="en-GB"></div>
       </div>
       <button class="btn btn-primary" id="hr_go">احتساب الساعات</button>
       <button class="icon-btn rect" id="hr_print" title="طباعة">🖨️ طباعة</button>
@@ -3299,7 +3299,7 @@ function renderStatsPage(c){
   c.innerHTML = `
   <div class="card">
     <h2>تقرير تصنيفيات</h2>
-    <div class="grid"><div class="field"><label>من تاريخ</label><input id="st_from" type="date" lang="en"></div><div class="field"><label>إلى تاريخ</label><input id="st_to" type="date" lang="en"></div></div>
+    <div class="grid"><div class="field"><label>من تاريخ</label><input id="st_from" type="date" lang="en-GB"></div><div class="field"><label>إلى تاريخ</label><input id="st_to" type="date" lang="en-GB"></div></div>
     <button class="btn btn-primary" id="st_go">احتساب</button>
     <button class="icon-btn rect" id="st_print" title="طباعة الكل">🖨️ طباعة الكل</button>
     <button class="btn btn-outline" id="st_excel">📊 تنزيل Excel (كل التصنيفات)</button>
@@ -3412,8 +3412,8 @@ function renderTasksPage(c){
   c.innerHTML = `<div class="card"><h2>إضافة مهمة</h2>
     <div class="grid">
       <div class="field"><label>اسم المهمة</label><input id="tk_title"></div>
-      <div class="field"><label>تاريخ البدء</label><input id="tk_start" type="date" lang="en"></div>
-      <div class="field"><label>تاريخ الاستحقاق</label><input id="tk_due" type="date" lang="en"></div>
+      <div class="field"><label>تاريخ البدء</label><input id="tk_start" type="date" lang="en-GB"></div>
+      <div class="field"><label>تاريخ الاستحقاق</label><input id="tk_due" type="date" lang="en-GB"></div>
       <div class="field"><label>مرتبطة بمنفذ مبادرة</label><select id="tk_trainer"><option value="">— بدون —</option>${state.trainers.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('')}</select></div>
       <div class="field"><label>الأولوية</label><select id="tk_priority"><option value="منخفضة">منخفضة</option><option value="متوسطة" selected>متوسطة</option><option value="عالية">عالية</option></select></div>
       <div class="field"><label>الحالة</label><select id="tk_status"><option value="لم تبدأ" selected>لم تبدأ</option><option value="قيد التنفيذ">قيد التنفيذ</option><option value="مكتملة">مكتملة</option></select></div>
@@ -3468,8 +3468,8 @@ function renderResultsPage(c){
   <div class="card">
     <h2>النتائج والتقييمات</h2>
     <div class="grid">
-      <div class="field"><label>من تاريخ</label><input id="res_from" type="date" lang="en"></div>
-      <div class="field"><label>إلى تاريخ</label><input id="res_to" type="date" lang="en"></div>
+      <div class="field"><label>من تاريخ</label><input id="res_from" type="date" lang="en-GB"></div>
+      <div class="field"><label>إلى تاريخ</label><input id="res_to" type="date" lang="en-GB"></div>
       <div class="field"><label>عرض</label><select id="res_filter">
         <option value="all">الكل</option><option value="evaluated">المقيَّمة فقط</option><option value="notEvaluated">غير المقيَّمة فقط</option>
       </select></div>
@@ -3552,9 +3552,9 @@ function renderDistributionsTabContent(c){
     <h2>توزيع الفعاليات على مقدمي المبادرة</h2>
     <div class="grid">
       <div class="field"><label>الفترة</label><select id="dist_period"><option value="week">أسبوع</option><option value="month">شهر</option><option value="year">سنة</option></select></div>
-      <div class="field"><label>تاريخ ضمن الفترة</label><input id="dist_date" type="date" lang="en" value="${today}"></div>
-      <div class="field"><label>أو من تاريخ (فترة مخصصة)</label><input id="dist_customFrom" type="date" lang="en"></div>
-      <div class="field"><label>إلى تاريخ (فترة مخصصة)</label><input id="dist_customTo" type="date" lang="en"></div>
+      <div class="field"><label>تاريخ ضمن الفترة</label><input id="dist_date" type="date" lang="en-GB" value="${today}"></div>
+      <div class="field"><label>أو من تاريخ (فترة مخصصة)</label><input id="dist_customFrom" type="date" lang="en-GB"></div>
+      <div class="field"><label>إلى تاريخ (فترة مخصصة)</label><input id="dist_customTo" type="date" lang="en-GB"></div>
     </div>
     <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;">
       <label class="checkbox-chip"><input type="checkbox" id="dist_showList" checked> قائمة (تفاصيل الفعاليات)</label>
@@ -3834,7 +3834,7 @@ function renderTrainerPortalPage(c){
   } else if(trainerPortalTab==='daily'){
     box.innerHTML = `<div class="card">
       <h2 class="tp-h">فعالياتي اليومية</h2>
-      <div class="grid"><div class="field"><label>من تاريخ</label><input id="tpd_from" type="date" lang="en" value="${today}"></div><div class="field"><label>إلى تاريخ</label><input id="tpd_to" type="date" lang="en" value="${today}"></div></div>
+      <div class="grid"><div class="field"><label>من تاريخ</label><input id="tpd_from" type="date" lang="en-GB" value="${today}"></div><div class="field"><label>إلى تاريخ</label><input id="tpd_to" type="date" lang="en-GB" value="${today}"></div></div>
       <button class="btn btn-primary" id="tpd_go">عرض</button>
       <div id="tpd_result" style="margin-top:16px;"></div>
     </div>`;
@@ -3895,7 +3895,7 @@ function renderTrainerPortalPage(c){
       </div>
       <div class="grid" style="grid-template-columns:1fr;"><div class="field"><label>عنوان المبادرة المقترحة</label><input id="tr_title" style="font-size:18px;padding:13px 14px;"></div></div>
       <div class="grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="field"><label>التاريخ المقترح</label><input id="tr_date" type="date" lang="en"></div>
+        <div class="field"><label>التاريخ المقترح</label><input id="tr_date" type="date" lang="en-GB"></div>
         <div class="field"><label>من الساعة</label><input id="tr_from" type="time" lang="en"></div>
         <div class="field"><label>إلى الساعة</label><input id="tr_to" type="time" lang="en"></div>
       </div>
@@ -4390,7 +4390,7 @@ async function importSchoolsExcel(file){
 }
 function exportToExcel(filename, headers, rows, titleAr){
   const now = new Date();
-  const dateStr = todayStr();
+  const dateStr = fmtDate(todayStr());
   const timeStr = now.toLocaleTimeString('ar-QA-u-nu-latn', {hour:'2-digit', minute:'2-digit'});
   const aoa = [];
   if(titleAr){ aoa.push([titleAr]); aoa.push([`تاريخ التصدير: ${dateStr}    وقت التصدير: ${timeStr}`]); aoa.push([]); }
@@ -4405,7 +4405,7 @@ function exportToExcel(filename, headers, rows, titleAr){
 function exportToExcelMultiSheet(filename, sheets, titleAr){
   // sheets: [{name, headers, rows}]
   const now = new Date();
-  const dateStr = todayStr(), timeStr = now.toLocaleTimeString('ar-QA-u-nu-latn', {hour:'2-digit', minute:'2-digit'});
+  const dateStr = fmtDate(todayStr()), timeStr = now.toLocaleTimeString('ar-QA-u-nu-latn', {hour:'2-digit', minute:'2-digit'});
   const wb = XLSX.utils.book_new();
   sheets.forEach(s=>{
     const aoa = [];

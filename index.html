@@ -21,11 +21,11 @@
     --font-head:'Cairo','Almarai',sans-serif;
     --radius:12px; --shadow:0 1px 2px rgba(138,21,56,.06),0 4px 16px rgba(138,21,56,.08);
   }
-  h1,h2,h3,h4{font-family:var(--font-head);}
+  h1,h2,h3,h4{font-family:var(--font-head); color:var(--maroon-800);}
   button{font-family:var(--font-body);}
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{font-family:var(--font-body); font-size:15px; line-height:1.7; background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 55%,#FBF3F6 100%); background-attachment:fixed; color:var(--ink); min-height:100vh;}
+  body{font-family:var(--font-body); font-size:10pt; line-height:1.65; background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 55%,#FBF3F6 100%); background-attachment:fixed; color:var(--ink); min-height:100vh;}
   #app{display:flex; min-height:100vh;}
   #sidebar{width:250px; flex:0 0 250px; background:linear-gradient(180deg,#5E0B26 0%,#7A1233 55%,#8A1538 100%); color:var(--white);
     display:flex; flex-direction:column; position:sticky; top:0; height:100vh;}
@@ -57,6 +57,46 @@
   .form-table.compact tbody td label{font-size:11.5px; margin-bottom:3px;}
   .form-table .auto-w{width:auto; min-width:0; max-width:100%;}
   .form-table .auto-w.num{width:84px;}
+  /* ===== بوابة الدخول: حدود ذهبية مضيئة وخلفية زرقاء فاتحة ===== */
+  .gate-card.gate-login{background:#EAF3FC !important; border:2px solid #D4AF37 !important;
+    box-shadow:0 0 0 3px rgba(212,175,55,.25), 0 0 22px 4px rgba(212,175,55,.45) !important;}
+  .gate-card.gate-login h1{color:var(--maroon-800);}
+
+  /* ===== مربع معلومات المستخدم وحالة المزامنة ===== */
+  .userbox{margin:10px 6px 4px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18);
+    border-radius:9px; overflow:hidden; font-size:11.5px;}
+  .userbox .row{display:flex; justify-content:space-between; gap:8px; padding:5px 9px; color:#fff;
+    border-bottom:1px solid rgba(255,255,255,.12);}
+  .userbox .row:last-child{border-bottom:none;}
+  .userbox .k{opacity:.75;}
+  .userbox .v{font-weight:700;}
+  .sync-dot{width:9px; height:9px; border-radius:50%; display:inline-block; margin-inline-end:5px; vertical-align:middle;}
+  .sync-ok{background:#35C46A; box-shadow:0 0 6px #35C46A;}
+  .sync-bad{background:#E5484D; box-shadow:0 0 6px #E5484D;}
+
+  /* ===== انطواء القائمة الجانبية ===== */
+  #sidebar{transition:width .18s ease, flex-basis .18s ease;}
+  body.nav-collapsed #sidebar{width:64px; flex:0 0 64px;}
+  body.nav-collapsed #sidebar .nav-text,
+  body.nav-collapsed #sidebar .userbox,
+  body.nav-collapsed #sidebar .brand-text{display:none;}
+  body.nav-collapsed nav.mainnav button{justify-content:center; padding:10px 0;}
+  #navToggle{all:unset; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    width:30px; height:30px; border-radius:8px; background:rgba(255,255,255,.12); color:#fff; font-size:15px;}
+  #navToggle:hover{background:rgba(255,255,255,.22);}
+  nav.mainnav button{position:relative;}
+  body.nav-collapsed nav.mainnav button::after{content:attr(data-label); position:absolute; right:calc(100% + 8px);
+    top:50%; transform:translateY(-50%); background:#222; color:#fff; padding:4px 9px; border-radius:6px;
+    font-size:12px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s; z-index:50;}
+  body.nav-collapsed nav.mainnav button:hover::after{opacity:1;}
+
+  /* ===== عناوين المربعات: منتصف الحافة بشكل مقصوص ===== */
+  .card.notched{position:relative; padding-top:26px; overflow:visible;}
+  .card.notched > h2.notch-title{position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    margin:0; padding:5px 26px; background:var(--white); color:var(--maroon-800); font-family:var(--font-head);
+    font-weight:700; font-size:13px; white-space:nowrap; border:1px solid var(--line);
+    border-radius:8px; box-shadow:var(--shadow); display:inline-flex; align-items:center; gap:8px;}
+
   .date-hint{font-size:11px; font-weight:700; color:var(--maroon-700); margin-top:3px; direction:rtl;}
   .plus-btn.mini{width:18px; height:18px; font-size:12px; line-height:1; padding:0; vertical-align:middle; margin-inline-start:4px;}
   .th-bar{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
@@ -64,16 +104,16 @@
   .th-actions .plus-btn.mini{width:auto; height:24px; padding:0 8px; font-size:11.5px; font-weight:800; border-radius:6px; background:rgba(255,255,255,.9); color:#8a6a1f; border:none; margin:0; white-space:nowrap;}
   .th-actions .plus-btn.mini:hover{background:#fff;}
   .th-search{width:160px; height:24px; padding:0 8px; font-size:11.5px; border-radius:6px; border:none; background:rgba(255,255,255,.92);}
-  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin-bottom:14px;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:10px;}
   .field{display:flex; flex-direction:column; gap:6px;}
   .field label{font-size:12.5px; font-weight:700; color:var(--ink);}
   .field .row-inline{display:flex; gap:6px;}
-  input,select,textarea{font-family:var(--font-body); font-size:13.5px; padding:9px 11px; border:1.5px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); width:100%;}
+  input,select,textarea{font-family:var(--font-body); font-size:10pt; padding:7px 9px; border:1.5px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); width:100%;}
   input:focus,select:focus,textarea:focus{outline:none; border-color:var(--maroon-600); box-shadow:0 0 0 3px rgba(200,169,81,.18);}
   input:disabled, select:disabled{background:#f2eaec; color:#a98d94;}
   input[type=date], input[type=time]{text-align:right; direction:rtl;}
   textarea{resize:vertical; min-height:64px;}
-  .btn{all:unset; cursor:pointer; font-family:var(--font-body); font-size:13.5px; font-weight:700; padding:9px 16px; border-radius:8px; text-align:center; display:inline-flex; align-items:center; gap:6px;}
+  .btn{all:unset; cursor:pointer; font-family:var(--font-body); font-size:10pt; font-weight:700; padding:8px 14px; border-radius:8px; text-align:center; display:inline-flex; align-items:center; gap:6px;}
   .btn-primary{background:var(--maroon-800); color:#fff;}
   .btn-primary:hover{background:var(--maroon-900);}
   .btn-outline{background:#fff; color:var(--maroon-800); border:1.5px solid var(--maroon-800);}
@@ -95,7 +135,7 @@
   .col-resizer:hover, .col-resizer.active{background:rgba(255,255,255,.35);}
   .plus-btn{all:unset; cursor:pointer; width:34px; height:34px; border-radius:7px; flex:0 0 auto; background:var(--maroon-800); color:#fff; font-size:18px; font-weight:800; display:flex; align-items:center; justify-content:center;}
   .plus-btn:hover{background:var(--maroon-900);}
-  table{width:100%; border-collapse:collapse; font-size:13.5px; font-family:var(--font-body);}
+  table{width:100%; border-collapse:collapse; font-size:10pt; font-family:var(--font-body);}
   thead th{background:var(--maroon-100); color:var(--maroon-950); padding:10px 12px; text-align:center; vertical-align:middle; font-family:var(--font-body); font-weight:700; font-style:normal; font-size:11.5px; white-space:nowrap;}
   tbody td{padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:middle; text-align:center; line-height:1.6;}
   tbody tr:hover{background:var(--maroon-50);}
@@ -106,16 +146,30 @@
   .badge.bad{background:#f7d6d6;color:#8f1a1a;}
   .empty-state{text-align:center; padding:40px 10px; color:#946; opacity:.65;}
   .checkbox-list{display:flex; flex-wrap:wrap; gap:10px;}
+  .rp_schoolRow{display:flex; align-items:flex-start; gap:6px; padding:3px 4px; border:none; background:transparent;
+    font-size:10pt; line-height:1.45; white-space:normal; overflow-wrap:anywhere; cursor:pointer; border-radius:6px;}
+  .rp_schoolRow:hover{background:var(--maroon-50);}
+  .rp_schoolRow input{width:auto; flex:none; margin-top:3px;}
   .checkbox-chip{display:flex; align-items:center; gap:6px; border:1.5px solid var(--line); border-radius:20px; padding:6px 12px; font-size:13.5px; cursor:pointer;}
   .checkbox-chip input{width:auto;}
   .presenter-chip{display:flex; align-items:center; gap:8px; border:none; border-radius:0; padding:4px 2px; font-size:15px; cursor:pointer; background:transparent; transition:.15s;}
   .presenter-chip input{width:auto; accent-color:var(--maroon-800);}
   .presenter-chip:has(input:checked){background:transparent; color:var(--maroon-800); font-weight:900;}
   .presenter-chip:has(input:disabled){opacity:.45;}
-  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px;}
-  .stat-box{background:#fff; border:1.5px solid var(--maroon-800); border-radius:8px; padding:6px; text-align:center;}
-  .stat-box .num{font-size:15px; font-weight:800; font-family:var(--font-head); font-style:italic; color:var(--maroon-800);}
-  .stat-box .lbl{font-size:9.5px; color:#7a5560; margin-top:1px;}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(105px,1fr)); gap:8px;}
+  /* بطاقة مؤشر إحصائي: أبيض نظيف + شريط عنابي علوي + أيقونة دائرية */
+  .stat-box{position:relative; background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:14px 8px 10px; text-align:center; box-shadow:var(--shadow); overflow:hidden;
+    transition:box-shadow .15s, transform .15s;}
+  .stat-box::before{content:''; position:absolute; top:0; right:0; left:0; height:3px;
+    background:linear-gradient(90deg,var(--maroon-800),var(--maroon-600));}
+  .stat-box:hover{box-shadow:0 2px 6px rgba(138,21,56,.12),0 8px 22px rgba(138,21,56,.10); transform:translateY(-1px);}
+  .stat-box .ic{width:30px; height:30px; margin:0 auto 5px; border-radius:50%;
+    background:var(--maroon-50); border:1px solid var(--maroon-100);
+    display:flex; align-items:center; justify-content:center; font-size:15px; line-height:1;}
+  .stat-box .num{font-size:18px; font-weight:800; font-family:var(--font-head); font-style:normal;
+    color:var(--maroon-800); letter-spacing:.2px; direction:ltr;}
+  .stat-box .lbl{font-size:9.5px; color:var(--muted,#7a5560); margin-top:3px; line-height:1.4;}
   .tabs{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; background:var(--maroon-50); padding:8px; border-radius:12px;}
   .tab-btn{all:unset; cursor:pointer; padding:11px 20px; font-size:14px; font-weight:700; color:var(--maroon-700); border-radius:10px; transition:.15s;}
   .tab-btn:hover{background:var(--maroon-50);}
@@ -162,16 +216,47 @@
 
   .mob-toggle{display:none;}
   .mob-scrim{display:none;}
+  /* ===== منع أي سحب أفقي أو خروج عناصر عن الشاشة ===== */
+  html,body{max-width:100%; overflow-x:hidden;}
+  #app{max-width:100vw;}
+  .content{min-width:0;}
+  img,canvas,svg,video{max-width:100%; height:auto;}
+  .card{min-width:0;}
+  .tbl-scroll{max-width:100%; -webkit-overflow-scrolling:touch;}
+
+  /* ===== تابلت ===== */
+  @media (max-width:1100px){
+    .grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}
+    .stat-grid{grid-template-columns:repeat(auto-fit,minmax(96px,1fr));}
+  }
+
+  /* ===== جوال: القائمة تتحول إلى Drawer ===== */
   @media (max-width:860px){
-    #sidebar{position:fixed; right:0; z-index:50; transform:translateX(100%); transition:transform .2s; box-shadow:0 0 40px rgba(0,0,0,.3);}
+    #sidebar{position:fixed; right:0; top:0; height:100vh; width:250px !important; flex-basis:250px !important;
+      z-index:50; transform:translateX(100%); transition:transform .2s; box-shadow:0 0 40px rgba(0,0,0,.3); overflow-y:auto;}
     #sidebar.open{transform:translateX(0);}
-    .content{padding:14px;}
-    header.topbar{padding:12px 14px;}
-    header.topbar h1{font-size:17px;}
-    .mob-toggle{display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:9px; background:var(--maroon-800); color:#fff; font-size:18px; border:none; cursor:pointer;}
+    /* في الجوال يُعرض الـDrawer كاملًا حتى لو كان الوضع مطويًا على الكمبيوتر */
+    body.nav-collapsed #sidebar .nav-text,
+    body.nav-collapsed #sidebar .userbox,
+    body.nav-collapsed #sidebar .brand-text{display:revert;}
+    body.nav-collapsed nav.mainnav button{justify-content:flex-start; padding:11px 12px;}
+    body.nav-collapsed nav.mainnav button::after{display:none;}
+    #navToggle{display:none;}
+    .content{padding:12px;}
+    header.topbar{padding:10px 12px; gap:8px; flex-wrap:wrap;}
+    header.topbar h1{font-size:16px;}
+    .mob-toggle{display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:9px; background:var(--maroon-800); color:#fff; font-size:18px; border:none; cursor:pointer;}
     .mob-scrim.show{display:block; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:45;}
     .grid{grid-template-columns:1fr !important;}
-    table{font-size:13.5px;}
+    .stat-grid{grid-template-columns:repeat(auto-fit,minmax(88px,1fr)) !important;}
+    table{font-size:10pt;}
+    /* أهداف لمس مريحة */
+    .btn, .icon-btn, .tab-btn, nav.mainnav button{min-height:40px;}
+    input,select,textarea{min-height:40px; font-size:16px;}  /* 16px يمنع تكبير الشاشة تلقائيًا في iOS */
+    .tabs{overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch;}
+    .tabs .tab-btn{flex:none;}
+    .table-toolbar{gap:6px;}
+    .field label{font-size:12px;}
   }
 </style>
 </head>
@@ -305,6 +390,7 @@ const STATE_DOC = () => getDb().collection('appState').doc('main');
 async function loadState(){
   try{
     const snap = await STATE_DOC().get();
+    syncState.ok = true; syncState.lastAt = Date.now();
     if(snap.exists){
       const raw = snap.data();
       // البيانات مخزّنة كنص JSON لتفادي قيود Firestore على المصفوفات المتداخلة
@@ -349,25 +435,46 @@ async function loadState(){
     }
   }catch(e){
     console.error('load error', e);
+    syncState.ok = false;
     alert('تعذّر تحميل البيانات من قاعدة البيانات.\n\nالسبب: ' + (e && e.message ? e.message : e) + '\n\nتأكد من إعدادات Firestore وقواعد الأمان.');
   }
   state = defaultState();
   await saveState();
 }
+const syncState = { ok:false, lastAt:null };
 let saving=false, pendingSave=false;
-async function saveState(){
+/* ══════════════════════════════════════════════════════════════════
+   الحفظ مع تجميع الطلبات (Debounce) — تحسين أداء
+   ──────────────────────────────────────────────────────────────────
+   كان كل تعديل صغير يُنفّذ JSON.stringify لكامل البيانات + كتابة شبكية
+   كاملة، فيبطؤ النظام مع كثرة السجلات. الآن تُجمَّع التعديلات المتتابعة
+   في كتابة واحدة بعد 600ms، مع ضمان الحفظ عند إغلاق الصفحة.
+   ══════════════════════════════════════════════════════════════════ */
+let __saveTimer = null;
+function saveState(){
+  return new Promise(resolve=>{
+    if(__saveTimer) clearTimeout(__saveTimer);
+    __saveTimer = setTimeout(()=>{ __saveTimer=null; flushSave().then(resolve); }, 600);
+  });
+}
+async function flushSave(){
   if(saving){ pendingSave=true; return; }
   saving=true;
   try{
     await STATE_DOC().set({ json: JSON.stringify(state), updatedAt: Date.now() });
+    syncState.ok = true; syncState.lastAt = Date.now(); renderUserBox();
   }catch(e){
     console.error('save error', e);
+    syncState.ok = false; renderUserBox();
     // إظهار الخطأ بوضوح بدل الفشل الصامت الذي كان يسبب فقدان البيانات
     toast('⚠️ لم يتم حفظ البيانات! ' + (e && e.message ? e.message : ''));
   }
   saving=false;
-  if(pendingSave){ pendingSave=false; saveState(); }
+  if(pendingSave){ pendingSave=false; flushSave(); }
 }
+/* ضمان عدم ضياع أي تعديل معلّق عند إغلاق الصفحة أو تركها */
+window.addEventListener('beforeunload', ()=>{ if(__saveTimer){ clearTimeout(__saveTimer); __saveTimer=null; flushSave(); } });
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden && __saveTimer){ clearTimeout(__saveTimer); __saveTimer=null; flushSave(); } });
 
 /* ============ Roles & Navigation ============ */
 const PAGES = [
@@ -404,6 +511,13 @@ function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, m=>({'&':'
 function fileToDataUrl(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 /* يحوّل قيمة الشهر (YYYY-MM) إلى اسم الشهر بالعربية + السنة، مثل "يونيو 2026" */
+/* اسم الشهر فقط بدون سنة (لفلاتر من شهر / إلى شهر) */
+function monthOnlyAr(m){
+  if(!m) return '';
+  const names=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const mm = String(m).includes('-') ? String(m).split('-')[1] : m;
+  return names[parseInt(mm,10)-1] || m;
+}
 function monthNameAr(m){
   if(!m) return '';
   const names = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -495,10 +609,13 @@ function renderRoot(){
       <button class="btn btn-outline" onclick="currentRole=null;currentUser=null;renderRoot();">رجوع لتسجيل الدخول</button></div></div>`;
     return;
   }
+  // القائمة منطوية افتراضيًا عند الدخول (تُحترم رغبة المستخدم إن غيّرها لاحقًا)
+  let col='1'; try{ const v=localStorage.getItem(navPrefKey()); if(v!==null) col=v; }catch(e){}
+  document.body.classList.toggle('nav-collapsed', col==='1');
   renderAppShell(root);
 }
 function renderGate(root){
-  root.innerHTML = `<div class="gate-wrap"><div class="gate-card">
+  root.innerHTML = `<div class="gate-wrap"><div class="gate-card gate-login">
     <div style="font-size:34px;">🕌</div>
     <h1>نظام طلبات الفعاليات والمبادرات</h1>
     <p>سجّل الدخول باسم المستخدم وكلمة المرور</p>
@@ -520,20 +637,31 @@ function doLogin(){
   loggedTrainerId = match.role==='trainer' ? match.trainerId : null;
   currentPage='home'; trainerPortalTab='upcoming'; tpAutoOpened=false;
   renderRoot();
-  setTimeout(()=>{
-    openAnnouncement('✅ النظام متصل بقاعدة البيانات',
-      'جميع البيانات التي تدخلها تُحفظ تلقائيًا في قاعدة بيانات سحابية (Firebase)، وتبقى محفوظة عند إغلاق المتصفح أو الدخول من جهاز آخر، وتتزامن بين جميع المستخدمين.\n\nإذا حدث أي خلل في الحفظ ستظهر لك رسالة تنبيه فورية.');
-  }, 400);
 }
 
+function navPrefKey(){
+  const u = (currentUser && (currentUser.username||currentUser.id)) || 'guest';
+  return 'navCollapsed:'+u;   // حالة الطي محفوظة لكل مستخدم على حدة
+}
+function toggleNav(){
+  document.body.classList.toggle('nav-collapsed');
+  try{ localStorage.setItem(navPrefKey(), document.body.classList.contains('nav-collapsed')?'1':'0'); }catch(e){}
+}
+function closeMobileDrawer(){
+  const sb=document.getElementById('sidebar'), sc=document.getElementById('mobScrim');
+  if(sb) sb.classList.remove('open');
+  if(sc) sc.classList.remove('show');
+}
 function renderAppShell(root){
   root.innerHTML = `
   <div id="app">
     <aside id="sidebar">
       <div class="brand">
         <div id="logoSlot"><div class="logo-placeholder">🕌</div></div>
-        <div><div class="brand-name" id="orgNameDisplay">إدارة الفعاليات</div><div class="brand-sub">نظام طلبات الفعاليات والمبادرات</div></div>
+        <div class="brand-text"><div class="brand-name" id="orgNameDisplay">إدارة الفعاليات</div><div class="brand-sub">نظام طلبات الفعاليات والمبادرات</div></div>
+        <button id="navToggle" title="طيّ / فتح القائمة" onclick="toggleNav()">☰</button>
       </div>
+      <div id="userBoxSlot"></div>
       <nav class="mainnav" id="mainNav"></nav>
       <div class="sidebar-foot">
         <div style="font-weight:800;">${currentUser?escapeHtml(currentUser.displayName||currentUser.username):''}</div>
@@ -547,7 +675,10 @@ function renderAppShell(root){
           <button class="mob-toggle" id="mobToggleBtn">☰</button>
           <div><h1 id="pageTitle"></h1><div class="sub" id="pageSub"></div></div>
         </div>
-        <div id="topbarActions" style="display:flex; align-items:center; gap:8px;"></div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <span id="topbarUser" style="font-size:10pt; font-weight:700; color:var(--maroon-800); white-space:nowrap;"></span>
+          <div id="topbarActions" style="display:flex; align-items:center; gap:8px;"></div>
+        </div>
       </header>
       <div class="content" id="content"></div>
     </div>
@@ -561,17 +692,40 @@ function renderAppShell(root){
 }
 
 /* ============ Page render dispatcher ============ */
+/* مربع إحصائي موحّد: أيقونة + رقم كبير + تسمية */
+function statBox(icon, num, label){
+  return `<div class="stat-box"><div class="ic">${icon}</div><div class="num">${num}</div><div class="lbl">${escapeHtml(label)}</div></div>`;
+}
 function renderNav(){
   const nav = document.getElementById('mainNav'); nav.innerHTML='';
   const pendingCount = state.trainerRequests.filter(r=>r.status==='pending').length;
   visiblePages().forEach(p=>{
     const b=document.createElement('button');
     b.className = p.id===currentPage ? 'active':'';
+    b.setAttribute('data-label', p.label);   // يظهر كتلميح في الوضع المضغوط
+    b.title = p.label;
     const badge = (p.id==='approvals' && pendingCount) ? ` <span class="badge" style="background:#f4c9d1;color:#7a1230;">${pendingCount}</span>` : '';
-    b.innerHTML = `<span class="ic">${p.icon}</span><span>${p.label}</span>${badge}`;
-    b.onclick=()=>{ currentPage=p.id; if(p.id==='order'){editingOrderId=null;} render(); };
+    b.innerHTML = `<span class="ic">${p.icon}</span><span class="nav-text">${p.label}</span>${badge}`;
+    b.onclick=()=>{ currentPage=p.id; if(p.id==='order'){editingOrderId=null;} closeMobileDrawer(); render(); };
     nav.appendChild(b);
   });
+  renderUserBox();
+  const tu=document.getElementById('topbarUser');
+  if(tu) tu.textContent = currentUser ? (currentUser.displayName||currentUser.username) : '';
+}
+/* مربع معلومات المستخدم + حالة المزامنة الحقيقية */
+const APP_VERSION = '2.6';
+function renderUserBox(){
+  const host = document.getElementById('userBoxSlot');
+  if(!host) return;
+  const roleLabel = currentRole==='admin' ? 'مدير نظام' : currentRole==='user' ? 'مستخدم' : 'مقدم فعالية';
+  const ok = syncState.ok;
+  host.innerHTML = `<div class="userbox">
+    <div class="row"><span class="k">الاسم</span><span class="v">${escapeHtml((currentUser&&currentUser.displayName)||(currentUser&&currentUser.username)||'—')}</span></div>
+    <div class="row"><span class="k">الدور</span><span class="v">${roleLabel}</span></div>
+    <div class="row"><span class="k">الإصدار</span><span class="v">${APP_VERSION}</span></div>
+    <div class="row"><span class="k">المزامنة</span><span class="v"><span class="sync-dot ${ok?'sync-ok':'sync-bad'}"></span>${ok?'متزامن':'غير متزامن'}</span></div>
+  </div>`;
 }
 function renderBell(){
   const today = todayStr();
@@ -690,67 +844,61 @@ function attachDateHints(){
 
 /* ============ Home ============ */
 function renderHome(c){
-  const totalOrders = state.orders.length;
-  const thisMonth = state.orders.filter(o=>{ if(!o.date) return false; const d=new Date(o.date), now=new Date(); return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear(); }).length;
-  const totalParticipants = state.orders.reduce((s,o)=>s+(Number(o.participantsCount)||0),0);
-  const pendingReq = state.trainerRequests.filter(r=>r.status==='pending').length;
+  /* الصفحة الرئيسية: مربعات وإحصائيات فقط، تُبنى ديناميكيًا من البيانات الفعلية.
+     لا يُعرض أي مربع أو مجموعة قيمتها صفر — فلا تظهر إحصائيات فارغة. */
+  const orders = state.orders || [];
+  const totalOrders = orders.length;
+  const now = new Date();
+  const thisMonth = orders.filter(o=>{ if(!o.date) return false; const d=new Date(o.date); return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear(); }).length;
+  const totalParticipants = orders.reduce((s,o)=>s+(Number(o.participantsCount)||0),0);
+  const totalHours = Math.round(orders.reduce((s,o)=>s+hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo),0)*10)/10;
+  const totalDays = orders.reduce((s,o)=>s+daysCount(o.date,o.dateTo),0);
+  const doneCount = orders.filter(o=>o.completionStatus==='تم').length;
+  const pendingReq = (state.trainerRequests||[]).filter(r=>r.status==='pending').length;
   const today = todayStr();
-  const tasksNotStarted = state.tasks.filter(t=>t.status==='لم تبدأ').length;
-  const tasksInProgress = state.tasks.filter(t=>t.status==='قيد التنفيذ').length;
-  const tasksOverdue = state.tasks.filter(t=>t.due && t.due<today && t.status!=='مكتملة').length;
-  c.innerHTML = `
-  <div class="stat-grid" style="margin-bottom:14px;">
-    <div class="stat-box"><div class="num">${totalOrders}</div><div class="lbl">إجمالي طلبات الفعاليات</div></div>
-    <div class="stat-box"><div class="num">${thisMonth}</div><div class="lbl">فعاليات هذا الشهر</div></div>
-    <div class="stat-box"><div class="num">${state.schools.length}</div><div class="lbl">عدد المدارس</div></div>
-    <div class="stat-box"><div class="num">${state.trainers.length}</div><div class="lbl">عدد مقدمي الفعاليات</div></div>
-    <div class="stat-box"><div class="num">${totalParticipants}</div><div class="lbl">إجمالي المستهدفين</div></div>
-    <div class="stat-box"><div class="num">${pendingReq}</div><div class="lbl">طلبات ترشيح بانتظار الرد</div></div>
-  </div>
-  <div class="stat-grid" style="margin-bottom:14px;">
-    <div class="stat-box"><div class="num">${tasksNotStarted}</div><div class="lbl">مهام لم تبدأ بعد</div></div>
-    <div class="stat-box"><div class="num">${tasksInProgress}</div><div class="lbl">مهام قيد التنفيذ</div></div>
-    <div class="stat-box" style="${tasksOverdue?'border-color:#9e2b2b;':''}"><div class="num" style="${tasksOverdue?'color:#9e2b2b;':''}">${tasksOverdue}</div><div class="lbl">⚠️ مهام متأخرة عن الاستحقاق</div></div>
-  </div>
-  <div class="card">
-    <h2>🔎 بحث سريع</h2>
-    <div class="grid">
-      <div class="field"><label>اسم الفعالية / المدرسة / رقم أمر التكليف</label><input id="hs_query" placeholder="اكتب للبحث..."></div>
-      <div class="field"><label>من تاريخ</label><input id="hs_from" type="date" lang="en-GB"></div>
-      <div class="field"><label>إلى تاريخ</label><input id="hs_to" type="date" lang="en-GB"></div>
-    </div>
-    <button class="btn btn-primary" id="hs_go">بحث</button>
-    <div id="hs_result" style="margin-top:14px;"></div>
-  </div>
-  <div class="card"><h2>أحدث الطلبات</h2>${ordersTableHtml(state.orders.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(0,6), 'otbl_home_latest')}</div>
-  <div class="card">
-    <h2>بيانات المؤسسة</h2>
-    <div class="grid">
-      <div class="field"><label>اسم الجهة</label><input id="homeOrgName" value="${escapeHtml(state.orgName||'')}"></div>
-      <div class="field"><label>شعار الجهة (يفضل صورة بخلفية شفافة PNG)</label><input id="homeLogo" type="file" accept="image/*"></div>
-    </div>
-    <button class="btn btn-primary" id="saveOrgBtn">حفظ</button>
-  </div>`;
-  document.getElementById('hs_go').onclick=()=>{
-    const q = document.getElementById('hs_query').value.trim();
-    const from = document.getElementById('hs_from').value, to = document.getElementById('hs_to').value;
-    let list = state.orders.slice();
-    if(q){
-      list = list.filter(o=>{
-        const school = state.schools.find(s=>s.id===o.schoolId);
-        return o.title.includes(q) || (school && school.name.includes(q)) || String(o.serial)===q;
-      });
-    }
-    if(from) list = list.filter(o=>o.date>=from);
-    if(to) list = list.filter(o=>o.date<=to);
-    document.getElementById('hs_result').innerHTML = ordersTableHtml(list.sort((a,b)=>b.serial-a.serial), 'otbl_home_search');
-  };
-  document.getElementById('saveOrgBtn').onclick=async ()=>{
-    state.orgName = document.getElementById('homeOrgName').value.trim();
-    const file=document.getElementById('homeLogo').files[0];
-    if(file){ state.logo = await fileToDataUrl(file); }
-    await saveState(); toast('تم الحفظ'); render();
-  };
+  const tasksOverdue = (state.tasks||[]).filter(t=>t.due && t.due<today && t.status!=='مكتملة').length;
+
+  // مربعات عامة — تُعرض فقط إن كانت لها قيمة فعلية
+  const general = [
+    ['📋', totalOrders, 'إجمالي الفعاليات'],
+    ['✅', doneCount, 'فعاليات منجزة'],
+    ['📅', thisMonth, 'فعاليات هذا الشهر'],
+    ['🏫', (state.schools||[]).length, 'الجهات والمدارس'],
+    ['🧑‍🏫', (state.trainers||[]).length, 'مقدمو الفعاليات'],
+    ['👥', totalParticipants, 'إجمالي المستهدفين'],
+    ['⏱️', totalHours, 'إجمالي الساعات'],
+    ['🗓️', totalDays, 'إجمالي الأيام'],
+    ['📨', pendingReq, 'طلبات بانتظار الرد'],
+    ['⚠️', tasksOverdue, 'مهام متأخرة'],
+  ].filter(x=>Number(x[1])>0);
+
+  // تجميع ديناميكي حسب أي بُعد، مع استبعاد ما قيمته صفر
+  function groupBoxes(items, matchFn, icon){
+    return items.map(it=>[icon, orders.filter(o=>matchFn(o,it)).length, it.name])
+                .filter(x=>x[1]>0)
+                .sort((a,b)=>b[1]-a[1]);
+  }
+  const byPath  = groupBoxes(state.programTypes||[], (o,it)=>o.programTypeId===it.id, '🛤️');
+  const byField = groupBoxes(state.fields||[],       (o,it)=>o.fieldId===it.id,       '🎯');
+  // حسب مكان التنفيذ/المرحلة — يُستخرج من الجهات الموجودة فعلًا
+  const levels = Array.from(new Set((state.schools||[]).map(s=>s.level).filter(Boolean)));
+  const byLevel = levels.map(l=>['🏷️', orders.filter(o=>{ const s=(state.schools||[]).find(x=>x.id===o.schoolId); return s && s.level===l; }).length, l])
+                        .filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+
+  function section(title, boxes){
+    if(!boxes.length) return '';
+    return `<div class="card notched" style="margin-bottom:12px;">
+      <h2 class="notch-title">${escapeHtml(title)}</h2>
+      <div class="stat-grid">${boxes.map(b=>statBox(b[0], b[1], b[2])).join('')}</div>
+    </div>`;
+  }
+
+  const html = section('نظرة عامة', general)
+             + section('حسب مسار المبادرة', byPath)
+             + section('حسب مجال المبادرة', byField)
+             + section('حسب مكان التنفيذ / المرحلة', byLevel);
+
+  c.innerHTML = html || `<div class="card"><div class="empty-state">لا توجد بيانات لعرض إحصائيات بعد — ابدأ بإضافة فعاليات.</div></div>`;
 }
 
 function trainerNames(order){
@@ -1010,23 +1158,58 @@ function renderOrderPage(c){
   if(orderSubTab==='list'){
     sub.innerHTML = `<div class="card"><h2>كل طلبات الفعاليات والمبادرات</h2>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:14px;">
-        <div class="field"><label>🔎 بحث بأمر التكليف</label><input id="ord_serialSearch" type="number" lang="en" placeholder="رقم أمر التكليف..."></div>
-        <div class="field"><label>🔎 بحث باسم المدرسة</label><input id="ord_schoolSearch" placeholder="اكتب اسم المدرسة..."></div>
-        <div class="field"><label>مقدم المبادرة</label><select id="ord_trainerFilter"><option value="">الكل</option>${state.trainers.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('')}</select></div>
-        <div class="field"><label>مجال المبادرة</label><select id="ord_fieldFilter"><option value="">الكل</option>${state.fields.map(f=>`<option value="${f.id}">${escapeHtml(f.name)}</option>`).join('')}</select></div>
-        <div class="field"><label>مسار المبادرة</label><select id="ord_pathFilter"><option value="">الكل</option>${state.programTypes.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select></div>
-        <div class="field"><label>الإنجاز</label><select id="ord_completionFilter"><option value="">الكل</option><option value="تم">تم الإنجاز</option><option value="لم يتم">لم يتم الإنجاز</option><option value="الغيت">أُلغيت</option><option value="المشرف لا يرد">المشرف لا يرد</option><option value="__pending">لم تنجز بعد</option></select></div>
-        <div class="field"><label>الحالة</label><select id="ord_statusFilter"><option value="">الكل</option><option value="active">نشطة</option><option value="cancelled">ملغاة</option><option value="postponed">مؤجّلة</option></select></div>
+        <div class="field" style="margin:0;"><label>🔎 أمر التكليف</label><input id="ord_serialSearch" type="number" lang="en" placeholder="1234" style="width:90px;"></div>
+        <div class="field" style="margin:0;"><label>🔎 اسم المدرسة</label><input id="ord_schoolSearch" placeholder="اكتب للبحث..." style="width:170px;"></div>
+        <div class="field" style="margin:0;"><label>تصفية حسب</label>
+          <select id="ord_filterKind" style="width:auto; min-width:140px;">
+            <option value="">— اختر بندًا —</option>
+            <option value="trainer">مقدم المبادرة</option>
+            <option value="field">مجال المبادرة</option>
+            <option value="path">مسار المبادرة</option>
+            <option value="completion">الإنجاز</option>
+            <option value="status">الحالة</option>
+          </select>
+        </div>
+        <div class="field" id="ord_filterValWrap" style="margin:0; display:none;"><label>القيمة</label>
+          <select id="ord_filterVal" style="width:auto; min-width:170px;"></select>
+        </div>
+        <button class="icon-btn rect" id="ord_clearFilter" title="مسح التصفية">✖️ مسح</button>
       </div>
       <div id="ord_listResult"></div></div>`;
+    function optionsForKind(kind){
+      if(kind==='trainer') return state.trainers.map(t=>({v:t.id, l:t.name}));
+      if(kind==='field') return state.fields.map(f=>({v:f.id, l:f.name}));
+      if(kind==='path') return state.programTypes.map(p=>({v:p.id, l:p.name}));
+      if(kind==='completion') return [{v:'تم',l:'تم الإنجاز'},{v:'لم يتم',l:'لم يتم الإنجاز'},{v:'الغيت',l:'أُلغيت'},{v:'المشرف لا يرد',l:'المشرف لا يرد'},{v:'__pending',l:'لم تنجز بعد'}];
+      if(kind==='status') return [{v:'active',l:'نشطة'},{v:'cancelled',l:'ملغاة'},{v:'postponed',l:'مؤجّلة'}];
+      return [];
+    }
+    document.getElementById('ord_filterKind').addEventListener('change', e=>{
+      const kind=e.target.value, wrap=document.getElementById('ord_filterValWrap'), sel=document.getElementById('ord_filterVal');
+      if(!kind){ wrap.style.display='none'; sel.innerHTML=''; drawFiltered(); return; }
+      // تُبنى قائمة القيم عند الطلب فقط لتخفيف الواجهة
+      sel.innerHTML = '<option value="">الكل</option>' + optionsForKind(kind).map(o=>`<option value="${escapeHtml(o.v)}">${escapeHtml(o.l)}</option>`).join('');
+      wrap.style.display=''; drawFiltered();
+    });
+    document.getElementById('ord_filterVal').addEventListener('change', ()=>drawFiltered());
+    document.getElementById('ord_clearFilter').onclick=()=>{
+      document.getElementById('ord_filterKind').value='';
+      document.getElementById('ord_filterValWrap').style.display='none';
+      document.getElementById('ord_filterVal').innerHTML='';
+      document.getElementById('ord_serialSearch').value='';
+      document.getElementById('ord_schoolSearch').value='';
+      drawFiltered();
+    };
     function drawFiltered(){
       const serialQ = document.getElementById('ord_serialSearch').value.trim();
       const q = document.getElementById('ord_schoolSearch').value.trim();
-      const trainerFilter = document.getElementById('ord_trainerFilter').value;
-      const fieldFilter = document.getElementById('ord_fieldFilter').value;
-      const pathFilter = document.getElementById('ord_pathFilter').value;
-      const completionFilter = document.getElementById('ord_completionFilter').value;
-      const statusFilter = document.getElementById('ord_statusFilter').value;
+      const kind = document.getElementById('ord_filterKind').value;
+      const val  = document.getElementById('ord_filterVal').value || '';
+      const trainerFilter    = kind==='trainer' ? val : '';
+      const fieldFilter      = kind==='field' ? val : '';
+      const pathFilter       = kind==='path' ? val : '';
+      const completionFilter = kind==='completion' ? val : '';
+      const statusFilter     = kind==='status' ? val : '';
       let list = state.orders.slice().sort((a,b)=>b.serial-a.serial);
       if(serialQ){ list = list.filter(o=>String(o.serial).includes(serialQ)); }
       if(q){ list = list.filter(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return s && s.name.includes(q); }); }
@@ -1042,7 +1225,6 @@ function renderOrderPage(c){
       enhanceReportTable(box);
     }
     ['ord_serialSearch','ord_schoolSearch'].forEach(id=>document.getElementById(id).addEventListener('input', drawFiltered));
-    ['ord_trainerFilter','ord_fieldFilter','ord_pathFilter','ord_completionFilter','ord_statusFilter'].forEach(id=>document.getElementById(id).addEventListener('change', drawFiltered));
     drawFiltered();
     return;
   }
@@ -1500,7 +1682,7 @@ function renderOrderForm(sub){
           </select>
         </td>
         <td><label>مكان المبادرة (${state.schools.length} مدرسة/جهة)</label>
-          <select id="f_school" size="1" required>${state.schools.map(s=>`<option value="${s.id}" data-level="${escapeHtml(s.level||'')}" ${editing&&editing.schoolId===s.id?'selected':''}>${escapeHtml(s.name)} — ${escapeHtml(s.level)}</option>`).join('')}</select>
+          <select id="f_school" size="1" required style="max-width:320px;">${state.schools.map(s=>`<option value="${s.id}" data-level="${escapeHtml(s.level||'')}" ${editing&&editing.schoolId===s.id?'selected':''}>${escapeHtml(s.name)} — ${escapeHtml(s.level)}</option>`).join('')}</select>
         </td>
         <td><label>المشرف</label>
           <select id="f_supervisor" required></select>
@@ -2103,6 +2285,16 @@ function fullTimeRange(from, to){
 }
 /* عرض التاريخ بصيغة DD-MM-YYYY (للعرض فقط — التخزين يبقى YYYY-MM-DD لضمان صحة الفرز والمقارنات) */
 /* نطاق تاريخ الفعالية: من تاريخ المبادرة إلى تاريخ الانتهاء (يعرض تاريخًا واحدًا لو كانت ليوم واحد) */
+/* مقدم الفعالية: الاسم في سطر ممتد ورقم الهاتف أسفله داخل نفس الخانة */
+function trainerCell(o){
+  const list=(o.trainerIds||[]).map(id=>state.trainers.find(t=>t.id===id)).filter(Boolean);
+  if(!list.length) return '—';
+  return list.map(t=>`<div style="line-height:1.35;margin:2px 0;"><div style="font-weight:700;">${escapeHtml(t.name)}</div>${t.phone?`<div style="font-size:9pt;color:#666;">${escapeHtml(t.phone)}</div>`:''}</div>`).join('');
+}
+function trainerCellText(o){
+  const list=(o.trainerIds||[]).map(id=>state.trainers.find(t=>t.id===id)).filter(Boolean);
+  return list.map(t=>t.phone?`${t.name} (${t.phone})`:t.name).join(' / ');
+}
 function dateRangeStr(o){
   const s = o && o.date ? fmtDate(o.date) : '';
   const e = o && o.dateTo && o.dateTo !== o.date ? fmtDate(o.dateTo) : '';
@@ -2295,10 +2487,10 @@ function renderAdminPage(c){
   c.innerHTML = `
   <div class="card">
     <h2>عرض الفعاليات اليومية</h2>
-    <div class="grid">
-      <div class="field"><label>من تاريخ</label><input id="adm_from" type="date" lang="en-GB" value="${today}"></div>
-      <div class="field"><label>إلى تاريخ</label><input id="adm_to" type="date" lang="en-GB" value="${today}"></div>
-      <div class="field"><label>🔎 بحث بأمر التكليف</label><input id="adm_serial" type="number" lang="en" placeholder="رقم أمر التكليف..."></div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;">
+      <div class="field" style="margin:0;"><label>من تاريخ</label><input id="adm_from" type="date" lang="en-GB" value="${today}" style="width:150px;"></div>
+      <div class="field" style="margin:0;"><label>إلى تاريخ</label><input id="adm_to" type="date" lang="en-GB" value="${today}" style="width:150px;"></div>
+      <div class="field" style="margin:0;"><label>🔎 أمر التكليف</label><input id="adm_serial" type="number" lang="en" placeholder="1234" style="width:90px;"></div>
     </div>
     <button class="btn btn-primary" id="adm_filter">عرض</button>
     <button class="icon-btn rect" id="adm_print" title="طباعة">🖨️ طباعة</button>
@@ -2344,11 +2536,11 @@ function renderAdminPage(c){
     const k = computeKpis(list);
     document.getElementById('adm_kpis').innerHTML = `<h2>ملخص الفترة</h2>
       <div class="stat-grid">
-        <div class="stat-box"><div class="num">${k.events}</div><div class="lbl">عدد الفعاليات</div></div>
-        <div class="stat-box"><div class="num">${k.trainers}</div><div class="lbl">عدد المدربين</div></div>
-        <div class="stat-box"><div class="num">${k.hours.toFixed(1)}</div><div class="lbl">إجمالي عدد الساعات</div></div>
-        <div class="stat-box"><div class="num">${k.schools}</div><div class="lbl">عدد المدارس</div></div>
-        <div class="stat-box"><div class="num">${k.reqs}</div><div class="lbl">عدد الطلبات الإدارية</div></div>
+        ${statBox('📋', k.events, 'عدد الفعاليات')}
+        ${statBox('🧑‍🏫', k.trainers, 'عدد المدربين')}
+        ${statBox('⏱️', k.hours.toFixed(1), 'إجمالي عدد الساعات')}
+        ${statBox('🏫', k.schools, 'عدد المدارس')}
+        ${statBox('🗂️', k.reqs, 'عدد الطلبات الإدارية')}
       </div>
       <h3 style="margin-top:16px;font-family:var(--font-head);color:var(--maroon-800);">توزيع الطلبات الإدارية خلال الفترة</h3>
       ${reqBreakdownTable(k.reqCounts)}`;
@@ -2364,9 +2556,9 @@ function renderAdminPage(c){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
       const reqs = (o.adminRequests||[]).map(id=>{const r=state.adminRequestsList.find(x=>x.id===id); return r?r.name:'';}).filter(Boolean).join('، ');
-      return [i+1, o.serial, o.title, dateRangeStr(o), fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', o.participantsCount||'', trainerNames(o), trainerPhones(o), reqs||'—'];
+      return [i+1, o.serial, o.title, dateRangeStr(o), daysCount(o.date,o.dateTo), fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', o.participantsCount||'', trainerNames(o), trainerPhones(o), reqs||'—'];
     });
-    exportToExcel('جدول_الفعاليات.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ (من — إلى)','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج'], rows, `جدول الفعاليات خلال فترة (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
+    exportToExcel('جدول_الفعاليات.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ','المدة','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج'], rows, `جدول الفعاليات خلال فترة (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
   };
   document.getElementById('adm_print').onclick=async ()=>{
     const {list, from, to}=getList();
@@ -2375,14 +2567,13 @@ function renderAdminPage(c){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
       const reqs = (o.adminRequests||[]).map(id=>{const r=state.adminRequestsList.find(x=>x.id===id); return r?r.name:'';}).filter(Boolean).join('، ');
-      const qr = await generateQRDataUrl(qrTextForOrder(o));
-      return [i+1, o.serial, escapeHtml(o.title), fullDateStr(o.date), escapeHtml(fullTimeRange(o.timeFrom,o.timeTo)), school?escapeHtml(school.name):'', supervisor&&supervisor.phone?phoneLink(supervisor.phone):'', o.participantsCount||'', trainerMiniTable(o), reqs||'—', qr?`<img src="${qr}" style="width:16mm;height:16mm;">`:''];
+      return [i+1, o.serial, escapeHtml(o.title), dateRangeStr(o), daysCount(o.date,o.dateTo), escapeHtml(fullTimeRange(o.timeFrom,o.timeTo)), school?escapeHtml(school.name):'', supervisor&&supervisor.phone?phoneLink(supervisor.phone):'', o.participantsCount||'', trainerMiniTable(o), reqs||'—'];
     }));
     const reqRows = Object.entries(k.reqCounts).map(([id,count])=>{ const r=state.adminRequestsList.find(x=>x.id===id); return `<tr><td>${escapeHtml(r?r.name:id)}</td><td>${count}</td></tr>`; }).join('') || '<tr><td colspan="2" style="text-align:center;color:#999;">لا توجد</td></tr>';
     doPrintDoc(buildReportDoc({
       titleAr:'جدول الفعاليات خلال فترة', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
       kpis:[{v:k.events,l:'عدد الفعاليات'},{v:k.trainers,l:'عدد المدربين'},{v:k.hours.toFixed(1),l:'إجمالي عدد الساعات'},{v:k.schools,l:'عدد المدارس'},{v:k.reqs,l:'عدد الطلبات الإدارية'}],
-      headers:['م','أمر التكليف','عنوان الفعالية','التاريخ (من — إلى)','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','الطلبات الإدارية للبرنامج','QR'],
+      headers:['م','أمر التكليف','عنوان الفعالية','التاريخ','المدة','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','الطلبات الإدارية للبرنامج'],
       rows,
       extraHtml:`<div class="sec-t">توزيع الطلبات الإدارية خلال الفترة</div><table><thead><tr><th>الطلب الإداري</th><th>عدد مرات الطلب</th></tr></thead><tbody>${reqRows}</tbody></table>`
     }), true, 'A4');
@@ -2639,15 +2830,13 @@ function renderQuranEntryForm(sub){
 function renderQuranReportTab(sub){
   sub.innerHTML = `<div class="card">
     <h2>تقرير الأنشطة القرآنية</h2>
-    <div class="grid" style="grid-template-columns:repeat(4,1fr);">
-      <div class="field"><label>البرنامج</label><select id="qr_program"><option value="">الكل</option><option value="روح">روح</option><option value="الرحيق">الرحيق</option></select></div>
-      <div class="field"><label>الشهر (شهر واحد)</label><input id="qr_month" type="month" lang="en-GB"></div>
-      <div class="field"><label>من شهر</label><input id="qr_from" type="month" lang="en-GB"></div>
-      <div class="field"><label>إلى شهر</label><input id="qr_to" type="month" lang="en-GB"></div>
-    </div>
-    <div class="grid" style="grid-template-columns:repeat(2,1fr);">
-      <div class="field"><label>من تاريخ</label><input id="qr_dFrom" type="date" lang="en-GB"></div>
-      <div class="field"><label>إلى تاريخ</label><input id="qr_dTo" type="date" lang="en-GB"></div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end; margin-bottom:8px;">
+      <div class="field" style="margin:0;"><label>البرنامج</label><select id="qr_program" style="width:auto; min-width:120px;"><option value="">الكل</option><option value="روح">روح</option><option value="الرحيق">الرحيق</option></select></div>
+      <div class="field" style="margin:0;"><label>الشهر</label><input id="qr_month" type="month" lang="en-GB" style="width:135px;"></div>
+      <div class="field" style="margin:0;"><label>من شهر</label><input id="qr_from" type="month" lang="en-GB" style="width:135px;"></div>
+      <div class="field" style="margin:0;"><label>إلى شهر</label><input id="qr_to" type="month" lang="en-GB" style="width:135px;"></div>
+      <div class="field" style="margin:0;"><label>من تاريخ</label><input id="qr_dFrom" type="date" lang="en-GB" style="width:150px;"></div>
+      <div class="field" style="margin:0;"><label>إلى تاريخ</label><input id="qr_dTo" type="date" lang="en-GB" style="width:150px;"></div>
     </div>
     <div class="helper" style="margin-bottom:8px;">اترك الحقول فارغة لعرض كل السجلات. "من/إلى شهر" تصفّي حسب شهر السجل، و"من/إلى تاريخ" تصفّي حسب فترة تنفيذ البرنامج المسجّلة.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -2725,7 +2914,7 @@ function renderQuranReportTab(sub){
     const df=document.getElementById('qr_dFrom').value, dt=document.getElementById('qr_dTo').value;
     if(df||dt) return `من ${df?fmtDate(df):'البداية'} إلى ${dt?fmtDate(dt):'النهاية'}`;
     if(m) return monthNameAr(m);
-    if(f||t) return `من ${f?monthNameAr(f):'البداية'} إلى ${t?monthNameAr(t):'النهاية'}`;
+    if(f||t) return `من ${f?monthOnlyAr(f):'البداية'} إلى ${t?monthOnlyAr(t):'النهاية'}`;
     return 'كل الأشهر';
   }
   document.getElementById('qr_excel').onclick=()=>{
@@ -2778,13 +2967,11 @@ function renderReportsPage(c){
     box.innerHTML = `<div class="card">
       <h2>ابدأ تقريرًا</h2>
       <div class="helper" style="margin-bottom:10px;">اختر الفترة ثم نوع التقرير، وسيُفتح التقرير المطلوب بالفترة معبّأة تلقائيًا.</div>
-      <div class="grid">
-        <div class="field"><label>من تاريخ</label><input id="rl_from" type="date" lang="en-GB"></div>
-        <div class="field"><label>إلى تاريخ</label><input id="rl_to" type="date" lang="en-GB"></div>
-      </div>
-      <div class="field" style="margin-bottom:12px;">
-        <label>نوع التقرير</label>
-        <select id="rl_type">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;">
+        <div class="field" style="margin:0;"><label>من تاريخ</label><input id="rl_from" type="date" lang="en-GB" style="width:150px;"></div>
+        <div class="field" style="margin:0;"><label>إلى تاريخ</label><input id="rl_to" type="date" lang="en-GB" style="width:150px;"></div>
+        <div class="field" style="margin:0;"><label>نوع التقرير</label>
+        <select id="rl_type" style="width:auto; min-width:190px;">
           <option value="trainer">تقرير مقدم الفعالية</option>
           <option value="school">تقرير مدرسة</option>
           <option value="bypath">تقرير حسب مسار / مجال المبادرة</option>
@@ -2792,7 +2979,7 @@ function renderReportsPage(c){
           <option value="adminReq">الطلبات الإدارية</option>
           <option value="eval">النتائج والإنجازات</option>
           <option value="dist">التوزيعات</option>
-        </select>
+        </select></div>
       </div>
       <button class="btn btn-primary" id="rl_go">فتح التقرير</button>
     </div>`;
@@ -2846,11 +3033,11 @@ function renderReportsPage(c){
     document.getElementById('bp_byPath').addEventListener('change', syncModeVisibility);
     document.getElementById('bp_byField').addEventListener('change', syncModeVisibility);
 
-    const baseCols = ['رقم التكليف','الفعالية','التاريخ (من — إلى)','الوقت','مكان التنفيذ','المكان','هاتف المشرف','مقدم الفعالية','هاتف مقدم الفعالية','الإنجاز'];
+    const baseCols = ['#','الفعالية','التاريخ','الوقت','المكان','هاتف المشرف','مقدم الفعالية'];
     function rowOf(o, extraCols){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
-      const base = [o.serial, o.title, dateRangeStr(o), fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
+      const base = [o.serial, o.title, dateRangeStr(o), fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', trainerCellText(o)];
       const extra = (extraCols||[]).map(c=>{
         if(c==='مسار المبادرة'){ const pt=state.programTypes.find(p=>p.id===o.programTypeId); return pt?pt.name:''; }
         if(c==='مجال المبادرة'){ const f=state.fields.find(x=>x.id===o.fieldId); return f?f.name:''; }
@@ -3095,10 +3282,9 @@ function renderReportsPage(c){
     function selectedModes(){ return Array.from(document.querySelectorAll('.rp_modeChk:checked')).map(cb=>cb.value); }
     function columnsFor(modes){
       // الأعمدة الأساسية موجودة دائمًا، ثم تُضاف أعمدة إضافية حسب الأنماط المختارة
-      const base = ['رقم التكليف','الفعالية','التاريخ (من — إلى)','الوقت','مكان التنفيذ','المكان','هاتف المشرف','مقدم الفعالية','هاتف مقدم الفعالية'];
+      const base = ['#','الفعالية','التاريخ','الوقت','المكان','هاتف المشرف','مقدم الفعالية'];
       const extra = [];
-      if(modes.includes('hours')) extra.push('عدد الأيام','عدد الساعات');
-      extra.push('الإنجاز');
+      if(modes.includes('hours')) extra.push('المدة','عدد الساعات');
       if(modes.includes('eval')) extra.push('تقييم المشرف','تقييم المدرسة','تقييم الطلاب');
       return [...base, ...extra];
     }
@@ -3106,15 +3292,14 @@ function renderReportsPage(c){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
       const map = {
-        'رقم التكليف': o.serial,
+        '#': o.serial,
         'الفعالية': o.title,
-        'التاريخ (من — إلى)': dateRangeStr(o),
+        'التاريخ': dateRangeStr(o),
         'الوقت': fullTimeRange(o.timeFrom,o.timeTo),
-        'مكان التنفيذ': school?placeTypeLabel(school.level):'',
         'المكان': school?school.name:'',
         'هاتف المشرف': supervisor?supervisor.phone||'':'',
-        'مقدم الفعالية': trainerNames(o),
-        'هاتف مقدم الفعالية': trainerPhones(o),
+        'مقدم الفعالية': trainerCellText(o),
+        'المدة': daysCount(o.date,o.dateTo),
         'عدد الأيام': daysCount(o.date,o.dateTo),
         'عدد الساعات': hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo),
         'الإنجاز': o.completionStatus||'لم تنجز',
@@ -3161,7 +3346,15 @@ function renderReportsPage(c){
         </tbody></table>`).join('');
       doPrintDoc(buildReportDoc({
         titleAr:'تقرير مقدم فعالية', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
-        kpis:[{v:groups.reduce((s,g)=>s+g.list.length,0),l:'إجمالي الفعاليات'}],
+        kpis:(function(){
+          const all = groups.flatMap(g=>g.list);
+          return [
+            {v:all.length, l:'📋 إجمالي الفعاليات'},
+            {v:all.reduce((s,o)=>s+daysCount(o.date,o.dateTo),0), l:'🗓️ المدة (أيام)'},
+            {v:Math.round(all.reduce((s,o)=>s+hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo),0)*10)/10, l:'⏱️ عدد الساعات'},
+            {v:all.reduce((s,o)=>s+(Number(o.participantsCount)||0),0), l:'👥 المستهدفون'},
+          ];
+        })(),
         extraHtml
       }), true, 'A4');
     }
@@ -3181,7 +3374,7 @@ function renderReportsPage(c){
           <label style="font-weight:400;font-size:12px;"><input type="checkbox" id="rp_schoolAll"> تحديد الكل</label>
         </label>
         <input id="rp_schoolSearch" placeholder="🔎 اكتب للبحث عن مدرسة..." style="margin-bottom:6px;">
-        <div id="rp_schoolChecks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;border:1px solid var(--line);border-radius:8px;padding:8px;max-height:180px;overflow:auto;">
+        <div id="rp_schoolChecks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 10px;border:1px solid var(--line);border-radius:8px;padding:8px;max-height:230px;overflow:auto;">
           ${state.schools.map(s=>`<label class="checkbox-chip rp_schoolRow" data-name="${escapeHtml(s.name)}"><input type="checkbox" class="rp_schoolChk" value="${s.id}"> ${escapeHtml(s.name)}</label>`).join('') || '<span class="helper">لا توجد مدارس</span>'}
         </div>
       </div>
@@ -3200,11 +3393,11 @@ function renderReportsPage(c){
         row.style.display = !q || row.dataset.name.includes(q) ? '' : 'none';
       });
     });
-    const columns = ['رقم التكليف','الفعالية','التاريخ (من — إلى)','الوقت','مكان التنفيذ','المكان','هاتف المشرف','مقدم الفعالية','هاتف مقدم الفعالية','الإنجاز'];
+    const columns = ['#','الفعالية','التاريخ','الوقت','المكان','هاتف المشرف','مقدم الفعالية'];
     function rowOf(o){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
-      return [o.serial, o.title, dateRangeStr(o), fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
+      return [o.serial, o.title, dateRangeStr(o), fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', trainerCellText(o)];
     }
     function gen(){
       const from=document.getElementById('rp_from2').value, to=document.getElementById('rp_to2').value;
@@ -3241,7 +3434,15 @@ function renderReportsPage(c){
         </tbody></table>`).join('');
       doPrintDoc(buildReportDoc({
         titleAr:'تقرير مدرسة', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
-        kpis:[{v:groups.reduce((s,g)=>s+g.list.length,0),l:'إجمالي الفعاليات'}],
+        kpis:(function(){
+          const all = groups.flatMap(g=>g.list);
+          return [
+            {v:all.length, l:'📋 إجمالي الفعاليات'},
+            {v:all.reduce((s,o)=>s+daysCount(o.date,o.dateTo),0), l:'🗓️ المدة (أيام)'},
+            {v:Math.round(all.reduce((s,o)=>s+hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo),0)*10)/10, l:'⏱️ عدد الساعات'},
+            {v:all.reduce((s,o)=>s+(Number(o.participantsCount)||0),0), l:'👥 المستهدفون'},
+          ];
+        })(),
         extraHtml
       }), true, 'A4');
     }

@@ -54,6 +54,7 @@
   .form-table.compact tbody td label{font-size:11.5px; margin-bottom:3px;}
   .form-table .auto-w{width:auto; min-width:0; max-width:100%;}
   .form-table .auto-w.num{width:84px;}
+  .date-hint{font-size:11px; font-weight:700; color:var(--maroon-700); margin-top:3px; direction:rtl;}
   .plus-btn.mini{width:18px; height:18px; font-size:12px; line-height:1; padding:0; vertical-align:middle; margin-inline-start:4px;}
   .th-bar{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
   .th-actions{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
@@ -92,8 +93,8 @@
   .plus-btn{all:unset; cursor:pointer; width:34px; height:34px; border-radius:7px; flex:0 0 auto; background:var(--maroon-800); color:#fff; font-size:18px; font-weight:800; display:flex; align-items:center; justify-content:center;}
   .plus-btn:hover{background:var(--maroon-900);}
   table{width:100%; border-collapse:collapse; font-size:14px; font-family:var(--font-body);}
-  thead th{background:var(--maroon-100); color:var(--maroon-950); padding:12px 13px; text-align:right; font-family:var(--font-body); font-weight:800; font-style:normal; font-size:14px;}
-  tbody td{padding:12px 13px; border-bottom:1px solid var(--line); vertical-align:middle; line-height:1.6;}
+  thead th{background:var(--maroon-100); color:var(--maroon-950); padding:12px 13px; text-align:center; vertical-align:middle; font-family:var(--font-body); font-weight:800; font-style:normal; font-size:14px;}
+  tbody td{padding:12px 13px; border-bottom:1px solid var(--line); vertical-align:middle; text-align:center; line-height:1.6;}
   tbody tr:hover{background:var(--maroon-50);}
   .actions-cell{display:flex; gap:4px; flex-wrap:wrap;}
   .badge{display:inline-block; padding:3px 9px; border-radius:20px; background:var(--maroon-100); color:var(--maroon-800); font-size:11.5px; font-weight:700;}
@@ -649,6 +650,38 @@ function render(){
   else if(currentPage==='settings') renderSettingsPage(c);
   document.getElementById('orgNameDisplay').textContent = state.orgName || 'إدارة الفعاليات';
   document.getElementById('logoSlot').innerHTML = state.logo ? `<img src="${state.logo}">` : `<div class="logo-placeholder">🕌</div>`;
+  attachDateHints();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   توضيح التاريخ تحت كل حقل تاريخ
+   ──────────────────────────────────────────────────────────────────
+   حقل <input type="date"> يعرض ترتيب اليوم/الشهر حسب لغة المتصفح،
+   وقد يظهر mm/dd/yyyy في بعض الأجهزة مما يوهم أن الشهر هو اليوم.
+   القيمة المخزَّنة دائمًا صحيحة (YYYY-MM-DD)، لذا نعرض تحت كل حقل
+   نصًا صريحًا بالعربية لا يحتمل اللبس، مثل: 6 أغسطس 2026 (06/08/2026)
+   ══════════════════════════════════════════════════════════════════ */
+function dateInWords(iso){
+  if(!iso) return '';
+  const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(!m) return '';
+  const names=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const day=parseInt(m[3],10), mon=names[parseInt(m[2],10)-1]||m[2], yr=m[1];
+  return `${day} ${mon} ${yr} (${m[3]}/${m[2]}/${m[1]})`;
+}
+function attachDateHints(){
+  document.querySelectorAll('input[type="date"]').forEach(inp=>{
+    if(inp.closest('td') && inp.classList.contains('qs-field')) return; // جدول التعديل السريع: مساحته ضيقة
+    let hint = inp.nextElementSibling;
+    if(!hint || !hint.classList || !hint.classList.contains('date-hint')){
+      hint = document.createElement('div');
+      hint.className = 'date-hint';
+      inp.insertAdjacentElement('afterend', hint);
+    }
+    const upd = ()=>{ hint.textContent = inp.value ? dateInWords(inp.value) : ''; };
+    if(!inp.dataset.hintBound){ inp.addEventListener('input', upd); inp.addEventListener('change', upd); inp.dataset.hintBound='1'; }
+    upd();
+  });
 }
 
 /* ============ Home ============ */
@@ -2000,8 +2033,8 @@ function printDocOpen(theme){
   table{width:100%;border-collapse:collapse;font-size:11pt;margin-bottom:4mm}
   thead{display:table-header-group}
   tfoot{display:table-footer-group}
-  th{background:${theme};color:#fff;padding:6px 8px;border:1px solid ${PRINT_LINE_COLOR};text-align:right;font-weight:800}
-  td{padding:6px 8px;border:1px solid ${PRINT_LINE_COLOR};text-align:right;font-weight:400}
+  th{background:${theme};color:#fff;padding:6px 8px;border:1px solid ${PRINT_LINE_COLOR};text-align:center;vertical-align:middle;font-weight:800}
+  td{padding:6px 8px;border:1px solid ${PRINT_LINE_COLOR};text-align:center;vertical-align:middle;font-weight:400}
   td.num, th.num{text-align:center}
   tr:nth-child(even) td{background:#f8fafc}
   tfoot td{background:#f0f4f8;font-weight:800}
@@ -2065,6 +2098,13 @@ function fullTimeRange(from, to){
   return from ? `من الساعة ${from}` : `إلى الساعة ${to}`;
 }
 /* عرض التاريخ بصيغة DD-MM-YYYY (للعرض فقط — التخزين يبقى YYYY-MM-DD لضمان صحة الفرز والمقارنات) */
+/* نطاق تاريخ الفعالية: من تاريخ المبادرة إلى تاريخ الانتهاء (يعرض تاريخًا واحدًا لو كانت ليوم واحد) */
+function dateRangeStr(o){
+  const s = o && o.date ? fmtDate(o.date) : '';
+  const e = o && o.dateTo && o.dateTo !== o.date ? fmtDate(o.dateTo) : '';
+  if(!s && !e) return '';
+  return e ? `${s} — ${e}` : s;
+}
 function fmtDate(dateStr){
   if(!dateStr) return '';
   const m = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -2320,9 +2360,9 @@ function renderAdminPage(c){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
       const reqs = (o.adminRequests||[]).map(id=>{const r=state.adminRequestsList.find(x=>x.id===id); return r?r.name:'';}).filter(Boolean).join('، ');
-      return [i+1, o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', o.participantsCount||'', trainerNames(o), trainerPhones(o), reqs||'—'];
+      return [i+1, o.serial, o.title, dateRangeStr(o), fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', o.participantsCount||'', trainerNames(o), trainerPhones(o), reqs||'—'];
     });
-    exportToExcel('جدول_الفعاليات.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج'], rows, `جدول الفعاليات خلال فترة (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
+    exportToExcel('جدول_الفعاليات.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ (من — إلى)','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج'], rows, `جدول الفعاليات خلال فترة (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
   };
   document.getElementById('adm_print').onclick=async ()=>{
     const {list, from, to}=getList();
@@ -2338,7 +2378,7 @@ function renderAdminPage(c){
     doPrintDoc(buildReportDoc({
       titleAr:'جدول الفعاليات خلال فترة', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
       kpis:[{v:k.events,l:'عدد الفعاليات'},{v:k.trainers,l:'عدد المدربين'},{v:k.hours.toFixed(1),l:'إجمالي عدد الساعات'},{v:k.schools,l:'عدد المدارس'},{v:k.reqs,l:'عدد الطلبات الإدارية'}],
-      headers:['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','الطلبات الإدارية للبرنامج','QR'],
+      headers:['م','أمر التكليف','عنوان الفعالية','التاريخ (من — إلى)','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','الطلبات الإدارية للبرنامج','QR'],
       rows,
       extraHtml:`<div class="sec-t">توزيع الطلبات الإدارية خلال الفترة</div><table><thead><tr><th>الطلب الإداري</th><th>عدد مرات الطلب</th></tr></thead><tbody>${reqRows}</tbody></table>`
     }), true, 'A4');
@@ -2802,11 +2842,11 @@ function renderReportsPage(c){
     document.getElementById('bp_byPath').addEventListener('change', syncModeVisibility);
     document.getElementById('bp_byField').addEventListener('change', syncModeVisibility);
 
-    const baseCols = ['رقم التكليف','الفعالية','التاريخ','الوقت','مكان التنفيذ','المكان','هاتف المشرف','مقدم الفعالية','هاتف مقدم الفعالية','الإنجاز'];
+    const baseCols = ['رقم التكليف','الفعالية','التاريخ (من — إلى)','الوقت','مكان التنفيذ','المكان','هاتف المشرف','مقدم الفعالية','هاتف مقدم الفعالية','الإنجاز'];
     function rowOf(o, extraCols){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
-      const base = [o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
+      const base = [o.serial, o.title, dateRangeStr(o), fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
       const extra = (extraCols||[]).map(c=>{
         if(c==='مسار المبادرة'){ const pt=state.programTypes.find(p=>p.id===o.programTypeId); return pt?pt.name:''; }
         if(c==='مجال المبادرة'){ const f=state.fields.find(x=>x.id===o.fieldId); return f?f.name:''; }
@@ -2923,8 +2963,8 @@ function renderReportsPage(c){
       const type=document.getElementById('gn_type').value, from=document.getElementById('gn_from').value, to=document.getElementById('gn_to').value;
       if(type==='orders'){
         const list = state.orders.filter(o=>(!from||o.date>=from)&&(!to||o.date<=to));
-        return {headers:['م','العنوان','التاريخ','المدرسة','مقدم المبادرة','الإنجاز'],
-          rows:list.map(o=>{const s=state.schools.find(x=>x.id===o.schoolId); return [o.serial, o.title, fmtDate(o.date), s?s.name:'', trainerNames(o), o.completionStatus||'لم تنجز'];})};
+        return {headers:['م','العنوان','التاريخ (من — إلى)','المدرسة','مقدم المبادرة','الإنجاز'],
+          rows:list.map(o=>{const s=state.schools.find(x=>x.id===o.schoolId); return [o.serial, o.title, dateRangeStr(o), s?s.name:'', trainerNames(o), o.completionStatus||'لم تنجز'];})};
       }
       if(type==='schools'){
         return {headers:['اسم المدرسة','المرحلة','عدد المشرفين'], rows:state.schools.map(s=>[s.name, s.level, s.supervisors.length])};
@@ -2967,10 +3007,10 @@ function renderReportsPage(c){
       const notEvaluated = executed.filter(o=>!o.completionStatus);
       return {evaluated, notEvaluated, from, to};
     }
-    const headers = ['أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','مقدم المبادرة','رقم الهاتف','الإنجاز'];
+    const headers = ['أمر التكليف','عنوان الفعالية','التاريخ (من — إلى)','الوقت','المكان','مقدم المبادرة','رقم الهاتف','الإنجاز'];
     function rowOf(o){
       const school = state.schools.find(s=>s.id===o.schoolId);
-      return [o.serial, escapeHtml(o.title), fmtDate(o.date), escapeHtml(fullTimeRange(o.timeFrom,o.timeTo)), school?escapeHtml(school.name):'', escapeHtml(trainerNames(o))||'—', escapeHtml(trainerPhones(o)), o.completionStatus||'لم تنجز'];
+      return [o.serial, escapeHtml(o.title), dateRangeStr(o), escapeHtml(fullTimeRange(o.timeFrom,o.timeTo)), school?escapeHtml(school.name):'', escapeHtml(trainerNames(o))||'—', escapeHtml(trainerPhones(o)), o.completionStatus||'لم تنجز'];
     }
     function tableOf(list){
       return `<table><thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>
@@ -3051,7 +3091,7 @@ function renderReportsPage(c){
     function selectedModes(){ return Array.from(document.querySelectorAll('.rp_modeChk:checked')).map(cb=>cb.value); }
     function columnsFor(modes){
       // الأعمدة الأساسية موجودة دائمًا، ثم تُضاف أعمدة إضافية حسب الأنماط المختارة
-      const base = ['رقم التكليف','الفعالية','التاريخ','الوقت','مكان التنفيذ','المكان','هاتف المشرف','مقدم الفعالية','هاتف مقدم الفعالية'];
+      const base = ['رقم التكليف','الفعالية','التاريخ (من — إلى)','الوقت','مكان التنفيذ','المكان','هاتف المشرف','مقدم الفعالية','هاتف مقدم الفعالية'];
       const extra = [];
       if(modes.includes('hours')) extra.push('عدد الأيام','عدد الساعات');
       extra.push('الإنجاز');
@@ -3064,7 +3104,7 @@ function renderReportsPage(c){
       const map = {
         'رقم التكليف': o.serial,
         'الفعالية': o.title,
-        'التاريخ': fmtDate(o.date),
+        'التاريخ (من — إلى)': dateRangeStr(o),
         'الوقت': fullTimeRange(o.timeFrom,o.timeTo),
         'مكان التنفيذ': school?placeTypeLabel(school.level):'',
         'المكان': school?school.name:'',
@@ -3156,11 +3196,11 @@ function renderReportsPage(c){
         row.style.display = !q || row.dataset.name.includes(q) ? '' : 'none';
       });
     });
-    const columns = ['رقم التكليف','الفعالية','التاريخ','الوقت','مكان التنفيذ','المكان','هاتف المشرف','مقدم الفعالية','هاتف مقدم الفعالية','الإنجاز'];
+    const columns = ['رقم التكليف','الفعالية','التاريخ (من — إلى)','الوقت','مكان التنفيذ','المكان','هاتف المشرف','مقدم الفعالية','هاتف مقدم الفعالية','الإنجاز'];
     function rowOf(o){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
-      return [o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
+      return [o.serial, o.title, dateRangeStr(o), fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
     }
     function gen(){
       const from=document.getElementById('rp_from2').value, to=document.getElementById('rp_to2').value;
@@ -3237,9 +3277,9 @@ function renderReportsPage(c){
       const list = state.orders.filter(o=>(o.trainerIds||[]).includes(tId) && (!from||o.date>=from) && (!to||o.date<=to)).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
       const trainer=state.trainers.find(t=>t.id===tId);
       let totalHours=0;
-      const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs=Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs; return [o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), hrs.toFixed(1)]; });
+      const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs=Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs; return [o.serial, o.title, dateRangeStr(o), fullTimeRange(o.timeFrom,o.timeTo), hrs.toFixed(1)]; });
       rows.push(['', '', '', 'الإجمالي', totalHours.toFixed(1)]);
-      exportToExcel('تقرير_ساعات.xlsx', ['م','عنوان الفعالية','التاريخ','الوقت','عدد الساعات'], rows, `تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''} (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
+      exportToExcel('تقرير_ساعات.xlsx', ['م','عنوان الفعالية','التاريخ (من — إلى)','الوقت','عدد الساعات'], rows, `تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''} (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
     };
     document.getElementById('hr_print').onclick=()=>{
       const tId=document.getElementById('hr_trainer').value;
@@ -3248,10 +3288,10 @@ function renderReportsPage(c){
       const trainer=state.trainers.find(t=>t.id===tId);
       let totalHours=0;
       const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs = Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs;
-        return [o.serial, escapeHtml(o.title), fmtDate(o.date), (o.timeFrom||'')+'-'+(o.timeTo||''), hrs.toFixed(1)]; });
+        return [o.serial, escapeHtml(o.title), dateRangeStr(o), (o.timeFrom||'')+'-'+(o.timeTo||''), hrs.toFixed(1)]; });
       doPrintDoc(buildReportDoc({ titleAr:`تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''}`, subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
         kpis:[{v:list.length,l:'عدد الفعاليات'},{v:totalHours.toFixed(1),l:'إجمالي الساعات'}],
-        headers:['م','عنوان الفعالية','التاريخ','الوقت','عدد الساعات'], rows }), true, 'A4');
+        headers:['م','عنوان الفعالية','التاريخ (من — إلى)','الوقت','عدد الساعات'], rows }), true, 'A4');
     };
     document.getElementById('hr_pdf').onclick=()=>document.getElementById('hr_print').onclick();
   }
@@ -3511,17 +3551,17 @@ function renderResultsPage(c){
   document.getElementById('res_go').onclick=()=>{ document.getElementById('res_result').innerHTML = tableHtml(getList()); };
   document.getElementById('res_print').onclick=()=>{
     const list=getList(); const from=document.getElementById('res_from').value, to=document.getElementById('res_to').value;
-    const rows = rowsData(list).map(r=>[r.i, r.o.serial, escapeHtml(r.o.title), fmtDate(r.o.date), (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.school?escapeHtml(r.school.name):'', escapeHtml(trainerNames(r.o)), escapeHtml(trainerPhones(r.o)), r.reqs||'—', r.o.completionStatus||'لم تنجز']);
+    const rows = rowsData(list).map(r=>[r.i, r.o.serial, escapeHtml(r.o.title), dateRangeStr(r.o), (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.school?escapeHtml(r.school.name):'', escapeHtml(trainerNames(r.o)), escapeHtml(trainerPhones(r.o)), r.reqs||'—', r.o.completionStatus||'لم تنجز']);
     doPrintDoc(buildReportDoc({
       titleAr:'النتائج والتقييمات', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
-      headers:['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج','الإنجاز'],
+      headers:['م','أمر التكليف','عنوان الفعالية','التاريخ (من — إلى)','الوقت','المكان','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج','الإنجاز'],
       rows
     }), true, 'A4');
   };
   document.getElementById('res_excel').onclick=()=>{
     const list=getList();
-    const rows = rowsData(list).map(r=>[r.i, r.o.serial, r.o.title, fmtDate(r.o.date), (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.school?r.school.name:'', trainerNames(r.o), trainerPhones(r.o), r.reqs||'—', r.o.completionStatus||'لم تنجز', r.evalSrc]);
-    exportToExcel('النتائج.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج','الإنجاز','من قيّم؟'], rows, 'النتائج والتقييمات');
+    const rows = rowsData(list).map(r=>[r.i, r.o.serial, r.o.title, dateRangeStr(r.o), (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.school?r.school.name:'', trainerNames(r.o), trainerPhones(r.o), r.reqs||'—', r.o.completionStatus||'لم تنجز', r.evalSrc]);
+    exportToExcel('النتائج.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ (من — إلى)','الوقت','المكان','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج','الإنجاز','من قيّم؟'], rows, 'النتائج والتقييمات');
   };
   document.getElementById('res_go').click();
 }
@@ -3818,14 +3858,14 @@ function renderTrainerPortalPage(c){
     box.innerHTML = `<div class="card"><h2 class="tp-h">فعالياتي القادمة <button class="btn btn-outline btn-sm" id="tp_print_up">🖨️ طباعة</button></h2>${upcomingTableOnScreen(upcoming)}</div>`;
     document.getElementById('tp_print_up').onclick=()=>doPrintDoc(buildReportDoc({
       titleAr:'فعاليات قادمة — '+(trainer?trainer.name:''), kpis:[{v:upcoming.length,l:'عدد الفعاليات'}],
-      headers:['م','أمر التكليف','عنوان المبادرة','المكان','هاتف المشرف','التاريخ','الوقت','الطلبات المقدمة','الإنجاز'], rows:upcomingRowsForPrint(upcoming)
+      headers:['م','أمر التكليف','عنوان المبادرة','المكان','هاتف المشرف','التاريخ (من — إلى)','الوقت','الطلبات المقدمة','الإنجاز'], rows:upcomingRowsForPrint(upcoming)
     }), true, 'A4');
 
   } else if(trainerPortalTab==='past'){
     box.innerHTML = `<div class="card"><h2 class="tp-h">فعالياتي السابقة <button class="btn btn-outline btn-sm" id="tp_print_past">🖨️ طباعة</button></h2>${upcomingTableOnScreen(past)}</div>`;
     document.getElementById('tp_print_past').onclick=()=>doPrintDoc(buildReportDoc({
       titleAr:'فعاليات سابقة — '+(trainer?trainer.name:''), kpis:[{v:past.length,l:'عدد الفعاليات'}],
-      headers:['م','أمر التكليف','عنوان المبادرة','المكان','هاتف المشرف','التاريخ','الوقت','الطلبات المقدمة','الإنجاز'], rows:upcomingRowsForPrint(past)
+      headers:['م','أمر التكليف','عنوان المبادرة','المكان','هاتف المشرف','التاريخ (من — إلى)','الوقت','الطلبات المقدمة','الإنجاز'], rows:upcomingRowsForPrint(past)
     }), true, 'A4');
 
   } else if(trainerPortalTab==='notEvaluated'){
@@ -3867,7 +3907,7 @@ function renderTrainerPortalPage(c){
     </div>`;
     document.getElementById('tp_print_hours').onclick=()=>doPrintDoc(buildReportDoc({
       titleAr:'تقرير ساعات مقدم الفعالية: '+(trainer?trainer.name:''), kpis:[{v:myOrders.length,l:'عدد الفعاليات'},{v:totalHours.toFixed(1),l:'إجمالي الساعات'}],
-      headers:['م','العنوان','التاريخ','الوقت','عدد الساعات'], rows:rows.map(r=>[r.o.serial, escapeHtml(r.o.title), r.o.date||'', (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.hrs.toFixed(1)])
+      headers:['م','العنوان','التاريخ (من — إلى)','الوقت','عدد الساعات'], rows:rows.map(r=>[r.o.serial, escapeHtml(r.o.title), dateRangeStr(r.o), (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.hrs.toFixed(1)])
     }), true, 'A4');
 
   } else if(trainerPortalTab==='tasks'){

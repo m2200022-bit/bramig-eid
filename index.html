@@ -2270,7 +2270,17 @@ function renderAdminPage(c){
     if(serialQ){
       return {list: state.orders.filter(o=>String(o.serial).includes(serialQ)).sort((a,b)=> (a.date||'').localeCompare(b.date||'')), from, to};
     }
-    return {list: state.orders.filter(o=> (!from || o.date>=from) && (!to || o.date<=to)).sort((a,b)=> (a.date||'').localeCompare(b.date||'')), from, to};
+    /* تصفية بالتقاطع: تُعرض الفعالية إذا تداخلت مدتها (من تاريخ البداية إلى تاريخ الانتهاء)
+       مع الفترة المطلوبة — وليس فقط إذا كان تاريخ بدايتها داخلها. هذا يضمن ظهور الفعاليات
+       متعددة الأيام التي تبدأ قبل الفترة وتمتد داخلها. */
+    return {list: state.orders.filter(o=>{
+      const s = o.date || '';
+      const e = o.dateTo || o.date || '';
+      if(!s && !e) return false;
+      if(from && e && e < from) return false;
+      if(to && s && s > to) return false;
+      return true;
+    }).sort((a,b)=> (a.date||'').localeCompare(b.date||'')), from, to};
   }
   function computeKpis(list){
     const trainerSet = new Set(); list.forEach(o=>(o.trainerIds||[]).forEach(id=>trainerSet.add(id)));
@@ -2312,7 +2322,7 @@ function renderAdminPage(c){
       const reqs = (o.adminRequests||[]).map(id=>{const r=state.adminRequestsList.find(x=>x.id===id); return r?r.name:'';}).filter(Boolean).join('، ');
       return [i+1, o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', o.participantsCount||'', trainerNames(o), trainerPhones(o), reqs||'—'];
     });
-    exportToExcel('جدول_الفعاليات.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج'], rows, `جدول الفعاليات خلال فترة (من ${from||'—'} إلى ${to||'—'})`);
+    exportToExcel('جدول_الفعاليات.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج'], rows, `جدول الفعاليات خلال فترة (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
   };
   document.getElementById('adm_print').onclick=async ()=>{
     const {list, from, to}=getList();
@@ -2326,7 +2336,7 @@ function renderAdminPage(c){
     }));
     const reqRows = Object.entries(k.reqCounts).map(([id,count])=>{ const r=state.adminRequestsList.find(x=>x.id===id); return `<tr><td>${escapeHtml(r?r.name:id)}</td><td>${count}</td></tr>`; }).join('') || '<tr><td colspan="2" style="text-align:center;color:#999;">لا توجد</td></tr>';
     doPrintDoc(buildReportDoc({
-      titleAr:'جدول الفعاليات خلال فترة', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
+      titleAr:'جدول الفعاليات خلال فترة', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
       kpis:[{v:k.events,l:'عدد الفعاليات'},{v:k.trainers,l:'عدد المدربين'},{v:k.hours.toFixed(1),l:'إجمالي عدد الساعات'},{v:k.schools,l:'عدد المدارس'},{v:k.reqs,l:'عدد الطلبات الإدارية'}],
       headers:['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','الطلبات الإدارية للبرنامج','QR'],
       rows,
@@ -2412,7 +2422,7 @@ function renderAdminRequestsReportPage(c){
 
   document.getElementById('arq_excel').onclick=()=>{
     const {list, from, to} = getList();
-    exportToExcel('الطلبات_الإدارية.xlsx', excelHeaders, excelRowsOf(rowsOf(list)), `تقرير الطلبات الإدارية (من ${from||'—'} إلى ${to||'—'})`);
+    exportToExcel('الطلبات_الإدارية.xlsx', excelHeaders, excelRowsOf(rowsOf(list)), `تقرير الطلبات الإدارية (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
   };
   document.getElementById('arq_excelSel').onclick=()=>{
     const rows = selectedRows();
@@ -2426,7 +2436,7 @@ function renderAdminRequestsReportPage(c){
   async function printIt(){
     const {list, from, to} = getList();
     doPrintDoc(buildReportDoc({
-      titleAr:'تقرير الطلبات الإدارية', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
+      titleAr:'تقرير الطلبات الإدارية', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
       kpis:[{v:list.length,l:'عدد الفعاليات'}],
       headers:excelHeaders,
       rows: buildPrintRows(rowsOf(list))
@@ -2852,19 +2862,19 @@ function renderReportsPage(c){
       const from=document.getElementById('bp_from').value, to=document.getElementById('bp_to').value;
       if(data.mode==='combined'){
         if(!data.list.length){ toast('لا توجد بيانات لتصديرها'); return; }
-        exportToExcel('تقرير_حسب_المسار_والمجال.xlsx', data.columns, data.list.map(o=>rowOf(o,['مسار المبادرة','مجال المبادرة'])), `تقرير حسب المسار والمجال (من ${from||'—'} إلى ${to||'—'})`);
+        exportToExcel('تقرير_حسب_المسار_والمجال.xlsx', data.columns, data.list.map(o=>rowOf(o,['مسار المبادرة','مجال المبادرة'])), `تقرير حسب المسار والمجال (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
       } else {
         if(!data.groups.length){ toast('لا توجد بيانات لتصديرها'); return; }
         const sheets = data.groups.map(g=>({name:g.label.slice(0,30), headers:data.columns, rows:g.list.map(o=>rowOf(o))}));
-        exportToExcelMultiSheet('تقرير_حسب_مسار_المبادرة.xlsx', sheets, `تقرير حسب مسار/مجال المبادرة (من ${from||'—'} إلى ${to||'—'})`);
+        exportToExcelMultiSheet('تقرير_حسب_مسار_المبادرة.xlsx', sheets, `تقرير حسب مسار/مجال المبادرة (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
       }
     };
     function printIt(){
       const data = gen();
       const from=document.getElementById('bp_from').value, to=document.getElementById('bp_to').value;
       const dateBox = `<div style="text-align:center;margin-bottom:5mm;font-size:11pt;font-weight:700;">
-        من <span style="display:inline-block;border:1.5px solid ${PRINT_LINE_COLOR};border-radius:6px;padding:1.5mm 6mm;margin:0 3mm;font-weight:900;">${from||'—'}</span>
-        إلى <span style="display:inline-block;border:1.5px solid ${PRINT_LINE_COLOR};border-radius:6px;padding:1.5mm 6mm;margin:0 3mm;font-weight:900;">${to||'—'}</span>
+        من <span style="display:inline-block;border:1.5px solid ${PRINT_LINE_COLOR};border-radius:6px;padding:1.5mm 6mm;margin:0 3mm;font-weight:900;">${from?fmtDate(from):'—'}</span>
+        إلى <span style="display:inline-block;border:1.5px solid ${PRINT_LINE_COLOR};border-radius:6px;padding:1.5mm 6mm;margin:0 3mm;font-weight:900;">${to?fmtDate(to):'—'}</span>
       </div>`;
       let bodyHtml, totalEvents;
       if(data.mode==='combined'){
@@ -2933,7 +2943,7 @@ function renderReportsPage(c){
     document.getElementById('gn_go').onclick=()=>{ const {headers,rows}=gen(); const box=document.getElementById('gn_result'); box.innerHTML = tableOf(headers,rows); enhanceReportTable(box); };
     document.getElementById('gn_print').onclick=()=>{
       const {headers,rows}=gen(); const from=document.getElementById('gn_from').value, to=document.getElementById('gn_to').value;
-      doPrintDoc(buildReportDoc({titleAr:'تقرير عام', subtitle:`من ${from||'—'} إلى ${to||'—'}`, headers, rows:rows.map(r=>r.map(escapeHtml))}), true, 'A4');
+      doPrintDoc(buildReportDoc({titleAr:'تقرير عام', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`, headers, rows:rows.map(r=>r.map(escapeHtml))}), true, 'A4');
     };
     document.getElementById('gn_pdf').onclick=()=>document.getElementById('gn_print').onclick();
     document.getElementById('gn_excel').onclick=()=>{ const {headers,rows}=gen(); exportToExcel('تقرير_عام.xlsx', headers, rows, 'تقرير عام'); };
@@ -2983,12 +2993,12 @@ function renderReportsPage(c){
       exportToExcelMultiSheet('النتائج_والإنجازات.xlsx', [
         {name:'مقيَّمة', headers, rows:evaluated.map(rowOf)},
         {name:'غير مقيَّمة', headers, rows:notEvaluated.map(rowOf)},
-      ], `النتائج والإنجازات (من ${from||'—'} إلى ${to||'—'})`);
+      ], `النتائج والإنجازات (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
     };
     document.getElementById('ev_print').onclick=()=>{
       const {evaluated, notEvaluated, from, to} = gen();
       doPrintDoc(buildReportDoc({
-        titleAr:'النتائج والإنجازات', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
+        titleAr:'النتائج والإنجازات', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
         kpis:[{v:evaluated.length,l:'فعاليات مقيَّمة'},{v:notEvaluated.length,l:'بانتظار التقييم'}],
         headers,
         rows:evaluated.map(rowOf),
@@ -3096,7 +3106,7 @@ function renderReportsPage(c){
       const {groups, columns, from, to} = gen();
       if(!groups.length){ toast('لا توجد بيانات لتصديرها'); return; }
       const sheets = groups.map(({trainer,list})=>({name:trainer.name.slice(0,30), headers:columns, rows:list.map(o=>rowOf(o,columns))}));
-      exportToExcelMultiSheet('تقرير_مقدم_فعالية.xlsx', sheets, `تقرير مقدم فعالية (من ${from||'—'} إلى ${to||'—'})`);
+      exportToExcelMultiSheet('تقرير_مقدم_فعالية.xlsx', sheets, `تقرير مقدم فعالية (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
     };
     function printIt(){
       const {groups, columns, from, to} = gen();
@@ -3106,7 +3116,7 @@ function renderReportsPage(c){
           ${list.map(o=>`<tr>${rowOf(o,columns).map(v=>`<td>${escapeHtml(String(v))}</td>`).join('')}</tr>`).join('')}
         </tbody></table>`).join('');
       doPrintDoc(buildReportDoc({
-        titleAr:'تقرير مقدم فعالية', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
+        titleAr:'تقرير مقدم فعالية', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
         kpis:[{v:groups.reduce((s,g)=>s+g.list.length,0),l:'إجمالي الفعاليات'}],
         extraHtml
       }), true, 'A4');
@@ -3176,7 +3186,7 @@ function renderReportsPage(c){
       const {groups, from, to} = gen();
       if(!groups.length){ toast('لا توجد بيانات لتصديرها'); return; }
       const sheets = groups.map(({school,list})=>({name:school.name.slice(0,30), headers:columns, rows:list.map(rowOf)}));
-      exportToExcelMultiSheet('تقرير_مدرسة.xlsx', sheets, `تقرير مدرسة (من ${from||'—'} إلى ${to||'—'})`);
+      exportToExcelMultiSheet('تقرير_مدرسة.xlsx', sheets, `تقرير مدرسة (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
     };
     function printIt(){
       const {groups, from, to} = gen();
@@ -3186,7 +3196,7 @@ function renderReportsPage(c){
           ${list.map(o=>`<tr>${rowOf(o).map(v=>`<td>${escapeHtml(String(v))}</td>`).join('')}</tr>`).join('')}
         </tbody></table>`).join('');
       doPrintDoc(buildReportDoc({
-        titleAr:'تقرير مدرسة', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
+        titleAr:'تقرير مدرسة', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
         kpis:[{v:groups.reduce((s,g)=>s+g.list.length,0),l:'إجمالي الفعاليات'}],
         extraHtml
       }), true, 'A4');
@@ -3229,7 +3239,7 @@ function renderReportsPage(c){
       let totalHours=0;
       const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs=Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs; return [o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), hrs.toFixed(1)]; });
       rows.push(['', '', '', 'الإجمالي', totalHours.toFixed(1)]);
-      exportToExcel('تقرير_ساعات.xlsx', ['م','عنوان الفعالية','التاريخ','الوقت','عدد الساعات'], rows, `تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''} (من ${from||'—'} إلى ${to||'—'})`);
+      exportToExcel('تقرير_ساعات.xlsx', ['م','عنوان الفعالية','التاريخ','الوقت','عدد الساعات'], rows, `تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''} (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
     };
     document.getElementById('hr_print').onclick=()=>{
       const tId=document.getElementById('hr_trainer').value;
@@ -3239,7 +3249,7 @@ function renderReportsPage(c){
       let totalHours=0;
       const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs = Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs;
         return [o.serial, escapeHtml(o.title), fmtDate(o.date), (o.timeFrom||'')+'-'+(o.timeTo||''), hrs.toFixed(1)]; });
-      doPrintDoc(buildReportDoc({ titleAr:`تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''}`, subtitle:`من ${from||'—'} إلى ${to||'—'}`,
+      doPrintDoc(buildReportDoc({ titleAr:`تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''}`, subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
         kpis:[{v:list.length,l:'عدد الفعاليات'},{v:totalHours.toFixed(1),l:'إجمالي الساعات'}],
         headers:['م','عنوان الفعالية','التاريخ','الوقت','عدد الساعات'], rows }), true, 'A4');
     };
@@ -3331,7 +3341,7 @@ function renderStatsPage(c){
 
   document.getElementById('st_go').onclick=()=>{
     const {byField, byType, byLevel, from, to} = compute();
-    const subtitle = `من ${from||'—'} إلى ${to||'—'}`;
+    const subtitle = `من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`;
     window.__lastStatsData = {byField, byType, byLevel, from, to};
 
     const fCard=document.getElementById('st_field_card'); fCard.style.display='block';
@@ -3376,7 +3386,7 @@ function renderStatsPage(c){
       {name:'حسب المجال', headers:['البند','عدد المدارس','عدد المبادرات','عدد الساعات','عدد الأيام','عدد المدربين','عدد الطلاب'], rows:byField.map(x=>[x.name,x.schools,x.programs,x.hours.toFixed(1),x.days,x.trainers,x.participants])},
       {name:'حسب نوع البرنامج', headers:['البند','عدد المدارس','عدد المبادرات','عدد الساعات','عدد الأيام','عدد المدربين','عدد الطلاب'], rows:byType.map(x=>[x.name,x.schools,x.programs,x.hours.toFixed(1),x.days,x.trainers,x.participants])},
       {name:'حسب المرحلة', headers:['المرحلة','عدد البرامج المنفذة'], rows:byLevel.map(x=>[x.name,x.programs])},
-    ], `تقرير التصنيفيات (من ${from||'—'} إلى ${to||'—'})`);
+    ], `تقرير التصنيفيات (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
   };
   document.getElementById('st_print').onclick=()=>{
     if(!window.__lastStatsData){ toast('اضغط "احتساب" أولاً'); return; }
@@ -3388,7 +3398,7 @@ function renderStatsPage(c){
       ${byLevel.map(x=>`<tr><td>${escapeHtml(x.name)}</td><td>${x.programs}</td></tr>`).join('')}
     </tbody></table>`;
     doPrintDoc(buildReportDoc({
-      titleAr:'تقرير التصنيفيات الشامل', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
+      titleAr:'تقرير التصنيفيات الشامل', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
       kpis:[{v:byField.reduce((s,x)=>s+x.programs,0),l:'إجمالي البرامج'},{v:byField.reduce((s,x)=>s+x.participants,0),l:'إجمالي الطلاب'},{v:byField.reduce((s,x)=>s+x.hours,0).toFixed(1),l:'إجمالي الساعات'}],
       extraHtml:`<div class="sec-t">حسب مجال المبادرة</div>${sectionTable(byField)}
         <div class="sec-t">حسب مسار المبادرة (نوع البرنامج)</div>${sectionTable(byType)}
@@ -3503,7 +3513,7 @@ function renderResultsPage(c){
     const list=getList(); const from=document.getElementById('res_from').value, to=document.getElementById('res_to').value;
     const rows = rowsData(list).map(r=>[r.i, r.o.serial, escapeHtml(r.o.title), fmtDate(r.o.date), (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.school?escapeHtml(r.school.name):'', escapeHtml(trainerNames(r.o)), escapeHtml(trainerPhones(r.o)), r.reqs||'—', r.o.completionStatus||'لم تنجز']);
     doPrintDoc(buildReportDoc({
-      titleAr:'النتائج والتقييمات', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
+      titleAr:'النتائج والتقييمات', subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
       headers:['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج','الإنجاز'],
       rows
     }), true, 'A4');
@@ -3611,7 +3621,7 @@ function renderDistributionsTabContent(c){
       const list = state.orders.filter(o=>(o.trainerIds||[]).includes(t.id) && o.date>=start && o.date<=end).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
       return {name:t.name, headers:['العنوان','من تاريخ','إلى تاريخ','عدد الأيام','الوقت','عدد الساعات','المدرسة','الإنجاز'], rows:list.map(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return [o.title, fmtDate(o.date), fmtDate(o.dateTo||o.date), daysCount(o.date,o.dateTo), fullTimeRange(o.timeFrom,o.timeTo), hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo), s?s.name:'', o.completionStatus||'لم تنجز']; })};
     });
-    exportToExcelMultiSheet('التوزيعات.xlsx', sheets, `التوزيعات (${start} إلى ${end})`);
+    exportToExcelMultiSheet('التوزيعات.xlsx', sheets, `التوزيعات (${fmtDate(start)} إلى ${fmtDate(end)})`);
   };
   function trainerGroups(){
     const period=document.getElementById('dist_period').value, dateStr=document.getElementById('dist_date').value || today;
@@ -3698,7 +3708,7 @@ function renderDistributionsTabContent(c){
   function printSummaryOnly(){
     const {start, end, groups} = trainerGroups();
     doPrintDoc(buildReportDoc({
-      titleAr:'جدول ملخّص لكل مقدم مبادرة', subtitle:`من ${start} إلى ${end}`,
+      titleAr:'جدول ملخّص لكل مقدم مبادرة', subtitle:`من ${fmtDate(start)} إلى ${fmtDate(end)}`,
       extraHtml: summaryTableHtml(groups) || '<div>لا توجد بيانات</div>'
     }), true, 'A4');
   }
@@ -3712,7 +3722,7 @@ function renderDistributionsTabContent(c){
         ${list.map(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return `<tr><td>${escapeHtml(o.title)}</td><td>${fmtDate(o.date)}</td><td>${daysCount(o.date,o.dateTo)}</td><td>${escapeHtml(fullTimeRange(o.timeFrom,o.timeTo))}</td><td>${hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo)}</td><td>${s?escapeHtml(s.name):''}</td><td>${o.completionStatus||'لم تنجز'}</td></tr>`; }).join('')}
       </tbody></table>`).join('');
     doPrintDoc(buildReportDoc({
-      titleAr:'توزيع الفعاليات على مقدمي المبادرة', subtitle:`من ${start} إلى ${end}`,
+      titleAr:'توزيع الفعاليات على مقدمي المبادرة', subtitle:`من ${fmtDate(start)} إلى ${fmtDate(end)}`,
       extraHtml
     }), true, 'A4');
   }

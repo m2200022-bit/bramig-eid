@@ -899,7 +899,7 @@ function ordersTableHtml(list, containerId){
     const orderStatusBadge = o.status==='cancelled' ? '<span class="badge bad">ملغاة</span>' : o.status==='postponed' ? '<span class="badge busy">مؤجّلة</span>' : '<span class="badge ok">نشطة</span>';
     return `<tr style="${o.status==='cancelled'?'opacity:.6;':''}">
       <td><input type="checkbox" class="otbl-check" data-id="${o.id}" onchange="otblSelect('${containerId}', this)"></td>
-      <td><span class="badge">${o.serial}</span></td><td>${escapeHtml(o.title)}</td><td>${o.date||''}</td>
+      <td><span class="badge">${o.serial}</span></td><td>${escapeHtml(o.title)}</td><td>${fmtDate(o.date)}</td>
       <td>${field?escapeHtml(field.name):''}</td><td>${school?escapeHtml(school.name):''}</td><td>${escapeHtml(trainerNames(o))}</td>
       <td>${statusBadge}</td><td>${orderStatusBadge}</td>
     </tr>`;
@@ -2064,13 +2064,19 @@ function fullTimeRange(from, to){
   if(from && to) return `من الساعة ${from} إلى الساعة ${to}`;
   return from ? `من الساعة ${from}` : `إلى الساعة ${to}`;
 }
+/* عرض التاريخ بصيغة DD-MM-YYYY (للعرض فقط — التخزين يبقى YYYY-MM-DD لضمان صحة الفرز والمقارنات) */
+function fmtDate(dateStr){
+  if(!dateStr) return '';
+  const m = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : dateStr;
+}
 function fullDateStr(dateStr){
   if(!dateStr) return '';
   try{
     const d = new Date(dateStr+'T00:00:00');
     const weekday = d.toLocaleDateString('ar-QA-u-nu-latn', {weekday:'long'});
-    return `${weekday}، ${dateStr}`;
-  }catch(e){ return dateStr; }
+    return `${weekday}، ${fmtDate(dateStr)}`;
+  }catch(e){ return fmtDate(dateStr); }
 }
 
 /* ---- single-document (order) print: field-row style ---- */
@@ -2091,7 +2097,7 @@ function generateBarcodeDataUrl(text){
 }
 function qrTextForOrder(o){
   const school = state.schools.find(s=>s.id===o.schoolId);
-  return `أمر تكليف رقم ${o.serial}\n${o.title}\nالتاريخ: ${o.date||''} ${o.timeFrom||''}\nالمكان: ${school?school.name:''}`;
+  return `أمر تكليف رقم ${o.serial}\n${o.title}\nالتاريخ: ${fmtDate(o.date)} ${o.timeFrom||''}\nالمكان: ${school?school.name:''}`;
 }
 /* Same dashed-column box but for people: name on top (bold), phone below (muted, clickable) — used for trainers/supervisor */
 function dashedPeopleBox(people){
@@ -2198,7 +2204,7 @@ function emailOrder(id){
   const field = state.fields.find(f=>f.id===o.fieldId);
   const school = state.schools.find(s=>s.id===o.schoolId);
   const subject = `طلب رقم ${o.serial} — ${o.title}`;
-  const body = `عنوان المبادرة: ${o.title}\nالمجال: ${field?field.name:''}\nالتاريخ: ${o.date||''}\nالوقت: ${o.timeFrom||''} - ${o.timeTo||''}\nالمدرسة: ${school?school.name:''}\nمقدم المبادرة: ${trainerNames(o)}\nملاحظة الإدارة: ${o.adminNote||''}\n\n📎 تنبيه: افتح نافذة أمر التكليف التي فُتحت الآن، اضغط "تنزيل PDF"، ثم أرفق الملف المحفوظ يدويًا في هذه الرسالة (لا يمكن للمتصفح إرفاق الملف تلقائيًا لأسباب تتعلق بالخصوصية).`;
+  const body = `عنوان المبادرة: ${o.title}\nالمجال: ${field?field.name:''}\nالتاريخ: ${fmtDate(o.date)}\nالوقت: ${o.timeFrom||''} - ${o.timeTo||''}\nالمدرسة: ${school?school.name:''}\nمقدم المبادرة: ${trainerNames(o)}\nملاحظة الإدارة: ${o.adminNote||''}\n\n📎 تنبيه: افتح نافذة أمر التكليف التي فُتحت الآن، اضغط "تنزيل PDF"، ثم أرفق الملف المحفوظ يدويًا في هذه الرسالة (لا يمكن للمتصفح إرفاق الملف تلقائيًا لأسباب تتعلق بالخصوصية).`;
   printOrderAdminCopy(id); // يفتح نافذة التقرير جاهزة لتنزيل PDF بجانب نافذة البريد
   window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
@@ -2304,7 +2310,7 @@ function renderAdminPage(c){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
       const reqs = (o.adminRequests||[]).map(id=>{const r=state.adminRequestsList.find(x=>x.id===id); return r?r.name:'';}).filter(Boolean).join('، ');
-      return [i+1, o.serial, o.title, o.date||'', fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', o.participantsCount||'', trainerNames(o), trainerPhones(o), reqs||'—'];
+      return [i+1, o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), school?school.name:'', supervisor?supervisor.phone||'':'', o.participantsCount||'', trainerNames(o), trainerPhones(o), reqs||'—'];
     });
     exportToExcel('جدول_الفعاليات.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','رقم المشرف','عدد المشاركين','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج'], rows, `جدول الفعاليات خلال فترة (من ${from||'—'} إلى ${to||'—'})`);
   };
@@ -2374,7 +2380,7 @@ function renderAdminRequestsReportPage(c){
     const rows = [];
     list.forEach(o=>{
       const school = state.schools.find(s=>s.id===o.schoolId);
-      const dateStr = o.dateTo && o.dateTo!==o.date ? `${o.date||''} — ${o.dateTo}` : (o.date||'');
+      const dateStr = o.dateTo && o.dateTo!==o.date ? `${fmtDate(o.date)} — ${fmtDate(o.dateTo)}` : fmtDate(o.date);
       const reqNames = (o.adminRequests||[]).map(id=>{ const r=state.adminRequestsList.find(x=>x.id===id); return r?r.name:''; }).filter(Boolean);
       reqNames.forEach(reqName=>{
         rows.push({o, school, dateStr, reqName});
@@ -2585,7 +2591,11 @@ function renderQuranReportTab(sub){
       <div class="field"><label>من شهر</label><input id="qr_from" type="month" lang="en"></div>
       <div class="field"><label>إلى شهر</label><input id="qr_to" type="month" lang="en"></div>
     </div>
-    <div class="helper" style="margin-bottom:8px;">اترك "من/إلى" فارغين لعرض كل الأشهر، أو استخدمهما لتحديد فترة. عند تعبئة "الشهر" يُعرض ذلك الشهر فقط.</div>
+    <div class="grid" style="grid-template-columns:repeat(2,1fr);">
+      <div class="field"><label>من تاريخ</label><input id="qr_dFrom" type="date" lang="en"></div>
+      <div class="field"><label>إلى تاريخ</label><input id="qr_dTo" type="date" lang="en"></div>
+    </div>
+    <div class="helper" style="margin-bottom:8px;">اترك الحقول فارغة لعرض كل السجلات. "من/إلى شهر" تصفّي حسب شهر السجل، و"من/إلى تاريخ" تصفّي حسب فترة تنفيذ البرنامج المسجّلة.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn btn-primary" id="qr_go">عرض</button>
       <button class="icon-btn rect" id="qr_print" title="طباعة">🖨️</button>
@@ -2600,12 +2610,23 @@ function renderQuranReportTab(sub){
     const month=document.getElementById('qr_month').value;
     const from=document.getElementById('qr_from').value;
     const to=document.getElementById('qr_to').value;
-    return state.quranActivities.filter(x=>
-        (!program||x.programName===program) &&
-        (!month||x.month===month) &&
-        (!from||(x.month||'')>=from) &&
-        (!to||(x.month||'')<=to)
-      )
+    const dFrom=document.getElementById('qr_dFrom').value;
+    const dTo=document.getElementById('qr_dTo').value;
+    return state.quranActivities.filter(x=>{
+        if(program && x.programName!==program) return false;
+        if(month && x.month!==month) return false;
+        if(from && (x.month||'')<from) return false;
+        if(to && (x.month||'')>to) return false;
+        // تصفية بالتاريخ: يُقبل السجل إذا تقاطعت فترته مع الفترة المطلوبة
+        if(dFrom || dTo){
+          const s = x.dateFrom || x.dateTo || '';
+          const e = x.dateTo || x.dateFrom || '';
+          if(!s && !e) return false;
+          if(dFrom && e && e < dFrom) return false;
+          if(dTo && s && s > dTo) return false;
+        }
+        return true;
+      })
       .sort((a,b)=> a.month.localeCompare(b.month) || a.programName.localeCompare(b.programName));
   }
   function totalsOf(list){
@@ -2636,7 +2657,7 @@ function renderQuranReportTab(sub){
     const box = document.getElementById('qr_result');
     box.innerHTML = `<h2>النتائج (${list.length})</h2>
       <table><thead><tr><th>اسم البرنامج</th><th>الشهر</th><th>الفترة</th><th>أيام التنفيذ</th><th>آلية التسميع</th><th>المعلمين</th><th>الطلاب</th><th>صفحات الحفظ</th><th>الأجزاء المحفوظة</th><th>صفحات المراجعة</th><th>الأجزاء المراجعة</th><th>نسبة الإنجاز %</th>${currentRole==='admin'?'<th>إجراءات</th>':''}</tr></thead><tbody>
-        ${list.map(x=>`<tr><td>${escapeHtml(x.programName)}</td><td>${monthNameAr(x.month)}</td><td>${x.dateFrom||''} — ${x.dateTo||''}</td><td>${x.execDays}</td><td>${escapeHtml(x.method)}</td><td>${x.teachersCount}</td><td>${x.studentsCount}</td><td>${x.memPages}</td><td>${x.memParts}</td><td>${x.revPages}</td><td>${x.revParts}</td><td>${x.completionPct}%</td>${currentRole==='admin'?`<td><button class="icon-btn" title="تعديل" onclick="editQuranRecord('${x.id}')">✏️</button> <button class="icon-btn" title="حذف" onclick="deleteQuranRecord('${x.id}')">🗑️</button></td>`:''}</tr>`).join('') || `<tr><td colspan="13" class="empty-state">لا توجد سجلات مطابقة</td></tr>`}
+        ${list.map(x=>`<tr><td>${escapeHtml(x.programName)}</td><td>${monthNameAr(x.month)}</td><td>${fmtDate(x.dateFrom)} — ${fmtDate(x.dateTo)}</td><td>${x.execDays}</td><td>${escapeHtml(x.method)}</td><td>${x.teachersCount}</td><td>${x.studentsCount}</td><td>${x.memPages}</td><td>${x.memParts}</td><td>${x.revPages}</td><td>${x.revParts}</td><td>${x.completionPct}%</td>${currentRole==='admin'?`<td><button class="icon-btn" title="تعديل" onclick="editQuranRecord('${x.id}')">✏️</button> <button class="icon-btn" title="حذف" onclick="deleteQuranRecord('${x.id}')">🗑️</button></td>`:''}</tr>`).join('') || `<tr><td colspan="13" class="empty-state">لا توجد سجلات مطابقة</td></tr>`}
       </tbody>
       ${list.length?`<tfoot><tr style="font-weight:900;background:#FAF5F7;"><td colspan="3">الإجمالي</td><td>${t.execDays}</td><td></td><td>${t.teachersCount}</td><td>${t.studentsCount}</td><td>${t.memPages}</td><td>${t.memParts}</td><td>${t.revPages}</td><td>${t.revParts}</td><td>${avgPct}%</td>${currentRole==='admin'?'<td></td>':''}</tr></tfoot>`:''}
       </table>`;
@@ -2647,20 +2668,22 @@ function renderQuranReportTab(sub){
   function periodLabel(){
     const m=document.getElementById('qr_month').value;
     const f=document.getElementById('qr_from').value, t=document.getElementById('qr_to').value;
+    const df=document.getElementById('qr_dFrom').value, dt=document.getElementById('qr_dTo').value;
+    if(df||dt) return `من ${df?fmtDate(df):'البداية'} إلى ${dt?fmtDate(dt):'النهاية'}`;
     if(m) return monthNameAr(m);
     if(f||t) return `من ${f?monthNameAr(f):'البداية'} إلى ${t?monthNameAr(t):'النهاية'}`;
     return 'كل الأشهر';
   }
   document.getElementById('qr_excel').onclick=()=>{
     const list=getList();
-    const rows=list.map(x=>[x.programName,monthNameAr(x.month),x.dateFrom||'',x.dateTo||'',x.execDays,x.method,x.teachersCount,x.studentsCount,x.memPages,x.memParts,x.revPages,x.revParts,x.completionPct]);
+    const rows=list.map(x=>[x.programName,monthNameAr(x.month),fmtDate(x.dateFrom),fmtDate(x.dateTo),x.execDays,x.method,x.teachersCount,x.studentsCount,x.memPages,x.memParts,x.revPages,x.revParts,x.completionPct]);
     exportToExcel('تقرير_الأنشطة_القرآنية.xlsx', ['اسم البرنامج','الشهر','من','إلى','أيام التنفيذ','آلية التسميع','المعلمين','الطلاب','صفحات الحفظ','الأجزاء المحفوظة','صفحات المراجعة','الأجزاء المراجعة','نسبة الإنجاز %'], rows, `تقرير الأنشطة القرآنية (${periodLabel()})`);
   };
   function printIt(){
     const list=getList();
     const t=totalsOf(list);
     const avgPct = list.length ? (t.pctSum/list.length).toFixed(1) : '0';
-    const rows=list.map(x=>[escapeHtml(x.programName),monthNameAr(x.month),`${x.dateFrom||''} — ${x.dateTo||''}`,x.execDays,escapeHtml(x.method),x.teachersCount,x.studentsCount,x.memPages,x.memParts,x.revPages,x.revParts,x.completionPct+'%']);
+    const rows=list.map(x=>[escapeHtml(x.programName),monthNameAr(x.month),`${fmtDate(x.dateFrom)} — ${fmtDate(x.dateTo)}`,x.execDays,escapeHtml(x.method),x.teachersCount,x.studentsCount,x.memPages,x.memParts,x.revPages,x.revParts,x.completionPct+'%']);
     doPrintDoc(buildReportDoc({
       titleAr:'تقرير الأنشطة القرآنية — روح والرحيق', subtitle:`${periodLabel()} — عدد السجلات: ${list.length}`,
       kpis:[{v:t.teachersCount,l:'إجمالي المعلمين'},{v:t.studentsCount,l:'إجمالي الطلاب'},{v:t.memPages,l:'إجمالي صفحات الحفظ'},{v:t.revPages,l:'إجمالي صفحات المراجعة'},{v:avgPct+'%',l:'متوسط نسبة الإنجاز'}],
@@ -2773,7 +2796,7 @@ function renderReportsPage(c){
     function rowOf(o, extraCols){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
-      const base = [o.serial, o.title, o.date||'', fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
+      const base = [o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
       const extra = (extraCols||[]).map(c=>{
         if(c==='مسار المبادرة'){ const pt=state.programTypes.find(p=>p.id===o.programTypeId); return pt?pt.name:''; }
         if(c==='مجال المبادرة'){ const f=state.fields.find(x=>x.id===o.fieldId); return f?f.name:''; }
@@ -2891,7 +2914,7 @@ function renderReportsPage(c){
       if(type==='orders'){
         const list = state.orders.filter(o=>(!from||o.date>=from)&&(!to||o.date<=to));
         return {headers:['م','العنوان','التاريخ','المدرسة','مقدم المبادرة','الإنجاز'],
-          rows:list.map(o=>{const s=state.schools.find(x=>x.id===o.schoolId); return [o.serial, o.title, o.date||'', s?s.name:'', trainerNames(o), o.completionStatus||'لم تنجز'];})};
+          rows:list.map(o=>{const s=state.schools.find(x=>x.id===o.schoolId); return [o.serial, o.title, fmtDate(o.date), s?s.name:'', trainerNames(o), o.completionStatus||'لم تنجز'];})};
       }
       if(type==='schools'){
         return {headers:['اسم المدرسة','المرحلة','عدد المشرفين'], rows:state.schools.map(s=>[s.name, s.level, s.supervisors.length])};
@@ -2937,7 +2960,7 @@ function renderReportsPage(c){
     const headers = ['أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','مقدم المبادرة','رقم الهاتف','الإنجاز'];
     function rowOf(o){
       const school = state.schools.find(s=>s.id===o.schoolId);
-      return [o.serial, escapeHtml(o.title), o.date||'', escapeHtml(fullTimeRange(o.timeFrom,o.timeTo)), school?escapeHtml(school.name):'', escapeHtml(trainerNames(o))||'—', escapeHtml(trainerPhones(o)), o.completionStatus||'لم تنجز'];
+      return [o.serial, escapeHtml(o.title), fmtDate(o.date), escapeHtml(fullTimeRange(o.timeFrom,o.timeTo)), school?escapeHtml(school.name):'', escapeHtml(trainerNames(o))||'—', escapeHtml(trainerPhones(o)), o.completionStatus||'لم تنجز'];
     }
     function tableOf(list){
       return `<table><thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>
@@ -3031,7 +3054,7 @@ function renderReportsPage(c){
       const map = {
         'رقم التكليف': o.serial,
         'الفعالية': o.title,
-        'التاريخ': o.date||'',
+        'التاريخ': fmtDate(o.date),
         'الوقت': fullTimeRange(o.timeFrom,o.timeTo),
         'مكان التنفيذ': school?placeTypeLabel(school.level):'',
         'المكان': school?school.name:'',
@@ -3127,7 +3150,7 @@ function renderReportsPage(c){
     function rowOf(o){
       const school = state.schools.find(s=>s.id===o.schoolId);
       const supervisor = school ? school.supervisors.find(s=>s.id===o.supervisorId) : null;
-      return [o.serial, o.title, o.date||'', fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
+      return [o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), school?placeTypeLabel(school.level):'', school?school.name:'', supervisor?supervisor.phone||'':'', trainerNames(o), trainerPhones(o), o.completionStatus||'لم تنجز'];
     }
     function gen(){
       const from=document.getElementById('rp_from2').value, to=document.getElementById('rp_to2').value;
@@ -3193,7 +3216,7 @@ function renderReportsPage(c){
       const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs = Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs; return {o,hrs}; });
       const trainer=state.trainers.find(t=>t.id===tId);
       const table = `<table class="print-table"><thead><tr><th>م</th><th>عنوان الفعالية</th><th>التاريخ</th><th>الوقت</th><th>عدد الساعات</th></tr></thead><tbody>
-        ${rows.map(r=>`<tr><td>${r.o.serial}</td><td>${escapeHtml(r.o.title)}</td><td>${r.o.date||''}</td><td>${r.o.timeFrom||''}-${r.o.timeTo||''}</td><td>${r.hrs.toFixed(1)}</td></tr>`).join('') || '<tr><td colspan="5" class="empty-state">لا توجد بيانات</td></tr>'}
+        ${rows.map(r=>`<tr><td>${r.o.serial}</td><td>${escapeHtml(r.o.title)}</td><td>${r.fmtDate(o.date)}</td><td>${r.o.timeFrom||''}-${r.o.timeTo||''}</td><td>${r.hrs.toFixed(1)}</td></tr>`).join('') || '<tr><td colspan="5" class="empty-state">لا توجد بيانات</td></tr>'}
         </tbody></table><div style="margin-top:10px;font-weight:800;color:var(--maroon-800);">إجمالي الساعات: ${totalHours.toFixed(1)} ساعة</div>`;
       return {table, title:`تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''}`, from, to};
     }
@@ -3204,7 +3227,7 @@ function renderReportsPage(c){
       const list = state.orders.filter(o=>(o.trainerIds||[]).includes(tId) && (!from||o.date>=from) && (!to||o.date<=to)).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
       const trainer=state.trainers.find(t=>t.id===tId);
       let totalHours=0;
-      const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs=Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs; return [o.serial, o.title, o.date||'', fullTimeRange(o.timeFrom,o.timeTo), hrs.toFixed(1)]; });
+      const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs=Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs; return [o.serial, o.title, fmtDate(o.date), fullTimeRange(o.timeFrom,o.timeTo), hrs.toFixed(1)]; });
       rows.push(['', '', '', 'الإجمالي', totalHours.toFixed(1)]);
       exportToExcel('تقرير_ساعات.xlsx', ['م','عنوان الفعالية','التاريخ','الوقت','عدد الساعات'], rows, `تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''} (من ${from||'—'} إلى ${to||'—'})`);
     };
@@ -3215,7 +3238,7 @@ function renderReportsPage(c){
       const trainer=state.trainers.find(t=>t.id===tId);
       let totalHours=0;
       const rows = list.map(o=>{ let hrs=0; if(o.timeFrom && o.timeTo){ const s=parseDT(o.date,o.timeFrom), e=parseDT(o.date,o.timeTo); hrs = Math.max(0,(e-s)/3600000)*daysCount(o.date,o.dateTo); } totalHours+=hrs;
-        return [o.serial, escapeHtml(o.title), o.date||'', (o.timeFrom||'')+'-'+(o.timeTo||''), hrs.toFixed(1)]; });
+        return [o.serial, escapeHtml(o.title), fmtDate(o.date), (o.timeFrom||'')+'-'+(o.timeTo||''), hrs.toFixed(1)]; });
       doPrintDoc(buildReportDoc({ titleAr:`تقرير ساعات مقدم الفعالية: ${trainer?trainer.name:''}`, subtitle:`من ${from||'—'} إلى ${to||'—'}`,
         kpis:[{v:list.length,l:'عدد الفعاليات'},{v:totalHours.toFixed(1),l:'إجمالي الساعات'}],
         headers:['م','عنوان الفعالية','التاريخ','الوقت','عدد الساعات'], rows }), true, 'A4');
@@ -3468,7 +3491,7 @@ function renderResultsPage(c){
     const rows = rowsData(list);
     return `<table><thead><tr><th>م</th><th>أمر التكليف</th><th>عنوان الفعالية</th><th>التاريخ</th><th>الوقت</th><th>المكان</th><th>مقدم البرنامج</th><th>رقم هاتفه</th><th>الطلبات الإدارية للبرنامج</th><th>الإنجاز</th><th>من قيّم؟</th><th></th></tr></thead><tbody>
       ${rows.map(r=>`<tr>
-        <td>${r.i}</td><td>${r.o.serial}</td><td>${escapeHtml(r.o.title)}</td><td>${r.o.date||''}</td><td>${r.o.timeFrom||''}-${r.o.timeTo||''}</td>
+        <td>${r.i}</td><td>${r.o.serial}</td><td>${escapeHtml(r.o.title)}</td><td>${r.fmtDate(o.date)}</td><td>${r.o.timeFrom||''}-${r.o.timeTo||''}</td>
         <td>${r.school?escapeHtml(r.school.name):''}</td><td>${escapeHtml(trainerNames(r.o))}</td><td>${escapeHtml(trainerPhones(r.o))}</td>
         <td>${r.reqs||'—'}</td><td>${r.o.completionStatus||'لم تنجز'}</td><td>${r.evalSrc}</td>
         <td><button class="icon-btn" title="تقييم / تعديل" onclick="openEvaluationModal('${r.o.id}')">📝</button></td>
@@ -3478,7 +3501,7 @@ function renderResultsPage(c){
   document.getElementById('res_go').onclick=()=>{ document.getElementById('res_result').innerHTML = tableHtml(getList()); };
   document.getElementById('res_print').onclick=()=>{
     const list=getList(); const from=document.getElementById('res_from').value, to=document.getElementById('res_to').value;
-    const rows = rowsData(list).map(r=>[r.i, r.o.serial, escapeHtml(r.o.title), r.o.date||'', (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.school?escapeHtml(r.school.name):'', escapeHtml(trainerNames(r.o)), escapeHtml(trainerPhones(r.o)), r.reqs||'—', r.o.completionStatus||'لم تنجز']);
+    const rows = rowsData(list).map(r=>[r.i, r.o.serial, escapeHtml(r.o.title), fmtDate(r.o.date), (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.school?escapeHtml(r.school.name):'', escapeHtml(trainerNames(r.o)), escapeHtml(trainerPhones(r.o)), r.reqs||'—', r.o.completionStatus||'لم تنجز']);
     doPrintDoc(buildReportDoc({
       titleAr:'النتائج والتقييمات', subtitle:`من ${from||'—'} إلى ${to||'—'}`,
       headers:['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج','الإنجاز'],
@@ -3487,7 +3510,7 @@ function renderResultsPage(c){
   };
   document.getElementById('res_excel').onclick=()=>{
     const list=getList();
-    const rows = rowsData(list).map(r=>[r.i, r.o.serial, r.o.title, r.o.date||'', (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.school?r.school.name:'', trainerNames(r.o), trainerPhones(r.o), r.reqs||'—', r.o.completionStatus||'لم تنجز', r.evalSrc]);
+    const rows = rowsData(list).map(r=>[r.i, r.o.serial, r.o.title, fmtDate(r.o.date), (r.o.timeFrom||'')+'-'+(r.o.timeTo||''), r.school?r.school.name:'', trainerNames(r.o), trainerPhones(r.o), r.reqs||'—', r.o.completionStatus||'لم تنجز', r.evalSrc]);
     exportToExcel('النتائج.xlsx', ['م','أمر التكليف','عنوان الفعالية','التاريخ','الوقت','المكان','مقدم البرنامج','رقم هاتفه','الطلبات الإدارية للبرنامج','الإنجاز','من قيّم؟'], rows, 'النتائج والتقييمات');
   };
   document.getElementById('res_go').click();
@@ -3586,7 +3609,7 @@ function renderDistributionsTabContent(c){
     const {start,end} = periodBounds(period, dateStr);
     const sheets = state.trainers.map(t=>{
       const list = state.orders.filter(o=>(o.trainerIds||[]).includes(t.id) && o.date>=start && o.date<=end).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-      return {name:t.name, headers:['العنوان','من تاريخ','إلى تاريخ','عدد الأيام','الوقت','عدد الساعات','المدرسة','الإنجاز'], rows:list.map(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return [o.title, o.date||'', o.dateTo||o.date||'', daysCount(o.date,o.dateTo), fullTimeRange(o.timeFrom,o.timeTo), hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo), s?s.name:'', o.completionStatus||'لم تنجز']; })};
+      return {name:t.name, headers:['العنوان','من تاريخ','إلى تاريخ','عدد الأيام','الوقت','عدد الساعات','المدرسة','الإنجاز'], rows:list.map(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return [o.title, fmtDate(o.date), fmtDate(o.dateTo||o.date), daysCount(o.date,o.dateTo), fullTimeRange(o.timeFrom,o.timeTo), hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo), s?s.name:'', o.completionStatus||'لم تنجز']; })};
     });
     exportToExcelMultiSheet('التوزيعات.xlsx', sheets, `التوزيعات (${start} إلى ${end})`);
   };
@@ -3656,7 +3679,7 @@ function renderDistributionsTabContent(c){
         ${list.length? list.map(o=>{
           const school=state.schools.find(s=>s.id===o.schoolId);
           const field=state.fields.find(f=>f.id===o.fieldId);
-          const dateRange = o.dateTo && o.dateTo!==o.date ? `${o.date||''} — إلى — ${o.dateTo}` : (o.date||'');
+          const dateRange = o.dateTo && o.dateTo!==o.date ? `${fmtDate(o.date)} — إلى — ${fmtDate(o.dateTo)}` : fmtDate(o.date);
           return `<div style="border-bottom:1px dashed var(--line); padding:8px 0; font-size:13px; line-height:1.8;">
             <strong>${escapeHtml(o.title)}</strong> ${field?`<span class="badge">${escapeHtml(field.name)}</span>`:''}<br>
             📅 ${dateRange} (${daysCount(o.date,o.dateTo)} يوم) — ⏰ ${o.timeFrom||''}-${o.timeTo||''} (${hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo)} ساعة)<br>
@@ -3686,7 +3709,7 @@ function renderDistributionsTabContent(c){
       <div class="sec-t">${escapeHtml(t.name)} (${stats.events} فعالية)</div>
       <div style="font-size:9.5pt;margin-bottom:2mm;">عدد الأيام: ${stats.daysTotal} — عدد الساعات: ${stats.hoursTotal} — عدد المدارس: ${stats.schoolsTotal}${stats.byPath.length?' — '+stats.byPath.map(p=>`${escapeHtml(p.name)}: ${p.count}`).join('، '):''}</div>
       <table><thead><tr><th>العنوان</th><th>التاريخ</th><th>عدد الأيام</th><th>الوقت</th><th>عدد الساعات</th><th>المدرسة</th><th>الإنجاز</th></tr></thead><tbody>
-        ${list.map(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return `<tr><td>${escapeHtml(o.title)}</td><td>${o.date||''}</td><td>${daysCount(o.date,o.dateTo)}</td><td>${escapeHtml(fullTimeRange(o.timeFrom,o.timeTo))}</td><td>${hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo)}</td><td>${s?escapeHtml(s.name):''}</td><td>${o.completionStatus||'لم تنجز'}</td></tr>`; }).join('')}
+        ${list.map(o=>{ const s=state.schools.find(x=>x.id===o.schoolId); return `<tr><td>${escapeHtml(o.title)}</td><td>${fmtDate(o.date)}</td><td>${daysCount(o.date,o.dateTo)}</td><td>${escapeHtml(fullTimeRange(o.timeFrom,o.timeTo))}</td><td>${hoursDuration(o.timeFrom,o.timeTo,o.date,o.dateTo)}</td><td>${s?escapeHtml(s.name):''}</td><td>${o.completionStatus||'لم تنجز'}</td></tr>`; }).join('')}
       </tbody></table>`).join('');
     doPrintDoc(buildReportDoc({
       titleAr:'توزيع الفعاليات على مقدمي المبادرة', subtitle:`من ${start} إلى ${end}`,
@@ -3768,7 +3791,7 @@ function renderTrainerPortalPage(c){
         const reqs = (o.adminRequests||[]).map(id=>{const r=state.adminRequestsList.find(x=>x.id===id); return r?r.name:'';}).filter(Boolean).join('، ');
         const statusBadge = o.completionStatus==='تم' ? '<span class="badge ok">تم</span>' : o.completionStatus==='لم يتم' ? '<span class="badge bad">لم يتم</span>' : o.completionStatus==='الغيت' ? '<span class="badge bad">أُلغيت</span>' : o.completionStatus==='المشرف لا يرد' ? '<span class="badge busy">المشرف لا يرد</span>' : '<span class="badge">لم تنجز بعد</span>';
         return `<tr><td>${i+1}</td><td><span class="badge">${o.serial}</span></td><td>${escapeHtml(o.title)}</td><td>${school?escapeHtml(school.name):''}</td>
-          <td>${supervisor?escapeHtml(supervisor.phone||''):''}</td><td>${o.date||''}</td><td>${o.timeFrom||''}-${o.timeTo||''}</td><td>${reqs||'—'}</td>
+          <td>${supervisor?escapeHtml(supervisor.phone||''):''}</td><td>${fmtDate(o.date)}</td><td>${o.timeFrom||''}-${o.timeTo||''}</td><td>${reqs||'—'}</td>
           <td>${statusBadge}</td><td><button class="icon-btn" title="تسجيل الإنجاز والتقييم" onclick="openEvaluationModal('${o.id}')">📝</button></td></tr>`;
       }).join('')}</tbody></table>`;
   }
@@ -3828,7 +3851,7 @@ function renderTrainerPortalPage(c){
         <div class="stat-box"><div class="num">${notEvaluated.length}</div><div class="lbl">بانتظار التقييم</div></div>
       </div>
       <table><thead><tr><th>م</th><th>العنوان</th><th>التاريخ</th><th>الوقت</th><th>عدد الساعات</th></tr></thead><tbody>
-        ${rows.length?rows.map(r=>`<tr><td>${r.o.serial}</td><td>${escapeHtml(r.o.title)}</td><td>${r.o.date||''}</td><td>${r.o.timeFrom||''}-${r.o.timeTo||''}</td><td>${r.hrs.toFixed(1)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty-state">لا توجد بيانات</td></tr>'}
+        ${rows.length?rows.map(r=>`<tr><td>${r.o.serial}</td><td>${escapeHtml(r.o.title)}</td><td>${r.fmtDate(o.date)}</td><td>${r.o.timeFrom||''}-${r.o.timeTo||''}</td><td>${r.hrs.toFixed(1)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty-state">لا توجد بيانات</td></tr>'}
       </tbody></table>
       <button class="btn btn-outline btn-sm" style="margin-top:12px;" id="tp_print_hours">🖨️ طباعة</button>
     </div>`;
@@ -3997,7 +4020,7 @@ function trainerOrdersTable(list){
     ${list.map(o=>{
       const school=state.schools.find(s=>s.id===o.schoolId);
       const statusBadge = o.completionStatus==='تم' ? '<span class="badge ok">تم</span>' : o.completionStatus==='لم يتم' ? '<span class="badge bad">لم يتم</span>' : o.completionStatus==='الغيت' ? '<span class="badge bad">أُلغيت</span>' : o.completionStatus==='المشرف لا يرد' ? '<span class="badge busy">المشرف لا يرد</span>' : '<span class="badge">لم تنجز بعد</span>';
-      return `<tr><td><span class="badge">${o.serial}</span></td><td>${escapeHtml(o.title)}</td><td>${o.date||''}</td><td>${o.timeFrom||''}-${o.timeTo||''}</td>
+      return `<tr><td><span class="badge">${o.serial}</span></td><td>${escapeHtml(o.title)}</td><td>${fmtDate(o.date)}</td><td>${o.timeFrom||''}-${o.timeTo||''}</td>
         <td>${school?escapeHtml(school.name):''}</td><td>${statusBadge}</td>
         <td><button class="icon-btn" title="تسجيل الإنجاز والتقييم" onclick="openEvaluationModal('${o.id}')">📝</button></td></tr>`;
     }).join('')}</tbody></table>`;
@@ -4006,7 +4029,7 @@ function trainerOrdersTablePrint(list){
   if(!list.length) return `<div class="empty-state">لا توجد فعاليات</div>`;
   return `<table><thead><tr><th>م</th><th>العنوان</th><th>التاريخ</th><th>الوقت</th><th>المدرسة</th><th>الإنجاز</th></tr></thead><tbody>
     ${list.map(o=>{ const school=state.schools.find(s=>s.id===o.schoolId);
-      return `<tr><td>${o.serial}</td><td>${escapeHtml(o.title)}</td><td>${o.date||''}</td><td>${o.timeFrom||''}-${o.timeTo||''}</td><td>${school?escapeHtml(school.name):''}</td><td>${o.completionStatus||'لم تنجز'}</td></tr>`;
+      return `<tr><td>${o.serial}</td><td>${escapeHtml(o.title)}</td><td>${fmtDate(o.date)}</td><td>${o.timeFrom||''}-${o.timeTo||''}</td><td>${school?escapeHtml(school.name):''}</td><td>${o.completionStatus||'لم تنجز'}</td></tr>`;
     }).join('')}</tbody></table>`;
 }
 async function markNotifRead(id){ const n=state.notifications.find(x=>x.id===id); if(n){ n.read=true; await saveState(); render(); } }

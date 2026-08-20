@@ -2579,12 +2579,15 @@ function renderQuranEntryForm(sub){
 function renderQuranReportTab(sub){
   sub.innerHTML = `<div class="card">
     <h2>تقرير الأنشطة القرآنية</h2>
-    <div class="grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);">
       <div class="field"><label>البرنامج</label><select id="qr_program"><option value="">الكل</option><option value="روح">روح</option><option value="الرحيق">الرحيق</option></select></div>
-      <div class="field"><label>الشهر</label><input id="qr_month" type="month" lang="en"></div>
-      <div class="field" style="align-self:flex-end;"><button class="btn btn-primary" id="qr_go">عرض</button></div>
+      <div class="field"><label>الشهر (شهر واحد)</label><input id="qr_month" type="month" lang="en"></div>
+      <div class="field"><label>من شهر</label><input id="qr_from" type="month" lang="en"></div>
+      <div class="field"><label>إلى شهر</label><input id="qr_to" type="month" lang="en"></div>
     </div>
-    <div style="display:flex;gap:8px;">
+    <div class="helper" style="margin-bottom:8px;">اترك "من/إلى" فارغين لعرض كل الأشهر، أو استخدمهما لتحديد فترة. عند تعبئة "الشهر" يُعرض ذلك الشهر فقط.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="qr_go">عرض</button>
       <button class="icon-btn rect" id="qr_print" title="طباعة">🖨️</button>
       <button class="icon-btn rect" id="qr_excel" title="تنزيل Excel">📊</button>
       <button class="icon-btn rect" id="qr_pdf" title="تنزيل PDF">📄</button>
@@ -2595,7 +2598,14 @@ function renderQuranReportTab(sub){
   function getList(){
     const program=document.getElementById('qr_program').value;
     const month=document.getElementById('qr_month').value;
-    return state.quranActivities.filter(x=> (!program||x.programName===program) && (!month||x.month===month))
+    const from=document.getElementById('qr_from').value;
+    const to=document.getElementById('qr_to').value;
+    return state.quranActivities.filter(x=>
+        (!program||x.programName===program) &&
+        (!month||x.month===month) &&
+        (!from||(x.month||'')>=from) &&
+        (!to||(x.month||'')<=to)
+      )
       .sort((a,b)=> a.month.localeCompare(b.month) || a.programName.localeCompare(b.programName));
   }
   function totalsOf(list){
@@ -2634,10 +2644,17 @@ function renderQuranReportTab(sub){
   }
   document.getElementById('qr_go').onclick=draw;
 
+  function periodLabel(){
+    const m=document.getElementById('qr_month').value;
+    const f=document.getElementById('qr_from').value, t=document.getElementById('qr_to').value;
+    if(m) return monthNameAr(m);
+    if(f||t) return `من ${f?monthNameAr(f):'البداية'} إلى ${t?monthNameAr(t):'النهاية'}`;
+    return 'كل الأشهر';
+  }
   document.getElementById('qr_excel').onclick=()=>{
     const list=getList();
     const rows=list.map(x=>[x.programName,monthNameAr(x.month),x.dateFrom||'',x.dateTo||'',x.execDays,x.method,x.teachersCount,x.studentsCount,x.memPages,x.memParts,x.revPages,x.revParts,x.completionPct]);
-    exportToExcel('تقرير_الأنشطة_القرآنية.xlsx', ['اسم البرنامج','الشهر','من','إلى','أيام التنفيذ','آلية التسميع','المعلمين','الطلاب','صفحات الحفظ','الأجزاء المحفوظة','صفحات المراجعة','الأجزاء المراجعة','نسبة الإنجاز %'], rows, 'تقرير الأنشطة القرآنية');
+    exportToExcel('تقرير_الأنشطة_القرآنية.xlsx', ['اسم البرنامج','الشهر','من','إلى','أيام التنفيذ','آلية التسميع','المعلمين','الطلاب','صفحات الحفظ','الأجزاء المحفوظة','صفحات المراجعة','الأجزاء المراجعة','نسبة الإنجاز %'], rows, `تقرير الأنشطة القرآنية (${periodLabel()})`);
   };
   function printIt(){
     const list=getList();
@@ -2645,7 +2662,7 @@ function renderQuranReportTab(sub){
     const avgPct = list.length ? (t.pctSum/list.length).toFixed(1) : '0';
     const rows=list.map(x=>[escapeHtml(x.programName),monthNameAr(x.month),`${x.dateFrom||''} — ${x.dateTo||''}`,x.execDays,escapeHtml(x.method),x.teachersCount,x.studentsCount,x.memPages,x.memParts,x.revPages,x.revParts,x.completionPct+'%']);
     doPrintDoc(buildReportDoc({
-      titleAr:'تقرير الأنشطة القرآنية — روح والرحيق', subtitle:`عدد السجلات: ${list.length}`,
+      titleAr:'تقرير الأنشطة القرآنية — روح والرحيق', subtitle:`${periodLabel()} — عدد السجلات: ${list.length}`,
       kpis:[{v:t.teachersCount,l:'إجمالي المعلمين'},{v:t.studentsCount,l:'إجمالي الطلاب'},{v:t.memPages,l:'إجمالي صفحات الحفظ'},{v:t.revPages,l:'إجمالي صفحات المراجعة'},{v:avgPct+'%',l:'متوسط نسبة الإنجاز'}],
       headers:['اسم البرنامج','الشهر','الفترة','أيام التنفيذ','آلية التسميع','المعلمين','الطلاب','صفحات الحفظ','الأجزاء المحفوظة','صفحات المراجعة','الأجزاء المراجعة','نسبة الإنجاز'],
       rows

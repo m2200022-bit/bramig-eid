@@ -4478,7 +4478,7 @@ function renderQuranReportTab(sub){
     const rows=list.map(x=>[escapeHtml(x.programName),monthNameAr(x.month),`${fmtDate(x.dateFrom)} — ${fmtDate(x.dateTo)}`,x.execDays,escapeHtml(x.method),x.teachersCount,x.studentsCount,x.memPages,x.memParts,x.revPages,x.revParts,x.completionPct+'%']);
     doPrintDoc(buildReportDoc({
       titleAr:'تقرير الأنشطة القرآنية — روح والرحيق', subtitle:`${periodLabel()} — عدد السجلات: ${list.length}`, subtitleNumFont:true,
-      kpis:[{v:t.teachersCount,l:'إجمالي المعلمين'},{v:t.studentsCount,l:'إجمالي الطلاب'},{v:t.memPages,l:'إجمالي صفحات الحفظ'},{v:t.revPages,l:'إجمالي صفحات المراجعة'},{v:avgPct+'%',l:'متوسط نسبة الإنجاز'}],
+      kpis:[{v:t.teachersCount,l:'🧑‍🏫 إجمالي المعلمين'},{v:t.studentsCount,l:'👥 إجمالي الطلاب'},{v:t.memPages,l:'📖 إجمالي صفحات الحفظ'},{v:t.revPages,l:'🔁 إجمالي صفحات المراجعة'},{v:avgPct+'%',l:'📊 متوسط نسبة الإنجاز'}],
       headers:['اسم البرنامج','الشهر','الفترة','أيام التنفيذ','آلية التسميع','المعلمين','الطلاب','صفحات الحفظ','الأجزاء المحفوظة','صفحات المراجعة','الأجزاء المراجعة','نسبة الإنجاز'],
       rows
     }), true, 'A4');
@@ -4510,7 +4510,7 @@ function renderReportsPage(c){
   <div id="reportContent"></div>`;
   let mode='start';
   const tabs = {start:'rt_start', trainer:'rt_trainer', school:'rt_school', hours:'rt_hours', eval:'rt_eval', general:'rt_general', bypath:'rt_bypath', stats:'rt_stats'};
-  function setActive(){ Object.entries(tabs).forEach(([k,id])=>document.getElementById(id).classList.toggle('active', mode===k)); }
+  function setActive(){ Object.entries(tabs).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) el.classList.toggle('active', mode===k); }); }
   function drawStart(){
     const box=document.getElementById('reportContent');
     box.innerHTML = `<div class="card">
@@ -4527,6 +4527,8 @@ function renderReportsPage(c){
           <option value="trainer">تقرير مقدم الفعالية</option>
           <option value="school">تقرير فعاليات مدرسة خلال فترة</option>
           <option value="bypath">تقرير حسب مسار / مجال المبادرة</option>
+          <option value="fieldSum">تقرير مجال المبادرة (ملخّص)</option>
+          <option value="quran">تقرير الأنشطة القرآنية — روح والرحيق</option>
           <option value="stats">الإحصائيات</option>
           <option value="adminReq">الطلبات الإدارية</option>
           <option value="eval">النتائج والإنجازات</option>
@@ -4541,6 +4543,8 @@ function renderReportsPage(c){
       if(type==='trainer'){ mode='trainer'; drawTrainer(); setActive(); if(from) document.getElementById('rp_from').value=from; if(to) document.getElementById('rp_to').value=to; }
       else if(type==='school'){ mode='school'; drawSchool(); setActive(); if(from) document.getElementById('rp_from2').value=from; if(to) document.getElementById('rp_to2').value=to; }
       else if(type==='bypath'){ mode='bypath'; drawByPath(); setActive(); if(from) document.getElementById('bp_from').value=from; if(to) document.getElementById('bp_to').value=to; }
+      else if(type==='fieldSum'){ mode='fieldSum'; drawFieldSummary(); setActive(); if(from) document.getElementById('fs_from').value=from; if(to) document.getElementById('fs_to').value=to; document.getElementById('fs_go').click(); }
+      else if(type==='quran'){ currentPage='quranActivities'; quranSubTab='report'; render(); }
       else if(type==='stats'){ mode='stats'; renderStatsPage(document.getElementById('reportContent')); setActive(); }
       else if(type==='eval'){ mode='eval'; drawEval(); setActive(); if(from) document.getElementById('ev_from').value=from; if(to) document.getElementById('ev_to').value=to; }
       else if(type==='adminReq'){ currentPage='distributions'; distSubTab='adminReq'; render(); }
@@ -4555,6 +4559,108 @@ function renderReportsPage(c){
   document.getElementById('rt_general').onclick=()=>{mode='general'; drawGeneral(); setActive();};
   document.getElementById('rt_bypath').onclick=()=>{mode='bypath'; drawByPath(); setActive();};
   document.getElementById('rt_stats').onclick=()=>{mode='stats'; renderStatsPage(document.getElementById('reportContent')); setActive();};
+
+  /* ══ تقرير مجال المبادرة (ملخّص): صف لكل مجال بإجمالياته ══ */
+  function drawFieldSummary(){
+    const box=document.getElementById('reportContent');
+    box.innerHTML = `<div class="card">
+      <h2>تقرير مجال المبادرة</h2>
+      <div class="rp-dates" style="margin-bottom:12px;">
+        <div class="rp-date"><label>من تاريخ</label><input id="fs_from" type="date" lang="en-GB"></div>
+        <div class="rp-date"><label>إلى تاريخ</label><input id="fs_to" type="date" lang="en-GB"></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+        <label class="checkbox-chip"><input type="checkbox" id="fs_done" checked> المنجزة</label>
+        <label class="checkbox-chip"><input type="checkbox" id="fs_notDone" checked> غير المنجزة</label>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="fs_go">عرض</button>
+        <button class="icon-btn rect" id="fs_print" data-tip="طباعة" title="طباعة">🖨️</button>
+        <button class="icon-btn rect" id="fs_pdf" data-tip="تنزيل PDF" title="تنزيل PDF">📄</button>
+        <button class="icon-btn rect" id="fs_excel" data-tip="تنزيل Excel" title="تنزيل Excel">📊</button>
+      </div>
+      <div id="fs_result" style="margin-top:14px;"></div>
+    </div>`;
+
+    const COLS = ['مجال المبادرة','الأيام','الساعات','الفعاليات','المنفّذون','المستهدفون','الأماكن'];
+    function gen(){
+      const from=document.getElementById('fs_from').value, to=document.getElementById('fs_to').value;
+      const wDone=document.getElementById('fs_done').checked;
+      const wNot=document.getElementById('fs_notDone').checked;
+      /* التقاطع مع الفترة حتى تُحتسب الفعاليات متعددة الأيام */
+      const base = state.orders.filter(o=>{
+        const isDone = o.completionStatus==='تم';
+        if(isDone && !wDone) return false;
+        if(!isDone && !wNot) return false;
+        const s=o.date||'', e=o.dateTo||o.date||'';
+        if(!s && !e) return false;
+        if(from && e && e<from) return false;
+        if(to && s && s>to) return false;
+        return true;
+      });
+      const rows = (state.fields||[]).map(f=>{
+        const list = base.filter(o=>o.fieldId===f.id);
+        return {
+          name: f.name,
+          days: list.reduce((s,o)=>s+daysCount(o.date,o.dateTo),0),
+          hours: Math.round(list.reduce((s,o)=>s+computeHours(o.timeFrom,o.timeTo,o.date,o.dateTo),0)*10)/10,
+          events: list.length,
+          trainers: new Set(list.flatMap(o=>o.trainerIds||[])).size,
+          people: list.reduce((s,o)=>s+(Number(o.participantsCount)||0),0),
+          places: new Set(list.map(o=>o.schoolId).filter(Boolean)).size,
+        };
+      }).filter(r=>r.events>0).sort((a,b)=>b.events-a.events);
+      const tot = {
+        name:'الإجمالي',
+        days: rows.reduce((s,r)=>s+r.days,0),
+        hours: Math.round(rows.reduce((s,r)=>s+r.hours,0)*10)/10,
+        events: rows.reduce((s,r)=>s+r.events,0),
+        trainers: new Set(base.flatMap(o=>o.trainerIds||[])).size,
+        people: rows.reduce((s,r)=>s+r.people,0),
+        places: new Set(base.map(o=>o.schoolId).filter(Boolean)).size,
+      };
+      return {rows, tot, from, to};
+    }
+    const asArr = r => [r.name, r.days, r.hours, r.events, r.trainers, r.people, r.places];
+    function tableHtml(rows, tot){
+      if(!rows.length) return `<div class="empty-state">لا توجد فعاليات ضمن هذه الفترة</div>`;
+      return `<table><thead><tr>${COLS.map(c=>`<th>${escapeHtml(c)}</th>`).join('')}</tr></thead><tbody>
+        ${rows.map(r=>`<tr>${asArr(r).map((v,i)=>`<td${i===0?' style="text-align:right;font-weight:700;"':''}>${escapeHtml(String(v))}</td>`).join('')}</tr>`).join('')}
+        <tr style="background:#FAF9F7;font-weight:700;">${asArr(tot).map((v,i)=>`<td${i===0?' style="text-align:right;"':''}>${escapeHtml(String(v))}</td>`).join('')}</tr>
+      </tbody></table>`;
+    }
+    document.getElementById('fs_go').onclick=()=>{
+      const {rows,tot}=gen();
+      const b=document.getElementById('fs_result');
+      b.innerHTML = tableHtml(rows,tot); enhanceReportTable(b);
+    };
+    function printIt(){
+      const {rows,tot,from,to}=gen();
+      if(!rows.length){ toast('لا توجد بيانات ضمن هذه الفترة'); return; }
+      doPrintDoc(buildReportDoc({
+        titleAr:'تقرير مجال المبادرة',
+        subtitle:`من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'}`,
+        kpis:[
+          {v:tot.events,l:'📋 الفعاليات'}, {v:tot.days,l:'🗓️ الأيام'},
+          {v:tot.hours,l:'⏱️ الساعات'}, {v:tot.people,l:'👥 المستهدفون'},
+        ],
+        headers: COLS,
+        rows: rows.map(r=>asArr(r).map(v=>escapeHtml(String(v))))
+              .concat([asArr(tot).map(v=>`<b>${escapeHtml(String(v))}</b>`)])
+      }), true, 'A4');
+    }
+    document.getElementById('fs_print').onclick=printIt;
+    document.getElementById('fs_pdf').onclick=printIt;
+    document.getElementById('fs_excel').onclick=()=>{
+      const {rows,tot,from,to}=gen();
+      if(!rows.length){ toast('لا توجد بيانات ضمن هذه الفترة'); return; }
+      exportToExcel('تقرير_مجال_المبادرة.xlsx', COLS, rows.map(asArr).concat([asArr(tot)]),
+        `تقرير مجال المبادرة (من ${from?fmtDate(from):'—'} إلى ${to?fmtDate(to):'—'})`);
+    };
+    ['fs_from','fs_to'].forEach(id=>document.getElementById(id).addEventListener('change',()=>document.getElementById('fs_go').click()));
+    ['fs_done','fs_notDone'].forEach(id=>document.getElementById(id).addEventListener('change',()=>document.getElementById('fs_go').click()));
+    document.getElementById('fs_go').click();
+  }
 
   function drawByPath(){
     const box=document.getElementById('reportContent');
